@@ -1,41 +1,51 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export const AppColors = {
+  background: '#FFF8F0',
+  surface: '#FFFFFF',
+  text: '#1A1A1A',
+  textSecondary: '#888888',
+  expense: '#C62828',
+  income: '#2E7D32',
+  primary: '#1B6B52',
+  primaryLight: '#E8F5E9',
+  border: '#E8E0D8',
+  borderLight: '#F0EBE4',
+  progressGreen: '#43A047',
+  progressRed: '#E53935',
+  calculator: '#7BA68C',
+  calculatorDark: '#5E8A6E',
+  fab: '#1B6B52',
+  tabActive: '#1B6B52',
+  tabInactive: '#999999',
+  white: '#FFFFFF',
+  shadow: 'rgba(0,0,0,0.08)',
+};
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: AppColors.text,
+    background: AppColors.background,
+    tint: AppColors.primary,
+    icon: AppColors.tabInactive,
+    tabIconDefault: AppColors.tabInactive,
+    tabIconSelected: AppColors.tabActive,
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
-    tint: tintColorDark,
+    tint: '#fff',
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: '#fff',
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
