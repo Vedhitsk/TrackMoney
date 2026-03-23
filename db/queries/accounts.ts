@@ -74,12 +74,12 @@ export async function listAccountsWithBalances(): Promise<AccountWithBalance[]> 
     for (const tx of allTx) {
       const accountId = tx.accountId ? Number(tx.accountId) : null;
       const toAccountId = tx.toAccountId ? Number(tx.toAccountId) : null;
-      const amount = Number(tx.actualAmount ?? tx.rawAmount ?? 0);
+      const amount = Number(tx.rawAmount ?? 0);
       const type = tx.type as string;
 
       if (accountId === acct.id) {
         if (type === "expense" || type === "transfer") balance -= amount;
-        if (type === "income") balance += amount;
+        if (type === "income" || type === "settlement") balance += amount;
       }
       if (toAccountId === acct.id && type === "transfer") {
         balance += amount;

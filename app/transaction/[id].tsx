@@ -21,7 +21,7 @@ import { addKeywordsToCategory } from "@/db/queries/categories";
 import type { TransactionType } from "@/types";
 import { AppColors } from "@/constants/theme";
 
-type UIType = "income" | "expense" | "transfer";
+type UIType = "income" | "expense" | "transfer" | "settlement";
 
 function extractTokens(input: string): string[] {
   return input
@@ -33,7 +33,8 @@ function extractTokens(input: string): string[] {
 }
 
 function txTypeToUI(type: TransactionType): UIType {
-  if (type === "income" || type === "settlement") return "income";
+  if (type === "settlement") return "settlement";
+  if (type === "income") return "income";
   if (type === "transfer") return "transfer";
   return "expense";
 }
@@ -177,16 +178,16 @@ export default function EditTransactionScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {/* Type Toggle */}
         <View style={styles.typeRow}>
-          {(["income", "expense", "transfer"] as UIType[]).map((t) => {
+          {(["income", "expense", "transfer", "settlement"] as UIType[]).map((t) => {
             const active = uiType === t;
             return (
               <TouchableOpacity
                 key={t}
                 style={[styles.typeChip, active && styles.typeChipActive]}
                 onPress={() => setUIType(t)}>
-                {active && <MaterialIcons name="check-circle" size={15} color={AppColors.primary} />}
+                {active && <MaterialIcons name="check-circle" size={13} color={AppColors.primary} />}
                 <ThemedText style={[styles.typeChipText, active && styles.typeChipActiveText]}>
-                  {t.toUpperCase()}
+                  {t === "settlement" ? "SETTLE" : t.toUpperCase()}
                 </ThemedText>
               </TouchableOpacity>
             );
@@ -400,15 +401,17 @@ const styles = StyleSheet.create({
   },
   typeRow: {
     flexDirection: "row",
-    justifyContent: "center",
-    gap: 4,
+    justifyContent: "space-around",
+    flexWrap: "nowrap",
+    gap: 2,
+    marginHorizontal: -4,
   },
   typeChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 2,
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 6,
     borderBottomWidth: 2,
     borderBottomColor: "transparent",
   },
@@ -416,7 +419,7 @@ const styles = StyleSheet.create({
     borderBottomColor: AppColors.primary,
   },
   typeChipText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     color: AppColors.textSecondary,
   },

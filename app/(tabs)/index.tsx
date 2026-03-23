@@ -137,7 +137,7 @@ export default function RecordsScreen() {
       const prefs = await loadRecordsFilterPrefs();
       if (prefs) {
         setFilterMode(prefs.filterMode);
-        setAnchor(prefs.anchor);
+        // deliberately leaving out setAnchor to always default to today on fresh load
       }
       setFilterPrefsHydrated(true);
     })();
@@ -313,7 +313,7 @@ export default function RecordsScreen() {
                     <ThemedText style={styles.txAccount} numberOfLines={1}>
                       {isTransfer ? "Account transfer" : catName}
                       {item.isShared ? " · Shared" : ""}
-                      {item.isExcluded && !isTransfer ? " · Excluded" : ""}
+                      {item.type === "settlement" ? " · Settled" : item.isExcluded && !isTransfer ? " · Excluded" : ""}
                     </ThemedText>
                   </View>
                   <ThemedText style={[styles.txAmount, { color: amountColor }]}>

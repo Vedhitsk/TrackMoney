@@ -145,6 +145,14 @@ export default function SettingsScreen() {
               : "Not available (Android only)",
           onPress: () => {},
         },
+        {
+          icon: "picture-as-pdf",
+          label: "Import Bank Statement (PDF)",
+          sub: "Requires internet connection. Coming soon.",
+          onPress: () => {
+            Alert.alert("Coming Soon", "PDF import will use AI to parse transactions. This feature will require an internet connection and isn't quite ready yet!");
+          },
+        },
       ],
     },
     {
