@@ -1,23 +1,23 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  SectionList,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Modal,
+    SectionList,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { ThemedText } from "@/components/themed-text";
-import { useTransactionStore } from "@/store/useTransactionStore";
-import {
-  loadRecordsFilterPrefs,
-  saveRecordsFilterPrefs,
-} from "@/lib/recordsFilterPrefs";
 import { AppColors } from "@/constants/theme";
+import {
+    loadRecordsFilterPrefs,
+    saveRecordsFilterPrefs,
+} from "@/lib/recordsFilterPrefs";
+import { useTransactionStore } from "@/store/useTransactionStore";
 import type { Transaction } from "@/types";
 import { formatMoneyINR } from "@/types";
 
@@ -31,6 +31,11 @@ function getCategoryLabel(categoryId: number | null, categories: { id: number; n
 function getCategoryIcon(categoryId: number | null, categories: { id: number; icon: string }[]) {
   if (!categoryId) return "💰";
   return categories.find((c) => c.id === categoryId)?.icon ?? "💰";
+}
+
+function getAccountLabel(accountId: number | null, accounts: { id: number; name: string }[]) {
+  if (!accountId) return "No Account";
+  return accounts.find((a) => a.id === accountId)?.name ?? "No Account";
 }
 
 function groupByDate(txns: Transaction[]): { title: string; data: Transaction[] }[] {
@@ -114,6 +119,8 @@ export default function RecordsScreen() {
   const {
     categories,
     loadCategories,
+    accounts,
+    loadAccounts,
     pendingTransactions,
     refreshPendingTransactions,
     allTransactions,
@@ -128,6 +135,7 @@ export default function RecordsScreen() {
 
   useEffect(() => {
     void loadCategories();
+    void loadAccounts();
     void refreshPendingTransactions();
     void refreshAllTransactions();
   }, []);
@@ -256,7 +264,7 @@ export default function RecordsScreen() {
 
       {/* Pending Review Banner */}
       {pendingCount > 0 && (
-        <TouchableOpacity style={styles.pendingBanner} onPress={() => {}}>
+        <TouchableOpacity style={styles.pendingBanner} onPress={() => router.push("/transaction/pending")}>
           <MaterialIcons name="info-outline" size={18} color={AppColors.primary} />
           <ThemedText style={styles.pendingText}>
             {pendingCount} transaction{pendingCount > 1 ? "s" : ""} need review
@@ -286,6 +294,7 @@ export default function RecordsScreen() {
           renderItem={({ item }) => {
             const icon = getCategoryIcon(item.categoryId, categories);
             const catName = getCategoryLabel(item.categoryId, categories);
+            const accountName = getAccountLabel(item.accountId, accounts);
             const isExpense = item.type === "expense";
             const isIncome = item.type === "income";
             const isTransfer = item.type === "transfer";
@@ -308,10 +317,10 @@ export default function RecordsScreen() {
                   </View>
                   <View style={styles.txInfo}>
                     <ThemedText style={styles.txCategory} numberOfLines={1}>
-                      {isTransfer ? "Transfer" : item.merchant || catName}
+                      {isTransfer ? "Transfer" : catName}
                     </ThemedText>
                     <ThemedText style={styles.txAccount} numberOfLines={1}>
-                      {isTransfer ? "Account transfer" : catName}
+                      {isTransfer ? "Account transfer" : accountName}
                       {item.isShared ? " · Shared" : ""}
                       {item.type === "settlement" ? " · Settled" : item.isExcluded && !isTransfer ? " · Excluded" : ""}
                     </ThemedText>

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -17,6 +19,8 @@ import * as Sharing from "expo-sharing";
 import { ThemedText } from "@/components/themed-text";
 import { exportTrackMoneyData, importTrackMoneyData } from "@/lib/serialization/trackmoney";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { parseSmsToTransactionDraft } from "@/lib/sms/smsParser";
+import { insertTransaction } from "@/db/queries/transactions";
 import { AppColors } from "@/constants/theme";
 
 type SettingItem = {
@@ -31,6 +35,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [showSimulateModal, setShowSimulateModal] = useState(false);
+  const [simulateText, setSimulateText] = useState("Rs 500.00 debited from HDFC Bank Act ending 1234. Info: SWIGGY. Aval Bal: Rs 10000");
 
   const onExport = async () => {
     try {
@@ -114,6 +120,31 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleSimulate = async () => {
+    try {
+      if (!simulateText.trim()) return;
+      const draft = await parseSmsToTransactionDraft({
+        rawSms: simulateText,
+        senderAddress: "SIMULATOR",
+        body: simulateText.trim(),
+        source: "sms",
+      });
+      if (!draft) {
+        Alert.alert("Simulate Failed", "Parser could not detect a valid transaction amount or the message indicated an ignored transaction.");
+        return;
+      }
+      await insertTransaction({
+        ...draft,
+        categoryId: null,
+      });
+      await useTransactionStore.getState().refreshPendingTransactions();
+      setShowSimulateModal(false);
+      Alert.alert("Success", "SMS transaction parsed and added to Pending log. Go to the Dashboard to review it!");
+    } catch (e) {
+      Alert.alert("Error", e instanceof Error ? e.message : "Unknown error");
+    }
+  };
+
   const sections: { title: string; items: SettingItem[] }[] = [
     {
       title: "Data",
@@ -144,6 +175,12 @@ export default function SettingsScreen() {
               ? "Active - reading bank SMS automatically"
               : "Not available (Android only)",
           onPress: () => {},
+        },
+        {
+          icon: "science",
+          label: "Simulate Incoming SMS",
+          sub: "Test the parser with a custom SMS text",
+          onPress: () => setShowSimulateModal(true),
         },
         {
           icon: "picture-as-pdf",
@@ -212,6 +249,30 @@ export default function SettingsScreen() {
           </View>
         ) : null}
       </ScrollView>
+
+      {/* Simulate Modal */}
+      <Modal visible={showSimulateModal} transparent animationType="fade" onRequestClose={() => setShowSimulateModal(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowSimulateModal(false)}>
+          <View style={styles.modal} onStartShouldSetResponder={() => true}>
+            <ThemedText style={styles.modalTitle}>Simulate Bank SMS</ThemedText>
+            
+            <ThemedText style={styles.fieldLabel}>Raw SMS Text</ThemedText>
+            <TextInput
+              style={[styles.input, { height: 120 }]}
+              value={simulateText}
+              onChangeText={setSimulateText}
+              placeholder="Paste your bank SMS here..."
+              placeholderTextColor={AppColors.textSecondary}
+              multiline
+              textAlignVertical="top"
+            />
+            
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSimulate}>
+              <ThemedText style={styles.saveBtnText}>SIMULATE</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -263,4 +324,36 @@ const styles = StyleSheet.create({
   rowSub: { fontSize: 12, color: AppColors.textSecondary },
   statusWrap: { paddingHorizontal: 16, paddingTop: 10 },
   statusText: { fontSize: 13, color: AppColors.primary, fontWeight: "600" },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modal: {
+    backgroundColor: AppColors.surface,
+    borderRadius: 14,
+    padding: 20,
+    width: "85%",
+    gap: 10,
+  },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
+  fieldLabel: { fontSize: 13, fontWeight: "600", color: AppColors.textSecondary, marginTop: 4 },
+  input: {
+    borderWidth: 1,
+    borderColor: AppColors.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: AppColors.text,
+  },
+  saveBtn: {
+    backgroundColor: AppColors.primary,
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  saveBtnText: { color: AppColors.white, fontSize: 15, fontWeight: "700" },
 });

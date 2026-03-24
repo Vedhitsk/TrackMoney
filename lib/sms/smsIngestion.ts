@@ -104,7 +104,7 @@ export async function startSmsAutoIngestion(): Promise<void> {
       });
 
       try {
-        const draft = parseSmsToTransactionDraft({
+        const draft = await parseSmsToTransactionDraft({
           rawSms,
           senderAddress: parsed.senderAddress,
           body: parsed.body,
@@ -116,20 +116,8 @@ export async function startSmsAutoIngestion(): Promise<void> {
           return;
         }
 
-        if (categoriesCache.length === 0) {
-          categoriesCache = await listCategories();
-        }
-
-        const suggestedCategoryId = suggestCategoryId({
-          merchant: draft.merchant,
-          notes: draft.notes,
-          categories: categoriesCache,
-        });
-
-        const enrichedDraft: Omit<TransactionDraft, "id"> = {
-          ...draft,
-          categoryId: suggestedCategoryId,
-        };
+        // The AI parser handles categoryId and accountId mapping internally now!
+        const enrichedDraft: Omit<TransactionDraft, "id"> = { ...draft };
 
         await insertTransaction(enrichedDraft);
 
