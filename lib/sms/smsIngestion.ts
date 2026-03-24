@@ -75,6 +75,7 @@ export async function startSmsAutoIngestion(): Promise<void> {
       checkIfHasSMSPermission,
       requestReadSMSPermission,
       startReadSMS,
+      // @ts-ignore: Library lacks official TypeScript typings
     } = await import("@maniac-tech/react-native-expo-read-sms");
 
     const perm = await checkIfHasSMSPermission();
@@ -98,9 +99,9 @@ export async function startSmsAutoIngestion(): Promise<void> {
 
       await db.insert(smsLog).values({
         rawSms,
-        parsed: 0,
-        isProcessed: 0,
-        smsDate: Date.now(),
+        parsed: false,
+        isProcessed: false,
+        smsDate: new Date(),
       });
 
       try {
@@ -112,7 +113,7 @@ export async function startSmsAutoIngestion(): Promise<void> {
         });
 
         if (!draft) {
-          await db.update(smsLog).set({ parsed: 1, isProcessed: 1 }).where(eq(smsLog.rawSms, rawSms));
+          await db.update(smsLog).set({ parsed: true, isProcessed: true }).where(eq(smsLog.rawSms, rawSms));
           return;
         }
 
@@ -123,10 +124,10 @@ export async function startSmsAutoIngestion(): Promise<void> {
 
         await db
           .update(smsLog)
-          .set({ parsed: 1, isProcessed: 1 })
+          .set({ parsed: true, isProcessed: true })
           .where(eq(smsLog.rawSms, rawSms));
       } catch {
-        await db.update(smsLog).set({ parsed: 1, isProcessed: 1 }).where(eq(smsLog.rawSms, rawSms));
+        await db.update(smsLog).set({ parsed: true, isProcessed: true }).where(eq(smsLog.rawSms, rawSms));
       }
     };
 
