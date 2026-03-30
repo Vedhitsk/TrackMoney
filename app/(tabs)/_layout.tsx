@@ -3,9 +3,11 @@ import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { HapticTab } from "@/components/haptic-tab";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppColors } from "@/constants/theme";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();  
   return (
     <Tabs
       screenOptions={{
@@ -16,8 +18,9 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: AppColors.white,
           borderTopColor: AppColors.border,
-          height: 58,
-          paddingBottom: 6,
+          height: 58 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 6,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,

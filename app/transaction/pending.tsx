@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { ThemedText } from "@/components/themed-text";
@@ -39,16 +39,24 @@ export default function PendingTransactionsScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    void refreshPendingTransactions();
-  }, [refreshPendingTransactions]);
+  // Refresh when this screen comes into focus (e.g. user edits then comes back)
+  useFocusEffect(
+    useCallback(() => {
+      void refreshPendingTransactions();
+    }, [refreshPendingTransactions]),
+  );
 
+  // Directly accept if category+account already filled; otherwise prompt to edit first
   const handleAccept = useCallback(
     async (item: Transaction) => {
       if (!item.categoryId || !item.accountId) {
         Alert.alert(
-          "Missing Details",
-          "Please tap this transaction to assign a Category and an Account before accepting."
+          "Incomplete Details",
+          "This transaction is missing a Category or Account. Tap the card to edit and fill them in before accepting.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Edit Now", onPress: () => router.push(`/transaction/${item.id}`) },
+          ]
         );
         return;
       }
@@ -61,10 +69,10 @@ export default function PendingTransactionsScreen() {
         setLoading(false);
       }
     },
-    [refreshPendingTransactions, refreshAllTransactions],
+    [router, refreshPendingTransactions, refreshAllTransactions],
   );
 
-  const handleReject = useCallback(
+  const handleDiscard = useCallback(
     (item: Transaction) => {
       Alert.alert(
         "Discard Transaction",
@@ -77,7 +85,6 @@ export default function PendingTransactionsScreen() {
             onPress: async () => {
               try {
                 setLoading(true);
-                // Also could delete from SMS log, but keeping SMS log is fine. 
                 await deleteTransaction(item.id);
                 await refreshPendingTransactions();
               } finally {
@@ -102,7 +109,7 @@ export default function PendingTransactionsScreen() {
       </View>
 
       <ThemedText style={styles.subtitle}>
-        These transactions were automatically fetched from your SMS. Please review them before they are added to your analytics.
+        Tap a card to edit details. Tap ACCEPT to add to your records.
       </ThemedText>
 
       {loading ? (
@@ -131,9 +138,13 @@ export default function PendingTransactionsScreen() {
                 ? AppColors.income
                 : AppColors.textSecondary;
             const sign = isExpense ? "-" : isIncome ? "+" : "";
+            const hasCategory = !!item.categoryId;
+            const hasAccount = !!item.accountId;
+            const isComplete = hasCategory && hasAccount;
 
             return (
               <View style={styles.card}>
+                {/* Tappable area → edit screen */}
                 <TouchableOpacity
                   style={styles.cardMain}
                   onPress={() => router.push(`/transaction/${item.id}`)}>
@@ -143,10 +154,10 @@ export default function PendingTransactionsScreen() {
                     </View>
                     <View style={styles.txInfo}>
                       <ThemedText style={styles.txCategory} numberOfLines={1}>
-                        {catName}
+                        {hasCategory ? catName : "No Category"}
                       </ThemedText>
                       <ThemedText style={styles.txType}>
-                        {item.type.toUpperCase()} • {accountName}
+                        {item.type.toUpperCase()} • {hasAccount ? accountName : "No Account"}
                       </ThemedText>
                     </View>
                     <ThemedText style={[styles.txAmount, { color: amountColor }]}>
@@ -159,19 +170,29 @@ export default function PendingTransactionsScreen() {
                       {item.notes || "No SMS content found."}
                     </ThemedText>
                   </View>
+
+                  {/* Completion hint */}
+                  {!isComplete && (
+                    <View style={styles.incompleteHint}>
+                      <MaterialIcons name="edit" size={13} color={AppColors.primary} />
+                      <ThemedText style={styles.incompleteHintText}>
+                        Tap to assign {!hasCategory ? "category" : ""}{!hasCategory && !hasAccount ? " & " : ""}{!hasAccount ? "account" : ""}
+                      </ThemedText>
+                    </View>
+                  )}
                 </TouchableOpacity>
 
                 <View style={styles.actionRow}>
                   <TouchableOpacity
                     style={[styles.actionBtn, styles.rejectBtn]}
-                    onPress={() => handleReject(item)}>
+                    onPress={() => handleDiscard(item)}>
                     <MaterialIcons name="close" size={20} color={AppColors.expense} />
                     <ThemedText style={[styles.actionBtnText, { color: AppColors.expense }]}>
                       DISCARD
                     </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.actionBtn, styles.acceptBtn]}
+                    style={[styles.actionBtn, styles.acceptBtn, !isComplete && styles.acceptBtnIncomplete]}
                     onPress={() => handleAccept(item)}>
                     <MaterialIcons name="check" size={20} color={AppColors.white} />
                     <ThemedText style={[styles.actionBtnText, { color: AppColors.white }]}>
@@ -201,10 +222,10 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 20, fontWeight: "700", color: AppColors.text },
   subtitle: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
+    paddingVertical: 10,
+    fontSize: 13,
     color: AppColors.textSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
     borderBottomWidth: 1,
     borderBottomColor: AppColors.borderLight,
   },
@@ -218,9 +239,7 @@ const styles = StyleSheet.create({
     borderColor: AppColors.borderLight,
     overflow: "hidden",
   },
-  cardMain: {
-    padding: 16,
-  },
+  cardMain: { padding: 16 },
   cardHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -255,6 +274,17 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontStyle: "italic",
   },
+  incompleteHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 8,
+  },
+  incompleteHintText: {
+    fontSize: 12,
+    color: AppColors.primary,
+    fontWeight: "600",
+  },
   actionRow: {
     flexDirection: "row",
     borderTopWidth: 1,
@@ -268,14 +298,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 8,
   },
-  rejectBtn: {
-    backgroundColor: AppColors.surface,
-  },
-  acceptBtn: {
-    backgroundColor: AppColors.primary,
-  },
-  actionBtnText: {
-    fontSize: 14,
-    fontWeight: "700",
-  },
+  rejectBtn: { backgroundColor: AppColors.surface },
+  acceptBtn: { backgroundColor: AppColors.primary },
+  acceptBtnIncomplete: { backgroundColor: AppColors.textSecondary },
+  actionBtnText: { fontSize: 14, fontWeight: "700" },
 });

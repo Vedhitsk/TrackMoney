@@ -70,3 +70,13 @@ export const smsLog = sqliteTable("sms_log", {
     () => new Date(),
   ),
 });
+
+export const appLogs = sqliteTable("app_logs", {
+  id: int("id").primaryKey({ autoIncrement: true }),
+  level: text("level", { enum: ["info", "warn", "error"] }).notNull(),
+  message: text("message").notNull(),
+  details: text("details"), // JSON string
+  createdAt: int("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date(),
+  ),
+});

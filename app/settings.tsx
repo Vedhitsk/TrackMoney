@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Appearance,
   Modal,
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -19,7 +22,7 @@ import * as Sharing from "expo-sharing";
 import { ThemedText } from "@/components/themed-text";
 import { exportTrackMoneyData, importTrackMoneyData } from "@/lib/serialization/trackmoney";
 import { useTransactionStore } from "@/store/useTransactionStore";
-import { parseSmsToTransactionDraft } from "@/lib/sms/smsParser";
+import { parseSmsOffline } from "@/lib/sms/smsParser";
 import { insertTransaction } from "@/db/queries/transactions";
 import { AppColors } from "@/constants/theme";
 
@@ -27,8 +30,10 @@ type SettingItem = {
   icon: keyof typeof MaterialIcons.glyphMap;
   label: string;
   sub: string;
-  onPress: () => void;
+  onPress?: () => void;
   color?: string;
+  rightElement?: React.ReactNode;
+  noArrow?: boolean;
 };
 
 export default function SettingsScreen() {
@@ -123,23 +128,22 @@ export default function SettingsScreen() {
   const handleSimulate = async () => {
     try {
       if (!simulateText.trim()) return;
-      const draft = await parseSmsToTransactionDraft({
-        rawSms: simulateText,
+      const draft = parseSmsOffline({
         senderAddress: "SIMULATOR",
         body: simulateText.trim(),
         source: "sms",
       });
       if (!draft) {
-        Alert.alert("Simulate Failed", "Parser could not detect a valid transaction amount or the message indicated an ignored transaction.");
+        Alert.alert("Simulate Failed", "Parser could not detect a valid transaction. Check that your SMS contains keywords like 'debited', 'credited', 'Rs.', etc.");
         return;
       }
-      await insertTransaction({
-        ...draft,
-        categoryId: null,
-      });
+      await insertTransaction(draft);
       await useTransactionStore.getState().refreshPendingTransactions();
       setShowSimulateModal(false);
-      Alert.alert("Success", "SMS transaction parsed and added to Pending log. Go to the Dashboard to review it!");
+      Alert.alert(
+        "Success ✅",
+        `Parsed!\n\nAmount: ₹${draft.actualAmount}\nType: ${draft.type}\nMerchant: ${draft.merchant}\n\nCheck the Pending dashboard!`
+      );
     } catch (e) {
       Alert.alert("Error", e instanceof Error ? e.message : "Unknown error");
     }
@@ -172,9 +176,9 @@ export default function SettingsScreen() {
           label: "SMS Auto-Ingestion",
           sub:
             Platform.OS === "android"
-              ? "Active - reading bank SMS automatically"
+              ? "Active - Tap here to view pending items"
               : "Not available (Android only)",
-          onPress: () => {},
+          onPress: () => router.push("/transaction/pending"),
         },
         {
           icon: "science",
@@ -183,12 +187,10 @@ export default function SettingsScreen() {
           onPress: () => setShowSimulateModal(true),
         },
         {
-          icon: "picture-as-pdf",
-          label: "Import Bank Statement (PDF)",
-          sub: "Requires internet connection. Coming soon.",
-          onPress: () => {
-            Alert.alert("Coming Soon", "PDF import will use AI to parse transactions. This feature will require an internet connection and isn't quite ready yet!");
-          },
+          icon: "history",
+          label: "System Logs",
+          sub: "View background activity and errors",
+          onPress: () => router.push("/settings/logs"),
         },
       ],
     },
@@ -197,9 +199,9 @@ export default function SettingsScreen() {
       items: [
         {
           icon: "info-outline",
-          label: "TrackMoney",
-          sub: "Version 1.0.0 - AI-Powered Expense Tracker",
-          onPress: () => {},
+          label: "TrackMoney v1.0",
+          sub: "Developed by Vedhit Suresh\nEmail: vedhitsk2804@gmail.com",
+          noArrow: true,
         },
       ],
     },
@@ -224,7 +226,7 @@ export default function SettingsScreen() {
               <TouchableOpacity
                 key={item.label}
                 style={[styles.row, busy && styles.rowDisabled]}
-                disabled={busy}
+                disabled={busy || !item.onPress}
                 onPress={item.onPress}>
                 <View style={styles.rowIcon}>
                   <MaterialIcons
@@ -237,7 +239,11 @@ export default function SettingsScreen() {
                   <ThemedText style={styles.rowLabel}>{item.label}</ThemedText>
                   <ThemedText style={styles.rowSub}>{item.sub}</ThemedText>
                 </View>
-                <MaterialIcons name="chevron-right" size={22} color={AppColors.textSecondary} />
+                {item.rightElement ? (
+                  item.rightElement
+                ) : item.noArrow ? null : (
+                  <MaterialIcons name="chevron-right" size={22} color={AppColors.textSecondary} />
+                )}
               </TouchableOpacity>
             ))}
           </View>

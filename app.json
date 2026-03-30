@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.trackmoney.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -39,11 +40,18 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "./withBackgroundSms"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1af0a8d9-23f3-4f52-9f8f-bf547aaa169b"
+      }
     }
   }
 }

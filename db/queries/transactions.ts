@@ -93,7 +93,10 @@ export async function deleteTransaction(id: number): Promise<void> {
 
 export async function listAllTransactions(): Promise<Transaction[]> {
   const rows = await db.select().from(transactions);
-  return rows.map(mapTransactionRow).sort((a, b) => b.date.getTime() - a.date.getTime());
+  // Only show accepted (manual) transactions in the main Records tab.
+  // SMS-sourced transactions stay in Pending until user taps Accept.
+  const accepted = rows.filter((r: any) => r.source === "manual");
+  return accepted.map(mapTransactionRow).sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
 export async function listExpensesForMonth(year: number, month: number): Promise<Transaction[]> {

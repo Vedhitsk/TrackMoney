@@ -9,6 +9,12 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { sqlite } from "@/db/client";
 import { startSmsAutoIngestion, stopSmsAutoIngestion } from "@/lib/sms/smsIngestion";
 import { AppColors } from "@/constants/theme";
+import { ensureTablesExist } from "@/db/init";
+import { PermissionModal } from "@/components/permission-modal";
+import { Alert, Linking, PermissionsAndroid } from "react-native";
+
+// AppRegistry.registerHeadlessTask moved to index.js for better reliability
+
 
 const MyMoneyLightTheme = {
   ...DefaultTheme,
@@ -27,83 +33,65 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const [showPermissions, setShowPermissions] = React.useState(false);
 
   React.useEffect(() => {
-    sqlite.execSync(`
-    CREATE TABLE IF NOT EXISTS categories (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      icon TEXT NOT NULL DEFAULT '💰',
-      color TEXT NOT NULL DEFAULT '#6366f1',
-      keywords TEXT NOT NULL DEFAULT '[]',
-      created_at INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS transactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      raw_amount REAL NOT NULL,
-      actual_amount REAL NOT NULL,
-      is_shared INTEGER NOT NULL DEFAULT 0,
-      type TEXT NOT NULL,
-      category_id INTEGER REFERENCES categories(id),
-      account_id INTEGER,
-      merchant TEXT NOT NULL DEFAULT 'Unknown',
-      notes TEXT DEFAULT '',
-      date INTEGER NOT NULL,
-      source TEXT NOT NULL DEFAULT 'manual',
-      is_excluded INTEGER NOT NULL DEFAULT 0,
-      created_at INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS budgets (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category_id INTEGER NOT NULL REFERENCES categories(id),
-      monthly_limit REAL NOT NULL,
-      month INTEGER NOT NULL,
-      year INTEGER NOT NULL,
-      is_template INTEGER NOT NULL DEFAULT 0,
-      created_at INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS sms_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      raw_sms TEXT NOT NULL,
-      parsed INTEGER NOT NULL DEFAULT 0,
-      is_processed INTEGER NOT NULL DEFAULT 0,
-      sms_date INTEGER,
-      created_at INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS accounts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      icon TEXT NOT NULL DEFAULT '💳',
-      initial_balance REAL NOT NULL DEFAULT 0,
-      created_at INTEGER
-    );
-  `);
-
-    const safeAlter = (sql: string) => {
-      try { sqlite.execSync(sql); } catch (_) { /* column exists */ }
-    };
-    safeAlter(`ALTER TABLE transactions ADD COLUMN account_id INTEGER;`);
-    safeAlter(`ALTER TABLE transactions ADD COLUMN to_account_id INTEGER;`);
-
-    // Migrate old type values: debit -> expense, credit -> income
-    try {
-      sqlite.execSync(`UPDATE transactions SET type = 'expense' WHERE type = 'debit';`);
-      sqlite.execSync(`UPDATE transactions SET type = 'income' WHERE type = 'credit';`);
-    } catch (_) { /* already migrated */ }
-
-    // Seed default accounts if none exist
-    const accountCount = sqlite.getFirstSync<{ cnt: number }>(
-      `SELECT COUNT(*) as cnt FROM accounts`
-    );
-    if (accountCount && accountCount.cnt === 0) {
-      sqlite.execSync(`
-        INSERT INTO accounts (name, icon, initial_balance) VALUES ('Card', '💳', 0);
-        INSERT INTO accounts (name, icon, initial_balance) VALUES ('Cash', '💵', 0);
-        INSERT INTO accounts (name, icon, initial_balance) VALUES ('Wallet', '👛', 0);
-      `);
+    ensureTablesExist();
+    
+    // Check permissions on mount
+    if (Platform.OS === "android") {
+      void checkPermissions();
     }
   }, []);
+
+  const checkPermissions = async () => {
+    const hasSms = await PermissionsAndroid.check("android.permission.RECEIVE_SMS");
+    const hasRead = await PermissionsAndroid.check("android.permission.READ_SMS");
+    // POST_NOTIFICATIONS is Android 13+
+    const hasNotify = Number(Platform.Version) >= 33 
+      ? await PermissionsAndroid.check("android.permission.POST_NOTIFICATIONS" as any)
+      : true;
+
+    if (!hasSms || !hasRead || !hasNotify) {
+      setShowPermissions(true);
+    }
+  };
+
+  const handleGrantPermissions = async () => {
+    try {
+      // 1. Request SMS Combined
+      const grantedSms = await PermissionsAndroid.requestMultiple([
+        "android.permission.RECEIVE_SMS",
+        "android.permission.READ_SMS"
+      ]);
+
+      const smsOk = grantedSms["android.permission.RECEIVE_SMS"] === "granted" && 
+                    grantedSms["android.permission.READ_SMS"] === "granted";
+
+      // 2. Request Notifications (Android 13+)
+      if (Number(Platform.Version) >= 33) {
+        await PermissionsAndroid.request("android.permission.POST_NOTIFICATIONS" as any);
+      }
+
+      setShowPermissions(false);
+
+      if (smsOk) {
+        await startSmsAutoIngestion();
+        
+        // 3. Battery Optimization Suggestion
+        Alert.alert(
+          "One Last Step 🔋",
+          "Android might stop background tracking to save battery. For best results, please set Battery Optimization to 'Unrestricted' for TrackMoney.",
+          [
+            { text: "Skip", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() }
+          ]
+        );
+      }
+    } catch (err) {
+      console.error("Permission request failed", err);
+    }
+  };
 
   React.useEffect(() => {
     if (Platform.OS !== "android") return;
@@ -112,7 +100,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : MyMoneyLightTheme}>
+    <ThemeProvider value={MyMoneyLightTheme}>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -124,6 +112,10 @@ export default function RootLayout() {
         <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />
       </Stack>
       <StatusBar style="dark" />
+      <PermissionModal 
+        visible={showPermissions} 
+        onGrant={handleGrantPermissions} 
+      />
     </ThemeProvider>
   );
 }

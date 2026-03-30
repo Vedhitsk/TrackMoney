@@ -147,7 +147,9 @@ export default function EditTransactionScreen() {
       await updateTransaction(draft.id ?? idNum, patch);
 
       if (uiType === "expense" && draft.categoryId) {
-        const tokens = extractTokens(`${draft.merchant} ${draft.notes}`);
+        // Only add the merchant name as keywords, NOT the full SMS body.
+        // Adding the full body pollutes category matching with words like 'ref', 'sbi', 'dear' etc.
+        const tokens = extractTokens(draft.merchant);
         if (tokens.length > 0) await addKeywordsToCategory(draft.categoryId, tokens);
       }
 

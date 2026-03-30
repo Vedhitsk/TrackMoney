@@ -1,81 +1,111 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
+
 import { NativeModules, Platform } from "react-native";
 
 import { db } from "@/db/client";
 import { smsLog } from "@/db/schema";
-import { listCategories } from "@/db/queries/categories";
 import { insertTransaction } from "@/db/queries/transactions";
-import type { Category, TransactionDraft } from "@/types";
+import { parseSmsOffline, looksLikeTransactionMessage } from "@/lib/sms/smsParser";
+import { logAppEvent } from "@/lib/logger";
+import { ensureTablesExist } from "@/db/init";
 
-import { parseSmsToTransactionDraft } from "@/lib/sms/smsParser";
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function hasSmsNativeModule(): boolean {
   return !!(NativeModules as any).RNExpoReadSms;
 }
 
-function parseSmsCallbackString(sms: unknown): { senderAddress: string; body: string; rawSms: string } | null {
-  const rawSms = typeof sms === "string" ? sms : JSON.stringify(sms);
-  const m = rawSms.match(/^\[(.*?),\s*([\s\S]*)\]$/);
-  if (!m) {
-    return { senderAddress: "", body: rawSms, rawSms };
+// The native SMS library wraps data as "[sender, body]"
+function parseSmsPayload(sms: unknown): { senderAddress: string; body: string } | null {
+  const raw = typeof sms === "string" ? sms : JSON.stringify(sms);
+  const m = raw.match(/^\[(.*?),\s*([\s\S]*)\]$/);
+  if (m) {
+    return { senderAddress: (m[1] ?? "").trim(), body: (m[2] ?? "").trim() };
   }
-  const senderAddress = (m[1] ?? "").trim();
-  const body = (m[2] ?? "").trim();
-  return { senderAddress, body, rawSms };
+  return { senderAddress: "", body: raw.trim() };
 }
 
-function normalizeToken(token: string) {
-  return token.trim().toLowerCase();
-}
+// ─── Core processor (shared by foreground and background) ────────────────────
 
-function extractTokens(text: string): string[] {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .split(" ")
-    .map((t) => t.trim())
-    .filter((t) => t.length > 2);
-}
-
-function suggestCategoryId(params: {
-  merchant: string;
-  notes: string;
-  categories: Category[];
-}): number | null {
-  const tokens = new Set([...extractTokens(params.merchant), ...extractTokens(params.notes)]);
-  if (tokens.size === 0) return null;
-
-  let bestCategoryId: number | null = null;
-  let bestScore = 0;
-
-  for (const c of params.categories) {
-    const keywords = c.keywords ?? [];
-    let score = 0;
-    for (const kw of keywords) {
-      const norm = normalizeToken(kw);
-      if (norm.length < 3) continue;
-      if (tokens.has(norm)) score += 1;
-    }
-    if (score > bestScore) {
-      bestScore = score;
-      bestCategoryId = c.id;
-    }
-  }
-
-  return bestScore >= 1 ? bestCategoryId : null;
-}
-
-export async function startSmsAutoIngestion(): Promise<void> {
-  if (Platform.OS !== "android" || !hasSmsNativeModule()) {
+async function processSms(senderAddress: string, body: string): Promise<void> {
+  if (!looksLikeTransactionMessage(body)) {
+    await logAppEvent("info", "SMS Processor: Ignored non-transaction SMS.");
     return;
   }
+
+  const amount = parseSmsOffline({ senderAddress, body, source: "sms" })?.actualAmount ?? 0;
+  const rawSms = `[${senderAddress}, ${body}, ${amount}]`;
+
+  // Deduplicate: Check if a similar SMS arrived in the last 60 seconds
+  const oneMinuteAgo = new Date(Date.now() - 60000);
+  const existing = await db.select().from(smsLog).where(
+    and(
+      eq(smsLog.rawSms, rawSms),
+      gte(smsLog.smsDate, oneMinuteAgo)
+    )
+  );
+
+  if (existing.length > 0) {
+    await logAppEvent("info", "SMS Processor: Duplicate SMS in 60s window, skipping.");
+    return;
+  }
+
+
+  // Log receipt
+  await logAppEvent("info", "SMS Processor: New transaction SMS received", {
+    sender: senderAddress,
+    preview: body.slice(0, 60) + "...",
+  });
+
+  // Parse offline — no network, instant, safe in background
+  const draft = parseSmsOffline({ senderAddress, body, source: "sms" });
+
+  if (!draft) {
+    await logAppEvent("info", "SMS Processor: Could not extract transaction details.");
+    // Still log the SMS so the user can see it was received
+    await db.insert(smsLog).values({
+      rawSms,
+      parsed: false,
+      isProcessed: true, // mark processed (it was just non-parseable, not an error)
+      smsDate: new Date(),
+    });
+    return;
+  }
+
+  await logAppEvent("info", "SMS Processor: Extracted transaction", {
+    amount: draft.actualAmount,
+    type: draft.type,
+    merchant: draft.merchant,
+    categoryId: draft.categoryId,
+    accountId: draft.accountId,
+  });
+
+  // Save transaction to pending dashboard
+  await insertTransaction(draft);
+
+  // Log the raw SMS
+  await db.insert(smsLog).values({
+    rawSms,
+    parsed: true,
+    isProcessed: true,
+    smsDate: new Date(),
+  });
+
+  await logAppEvent("info", "SMS Processor: Transaction saved successfully.");
+}
+
+// ─── Foreground Listener (app open) ──────────────────────────────────────────
+
+export async function startSmsAutoIngestion(): Promise<void> {
+  if (Platform.OS !== "android" || !hasSmsNativeModule()) return;
 
   try {
     const {
       checkIfHasSMSPermission,
       requestReadSMSPermission,
       startReadSMS,
-      // @ts-ignore: Library lacks official TypeScript typings
+      // @ts-ignore
     } = await import("@maniac-tech/react-native-expo-read-sms");
 
     const perm = await checkIfHasSMSPermission();
@@ -84,66 +114,67 @@ export async function startSmsAutoIngestion(): Promise<void> {
       if (!granted) return;
     }
 
-    let categoriesCache: Category[] = [];
-
     const handler = async (status: string, sms: unknown, _error: unknown) => {
-      if (status !== "success" || !sms) return;
+      if (status !== "success" || !sms) {
+        if (status === "error") {
+          await logAppEvent("error", "Foreground SMS listener error", String(_error));
+        }
+        return;
+      }
 
-      const parsed = parseSmsCallbackString(sms);
+      const parsed = parseSmsPayload(sms);
       if (!parsed) return;
 
-      const rawSms = parsed.rawSms;
-
-      const existing = await db.select().from(smsLog).where(eq(smsLog.rawSms, rawSms));
-      if (existing.length > 0) return;
-
-      await db.insert(smsLog).values({
-        rawSms,
-        parsed: false,
-        isProcessed: false,
-        smsDate: new Date(),
-      });
-
       try {
-        const draft = await parseSmsToTransactionDraft({
-          rawSms,
-          senderAddress: parsed.senderAddress,
-          body: parsed.body,
-          source: "sms",
-        });
-
-        if (!draft) {
-          await db.update(smsLog).set({ parsed: true, isProcessed: true }).where(eq(smsLog.rawSms, rawSms));
-          return;
-        }
-
-        // The AI parser handles categoryId and accountId mapping internally now!
-        const enrichedDraft: Omit<TransactionDraft, "id"> = { ...draft };
-
-        await insertTransaction(enrichedDraft);
-
-        await db
-          .update(smsLog)
-          .set({ parsed: true, isProcessed: true })
-          .where(eq(smsLog.rawSms, rawSms));
-      } catch {
-        await db.update(smsLog).set({ parsed: true, isProcessed: true }).where(eq(smsLog.rawSms, rawSms));
+        await processSms(parsed.senderAddress, parsed.body);
+      } catch (err) {
+        await logAppEvent("error", "Foreground: processSms failed", String(err));
       }
     };
 
     startReadSMS(handler as any);
-  } catch {
-    // SMS native module not available (Expo Go) -- silently skip
+    await logAppEvent("info", "SMS Auto-Ingestion: Listener started.");
+  } catch (err) {
+    await logAppEvent("error", "SMS Auto-Ingestion: Failed to start listener", String(err));
   }
 }
 
 export function stopSmsAutoIngestion() {
   try {
     const maybe = (NativeModules as any).RNExpoReadSms;
-    if (maybe?.stopReadSMS) {
-      maybe.stopReadSMS();
-    }
+    if (maybe?.stopReadSMS) maybe.stopReadSMS();
   } catch {
-    // Swallow during dev/unmount
+    // ignore
   }
 }
+
+// ─── Background Headless JS Task (app killed) ─────────────────────────────────
+// This now parses AND saves inline — safe because parseSmsOffline() is
+// 100% synchronous and makes zero network calls. Android can't kill it.
+
+export const processSmsBackground = async (taskData: any) => {
+  try {
+    // Ensure tables exist in background process (it might start before the UI)
+    ensureTablesExist();
+
+    await logAppEvent("info", "Background Task: Headless JS task started.");
+
+
+    const body: string = taskData?.sms_body ?? "";
+    const senderAddress: string = taskData?.sms_sender ?? "";
+
+    if (!body) {
+      await logAppEvent("warn", "Background Task: Received empty SMS body.");
+      return;
+    }
+
+    await processSms(senderAddress, body);
+
+    await logAppEvent("info", "Background Task: Completed successfully.");
+  } catch (err) {
+    await logAppEvent("error", "Background Task: CRASHED", {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+    });
+  }
+};
