@@ -2,22 +2,28 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
 import { AppColors } from "@/constants/theme";
 import { formatMoneyINR } from "@/types";
 import type { AccountWithBalance } from "@/db/queries/accounts";
+import { countActiveRecoveries } from "@/db/queries/settlements";
 
 const ACCOUNT_ICONS = ["💳", "💵", "👛", "🏦", "📱", "💰", "🏧", "🪙"];
 
 export default function AccountsScreen() {
+  const router = useRouter();
   const [accounts, setAccounts] = useState<AccountWithBalance[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -25,12 +31,14 @@ export default function AccountsScreen() {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("💳");
   const [balanceStr, setBalanceStr] = useState("0");
+  const [recoveryCount, setRecoveryCount] = useState(0);
 
   const load = useCallback(async () => {
     const { listAccountsWithBalances } = await import("@/db/queries/accounts");
     setLoading(true);
     try {
       setAccounts(await listAccountsWithBalances());
+      setRecoveryCount(await countActiveRecoveries());
     } finally {
       setLoading(false);
     }
@@ -39,6 +47,13 @@ export default function AccountsScreen() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Re-fetch when tab comes into focus — balance updates after tx accepts/deletes
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   const totalBalance = accounts.reduce((s, a) => s + a.currentBalance, 0);
 
@@ -149,6 +164,19 @@ export default function AccountsScreen() {
             <ThemedText style={styles.emptyText}>No accounts yet</ThemedText>
           </View>
         }
+        ListFooterComponent={
+          <TouchableOpacity
+            style={styles.recoveriesBtn}
+            onPress={() => router.push("/recoveries")}>
+            <MaterialIcons name="people" size={20} color={AppColors.primary} />
+            <ThemedText style={styles.recoveriesBtnText}>View Pending Recoveries</ThemedText>
+            {recoveryCount > 0 && (
+              <View style={styles.recoveriesBadge}>
+                <ThemedText style={styles.recoveriesBadgeText}>{recoveryCount}</ThemedText>
+              </View>
+            )}
+          </TouchableOpacity>
+        }
       />
 
       {/* FAB */}
@@ -158,51 +186,64 @@ export default function AccountsScreen() {
 
       {/* Form Modal */}
       <Modal visible={showForm} transparent animationType="fade" onRequestClose={() => setShowForm(false)}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowForm(false)}>
-          <View style={styles.modal} onStartShouldSetResponder={() => true}>
-            <ThemedText style={styles.modalTitle}>
-              {editId ? "Edit Account" : "Add Account"}
-            </ThemedText>
+        <KeyboardAvoidingView
+          style={styles.modalKav}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowForm(false)}>
+            <ScrollView
+              contentContainerStyle={styles.modalScrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.modal} onStartShouldSetResponder={() => true}>
+              <ThemedText style={styles.modalTitle}>
+                {editId ? "Edit Account" : "Add Account"}
+              </ThemedText>
 
-            <ThemedText style={styles.fieldLabel}>Name</ThemedText>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="e.g. HDFC Card"
-              placeholderTextColor={AppColors.textSecondary}
-            />
+              <ThemedText style={styles.fieldLabel}>Name</ThemedText>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="e.g. HDFC Card"
+                placeholderTextColor={AppColors.textSecondary}
+                returnKeyType="done"
+              />
 
-            <ThemedText style={styles.fieldLabel}>Icon</ThemedText>
-            <View style={styles.iconGrid}>
-              {ACCOUNT_ICONS.map((ic) => (
-                <TouchableOpacity
-                  key={ic}
-                  style={[styles.iconCell, icon === ic && styles.iconCellActive]}
-                  onPress={() => setIcon(ic)}>
-                  <ThemedText style={styles.iconText}>{ic}</ThemedText>
-                </TouchableOpacity>
-              ))}
+              <ThemedText style={styles.fieldLabel}>Icon</ThemedText>
+              <View style={styles.iconGrid}>
+                {ACCOUNT_ICONS.map((ic) => (
+                  <TouchableOpacity
+                    key={ic}
+                    style={[styles.iconCell, icon === ic && styles.iconCellActive]}
+                    onPress={() => setIcon(ic)}>
+                    <ThemedText style={styles.iconText}>{ic}</ThemedText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <ThemedText style={styles.fieldLabel}>Initial Balance (INR)</ThemedText>
+              <TextInput
+                style={styles.input}
+                value={balanceStr}
+                onChangeText={setBalanceStr}
+                keyboardType="numeric"
+                placeholder="0"
+                placeholderTextColor={AppColors.textSecondary}
+                returnKeyType="done"
+              />
+
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+                <ThemedText style={styles.saveBtnText}>SAVE</ThemedText>
+              </TouchableOpacity>
             </View>
-
-            <ThemedText style={styles.fieldLabel}>Initial Balance (INR)</ThemedText>
-            <TextInput
-              style={styles.input}
-              value={balanceStr}
-              onChangeText={setBalanceStr}
-              keyboardType="numeric"
-              placeholder="0"
-              placeholderTextColor={AppColors.textSecondary}
-            />
-
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <ThemedText style={styles.saveBtnText}>SAVE</ThemedText>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+            </ScrollView>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -259,6 +300,31 @@ const styles = StyleSheet.create({
   cardBalance: { fontSize: 16, fontWeight: "700" },
   cardSub: { fontSize: 11, color: AppColors.textSecondary },
   center: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 60 },
+  recoveriesBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginHorizontal: 0,
+    marginTop: 8,
+    marginBottom: 80,
+    padding: 16,
+    backgroundColor: AppColors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: AppColors.border,
+  },
+  recoveriesBtnText: { flex: 1, fontSize: 15, fontWeight: "600", color: AppColors.primary },
+  recoveriesBadge: {
+    backgroundColor: AppColors.expense,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  recoveriesBadgeText: { color: "#fff", fontSize: 12, fontWeight: "800" },
+
   emptyText: { fontSize: 16, fontWeight: "600", color: AppColors.textSecondary },
   fab: {
     position: "absolute",
@@ -276,17 +342,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-  modalOverlay: {
+  modalKav: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
     justifyContent: "center",
     alignItems: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalScrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
+    width: "100%",
+  },
   modal: {
     backgroundColor: AppColors.surface,
-    borderRadius: 14,
-    padding: 20,
-    width: "85%",
+    borderRadius: 18,
+    padding: 24,
+    width: "88%",
     gap: 10,
   },
   modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },

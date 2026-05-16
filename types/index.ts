@@ -1,5 +1,7 @@
 export type TransactionType = "expense" | "income" | "transfer" | "ignored" | "settlement";
 export type TransactionSource = "sms" | "pdf" | "manual";
+export type ParsedBy = "regex" | "groq" | "gemini" | "manual";
+export type ParseStatus = "complete" | "partial" | "needs_review";
 
 export type Account = {
   id: number;
@@ -41,6 +43,8 @@ export type Transaction = {
   notes: string;
   date: Date;
   source: TransactionSource;
+  parsedBy: ParsedBy | null;
+  parseStatus: ParseStatus;
   isExcluded: boolean;
   createdAt: Date;
 };
@@ -58,6 +62,8 @@ export type TransactionDraft = {
   notes: string;
   date: Date;
   source: TransactionSource;
+  parsedBy: ParsedBy | null;
+  parseStatus: ParseStatus;
   isExcluded: boolean;
 };
 

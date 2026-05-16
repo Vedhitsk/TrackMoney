@@ -6,12 +6,12 @@ import React from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { sqlite } from "@/db/client";
-import { startSmsAutoIngestion, stopSmsAutoIngestion } from "@/lib/sms/smsIngestion";
+import { backfillFromInbox } from "@/lib/sms/smsIngestion";
 import { AppColors } from "@/constants/theme";
 import { ensureTablesExist } from "@/db/init";
 import { PermissionModal } from "@/components/permission-modal";
-import { Alert, Linking, PermissionsAndroid } from "react-native";
+import { Alert, Linking, PermissionsAndroid, LogBox } from "react-native";
+LogBox.ignoreLogs(["new NativeEventEmitter()"]);
 
 // AppRegistry.registerHeadlessTask moved to index.js for better reliability
 
@@ -54,6 +54,8 @@ export default function RootLayout() {
 
     if (!hasSms || !hasRead || !hasNotify) {
       setShowPermissions(true);
+    } else {
+      void backfillFromInbox();
     }
   };
 
@@ -75,8 +77,8 @@ export default function RootLayout() {
 
       setShowPermissions(false);
 
-      if (smsOk) {
-        await startSmsAutoIngestion();
+    if (smsOk) {
+        void backfillFromInbox();
         
         // 3. Battery Optimization Suggestion
         Alert.alert(
@@ -93,12 +95,6 @@ export default function RootLayout() {
     }
   };
 
-  React.useEffect(() => {
-    if (Platform.OS !== "android") return;
-    void startSmsAutoIngestion();
-    return () => stopSmsAutoIngestion();
-  }, []);
-
   return (
     <ThemeProvider value={MyMoneyLightTheme}>
       <Stack
@@ -109,7 +105,10 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="transaction/new" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="transaction/[id]" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="transaction/pending" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />
+        <Stack.Screen name="settings/logs" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="recoveries" options={{ animation: "slide_from_right" }} />
       </Stack>
       <StatusBar style="dark" />
       <PermissionModal 

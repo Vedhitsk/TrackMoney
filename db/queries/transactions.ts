@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { transactions } from "@/db/schema";
 
-import type { Transaction, TransactionDraft, TransactionSource, TransactionType } from "@/types";
+import type { Transaction, TransactionDraft, TransactionSource, TransactionType, ParsedBy, ParseStatus } from "@/types";
 
 function toDate(value: unknown): Date {
   if (value instanceof Date) return value;
@@ -26,6 +26,8 @@ function mapTransactionRow(r: any): Transaction {
     notes: r.notes ?? "",
     date: toDate(r.date),
     source: r.source as TransactionSource,
+    parsedBy: (r.parsedBy as ParsedBy) ?? null,
+    parseStatus: (r.parseStatus as ParseStatus) ?? "complete",
     isExcluded: r.isExcluded === true || r.isExcluded === 1,
     createdAt: toDate(r.createdAt),
   };
@@ -59,6 +61,8 @@ export async function insertTransaction(draft: Omit<TransactionDraft, "id">): Pr
       notes: draft.notes,
       date: draft.date,
       source: draft.source,
+      parsedBy: draft.parsedBy,
+      parseStatus: draft.parseStatus,
       isExcluded: draft.isExcluded,
     })
     .returning();
@@ -81,6 +85,8 @@ export async function updateTransaction(
   if (patch.merchant !== undefined) set.merchant = patch.merchant;
   if (patch.notes !== undefined) set.notes = patch.notes;
   if (patch.source !== undefined) set.source = patch.source;
+  if (patch.parsedBy !== undefined) set.parsedBy = patch.parsedBy;
+  if (patch.parseStatus !== undefined) set.parseStatus = patch.parseStatus;
   if (patch.isExcluded !== undefined) set.isExcluded = patch.isExcluded;
   if (patch.date !== undefined) set.date = patch.date;
 

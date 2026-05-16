@@ -128,21 +128,22 @@ export default function SettingsScreen() {
   const handleSimulate = async () => {
     try {
       if (!simulateText.trim()) return;
-      const draft = parseSmsOffline({
+      const regexResult = parseSmsOffline({
         senderAddress: "SIMULATOR",
         body: simulateText.trim(),
         source: "sms",
       });
-      if (!draft) {
+      if (!regexResult) {
         Alert.alert("Simulate Failed", "Parser could not detect a valid transaction. Check that your SMS contains keywords like 'debited', 'credited', 'Rs.', etc.");
         return;
       }
+      const draft = regexResult.draft;
       await insertTransaction(draft);
       await useTransactionStore.getState().refreshPendingTransactions();
       setShowSimulateModal(false);
       Alert.alert(
         "Success ✅",
-        `Parsed!\n\nAmount: ₹${draft.actualAmount}\nType: ${draft.type}\nMerchant: ${draft.merchant}\n\nCheck the Pending dashboard!`
+        `Parsed!\n\nAmount: ₹${draft.actualAmount}\nType: ${draft.type}\nMerchant: ${draft.merchant}\nStatus: ${draft.parseStatus}\n\nCheck the Pending dashboard!`
       );
     } catch (e) {
       Alert.alert("Error", e instanceof Error ? e.message : "Unknown error");

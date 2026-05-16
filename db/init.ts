@@ -57,6 +57,13 @@ export function ensureTablesExist() {
       details TEXT,
       created_at INTEGER
     );
+    CREATE TABLE IF NOT EXISTS settlements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      income_tx_id INTEGER NOT NULL REFERENCES transactions(id),
+      expense_tx_id INTEGER NOT NULL REFERENCES transactions(id),
+      amount REAL NOT NULL,
+      created_at INTEGER
+    );
   `);
 
   const safeAlter = (sql: string) => {
@@ -64,6 +71,8 @@ export function ensureTablesExist() {
   };
   safeAlter(`ALTER TABLE transactions ADD COLUMN account_id INTEGER;`);
   safeAlter(`ALTER TABLE transactions ADD COLUMN to_account_id INTEGER;`);
+  safeAlter(`ALTER TABLE transactions ADD COLUMN parsed_by TEXT;`);
+  safeAlter(`ALTER TABLE transactions ADD COLUMN parse_status TEXT NOT NULL DEFAULT 'complete';`);
 
   // Migrate old type values: debit -> expense, credit -> income
   try {

@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
+  DeviceEventEmitter,
   FlatList,
   StyleSheet,
   TouchableOpacity,
@@ -16,6 +17,7 @@ import { AppColors } from "@/constants/theme";
 import type { Transaction } from "@/types";
 import { formatMoneyINR } from "@/types";
 import { deleteTransaction, updateTransaction } from "@/db/queries/transactions";
+import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
 
 function getCategoryLabel(categoryId: number | null, categories: { id: number; name: string }[]) {
   if (!categoryId) return "Uncategorized";
@@ -38,6 +40,14 @@ export default function PendingTransactionsScreen() {
     useTransactionStore();
 
   const [loading, setLoading] = useState(false);
+
+  // Instant update when background task saves a new transaction
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(SMS_TRANSACTION_EVENT, () => {
+      void refreshPendingTransactions();
+    });
+    return () => sub.remove();
+  }, [refreshPendingTransactions]);
 
   // Refresh when this screen comes into focus (e.g. user edits then comes back)
   useFocusEffect(
@@ -142,8 +152,21 @@ export default function PendingTransactionsScreen() {
             const hasAccount = !!item.accountId;
             const isComplete = hasCategory && hasAccount;
 
+            const status = item.parseStatus;
+            const isUnparsed = status === "needs_review";
+            const statusColor = status === "complete" ? "#22c55e" : status === "partial" ? "#f59e0b" : "#ef4444";
+            const statusLabel = status.toUpperCase();
+
             return (
-              <View style={styles.card}>
+              <View style={[styles.card, isUnparsed && styles.cardUnparsed]}>
+                {/* Status Badge */}
+                <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+                  <ThemedText style={styles.statusBadgeText}>{statusLabel}</ThemedText>
+                  {item.parsedBy && (
+                    <ThemedText style={styles.parsedByText}>via {item.parsedBy.toUpperCase()}</ThemedText>
+                  )}
+                </View>
+
                 {/* Tappable area → edit screen */}
                 <TouchableOpacity
                   style={styles.cardMain}
@@ -154,7 +177,7 @@ export default function PendingTransactionsScreen() {
                     </View>
                     <View style={styles.txInfo}>
                       <ThemedText style={styles.txCategory} numberOfLines={1}>
-                        {hasCategory ? catName : "No Category"}
+                        {hasCategory ? catName : (isUnparsed ? "Unparsed" : "No Category")}
                       </ThemedText>
                       <ThemedText style={styles.txType}>
                         {item.type.toUpperCase()} • {hasAccount ? accountName : "No Account"}
@@ -165,8 +188,11 @@ export default function PendingTransactionsScreen() {
                     </ThemedText>
                   </View>
 
-                  <View style={styles.smsPreviewBox}>
-                    <ThemedText style={styles.smsPreviewText} numberOfLines={3}>
+                  <View style={[styles.smsPreviewBox, isUnparsed && styles.smsPreviewBoxUnparsed]}>
+                    {isUnparsed && (
+                      <ThemedText style={styles.rawSmsLabel}>RAW SMS CONTENT:</ThemedText>
+                    )}
+                    <ThemedText style={[styles.smsPreviewText, isUnparsed && styles.smsPreviewTextUnparsed]} numberOfLines={isUnparsed ? undefined : 3}>
                       {item.notes || "No SMS content found."}
                     </ThemedText>
                   </View>
@@ -174,9 +200,9 @@ export default function PendingTransactionsScreen() {
                   {/* Completion hint */}
                   {!isComplete && (
                     <View style={styles.incompleteHint}>
-                      <MaterialIcons name="edit" size={13} color={AppColors.primary} />
-                      <ThemedText style={styles.incompleteHintText}>
-                        Tap to assign {!hasCategory ? "category" : ""}{!hasCategory && !hasAccount ? " & " : ""}{!hasAccount ? "account" : ""}
+                      <MaterialIcons name="edit" size={13} color={isUnparsed ? AppColors.expense : AppColors.primary} />
+                      <ThemedText style={[styles.incompleteHintText, isUnparsed && { color: AppColors.expense }]}>
+                        {isUnparsed ? "Tap to fill manually" : `Tap to assign ${!hasCategory ? "category" : ""}${!hasCategory && !hasAccount ? " & " : ""}${!hasAccount ? "account" : ""}`}
                       </ThemedText>
                     </View>
                   )}
@@ -192,7 +218,7 @@ export default function PendingTransactionsScreen() {
                     </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.actionBtn, styles.acceptBtn, !isComplete && styles.acceptBtnIncomplete]}
+                    style={[styles.actionBtn, styles.acceptBtn, (!isComplete || isUnparsed) && styles.acceptBtnIncomplete]}
                     onPress={() => handleAccept(item)}>
                     <MaterialIcons name="check" size={20} color={AppColors.white} />
                     <ThemedText style={[styles.actionBtnText, { color: AppColors.white }]}>
@@ -239,7 +265,22 @@ const styles = StyleSheet.create({
     borderColor: AppColors.borderLight,
     overflow: "hidden",
   },
-  cardMain: { padding: 16 },
+  cardUnparsed: { borderLeftWidth: 4, borderLeftColor: AppColors.expense },
+  statusBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderBottomLeftRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    zIndex: 10,
+  },
+  statusBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
+  parsedByText: { color: "rgba(255,255,255,0.8)", fontSize: 8, fontWeight: "600" },
+  cardMain: { padding: 16, paddingTop: 20 },
   cardHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -268,12 +309,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppColors.borderLight,
   },
+  smsPreviewBoxUnparsed: { backgroundColor: "rgba(239, 68, 68, 0.05)", borderColor: "rgba(239, 68, 68, 0.2)" },
+  rawSmsLabel: { fontSize: 10, fontWeight: "800", color: AppColors.expense, marginBottom: 4 },
   smsPreviewText: {
     color: AppColors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
     fontStyle: "italic",
   },
+  smsPreviewTextUnparsed: { color: AppColors.text, fontStyle: "normal", fontWeight: "500" },
   incompleteHint: {
     flexDirection: "row",
     alignItems: "center",

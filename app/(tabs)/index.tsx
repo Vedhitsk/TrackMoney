@@ -1,9 +1,10 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    DeviceEventEmitter,
     Modal,
     SectionList,
     StyleSheet,
@@ -20,6 +21,7 @@ import {
 import { useTransactionStore } from "@/store/useTransactionStore";
 import type { Transaction } from "@/types";
 import { formatMoneyINR } from "@/types";
+import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
 
 type FilterMode = "day" | "week" | "month" | "year";
 
@@ -139,6 +141,22 @@ export default function RecordsScreen() {
     void refreshPendingTransactions();
     void refreshAllTransactions();
   }, []);
+
+  // Re-fetch when tab comes into focus (catches accepts/deletes from Pending Dashboard)
+  useFocusEffect(
+    useCallback(() => {
+      void refreshPendingTransactions();
+      void refreshAllTransactions();
+    }, [refreshPendingTransactions, refreshAllTransactions]),
+  );
+
+  // Also update pending count in real-time when background task saves a new SMS transaction
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(SMS_TRANSACTION_EVENT, () => {
+      void refreshPendingTransactions();
+    });
+    return () => sub.remove();
+  }, [refreshPendingTransactions]);
 
   useEffect(() => {
     void (async () => {

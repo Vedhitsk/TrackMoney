@@ -38,6 +38,10 @@ export const transactions = sqliteTable("transactions", {
   source: text("source", { enum: ["sms", "pdf", "manual"] })
     .notNull()
     .default("manual"),
+  parsedBy: text("parsed_by", { enum: ["regex", "groq", "gemini", "manual"] }),
+  parseStatus: text("parse_status", { enum: ["complete", "partial", "needs_review"] })
+    .notNull()
+    .default("complete"),
   isExcluded: int("is_excluded", { mode: "boolean" }).notNull().default(false),
   createdAt: int("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
@@ -76,6 +80,20 @@ export const appLogs = sqliteTable("app_logs", {
   level: text("level", { enum: ["info", "warn", "error"] }).notNull(),
   message: text("message").notNull(),
   details: text("details"), // JSON string
+  createdAt: int("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date(),
+  ),
+});
+
+// Many-to-many: one credit can settle multiple shared expenses, one expense can have multiple credits
+export const settlements = sqliteTable("settlements", {
+  id: int("id").primaryKey({ autoIncrement: true }),
+  // The credit/income transaction that is paying you back
+  incomeTxId: int("income_tx_id").references(() => transactions.id).notNull(),
+  // The original shared expense transaction where rawAmount > actualAmount
+  expenseTxId: int("expense_tx_id").references(() => transactions.id).notNull(),
+  // How much of this credit is applied to this expense
+  amount: real("amount").notNull(),
   createdAt: int("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),

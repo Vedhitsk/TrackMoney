@@ -4,13 +4,16 @@ import {
   Alert,
   FlatList,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useFocusEffect } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTransactionStore } from "@/store/useTransactionStore";
@@ -51,6 +54,14 @@ export default function BudgetsScreen() {
     void loadCategories();
     void refreshAllTransactions();
   }, []);
+
+  // Re-fetch when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      void refreshAllTransactions();
+      void loadBudgets();
+    }, [refreshAllTransactions, loadBudgets]),
+  );
 
   useEffect(() => {
     void loadBudgets();
@@ -289,52 +300,62 @@ export default function BudgetsScreen() {
 
       {/* Add/Edit Budget Modal */}
       <Modal visible={showForm} transparent animationType="fade" onRequestClose={() => setShowForm(false)}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowForm(false)}>
-          <View style={styles.modal} onStartShouldSetResponder={() => true}>
-            <ThemedText style={styles.modalTitle}>
-              {editBudgetId ? "Edit Budget" : "Add Budget"}
-            </ThemedText>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }} 
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowForm(false)}>
+            <ScrollView 
+              contentContainerStyle={styles.modalScrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.modal} onStartShouldSetResponder={() => true}>
+                <ThemedText style={styles.modalTitle}>
+                  {editBudgetId ? "Edit Budget" : "Add Budget"}
+                </ThemedText>
 
-            <ThemedText style={styles.fieldLabel}>Category</ThemedText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
-              {catsForPicker.map((cat) => (
-                <TouchableOpacity
-                  key={cat.id}
-                  style={[
-                    styles.catChip,
-                    selectedCatId === cat.id && styles.catChipActive,
-                  ]}
-                  onPress={() => setSelectedCatId(cat.id)}>
-                  <ThemedText style={styles.catChipIcon}>{cat.icon}</ThemedText>
-                  <ThemedText
-                    style={[
-                      styles.catChipText,
-                      selectedCatId === cat.id && styles.catChipTextActive,
-                    ]}>
-                    {cat.name}
-                  </ThemedText>
+                <ThemedText style={styles.fieldLabel}>Category</ThemedText>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
+                  {catsForPicker.map((cat) => (
+                    <TouchableOpacity
+                      key={cat.id}
+                      style={[
+                        styles.catChip,
+                        selectedCatId === cat.id && styles.catChipActive,
+                      ]}
+                      onPress={() => setSelectedCatId(cat.id)}>
+                      <ThemedText style={styles.catChipIcon}>{cat.icon}</ThemedText>
+                      <ThemedText
+                        style={[
+                          styles.catChipText,
+                          selectedCatId === cat.id && styles.catChipTextActive,
+                        ]}>
+                        {cat.name}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                <ThemedText style={styles.fieldLabel}>Monthly Limit (INR)</ThemedText>
+                <TextInput
+                  style={styles.input}
+                  value={limitStr}
+                  onChangeText={setLimitStr}
+                  keyboardType="numeric"
+                  placeholder="e.g. 5000"
+                  placeholderTextColor={AppColors.textSecondary}
+                />
+
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSaveBudget}>
+                  <ThemedText style={styles.saveBtnText}>SAVE</ThemedText>
                 </TouchableOpacity>
-              ))}
+              </View>
             </ScrollView>
-
-            <ThemedText style={styles.fieldLabel}>Monthly Limit (INR)</ThemedText>
-            <TextInput
-              style={styles.input}
-              value={limitStr}
-              onChangeText={setLimitStr}
-              keyboardType="numeric"
-              placeholder="e.g. 5000"
-              placeholderTextColor={AppColors.textSecondary}
-            />
-
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveBudget}>
-              <ThemedText style={styles.saveBtnText}>SAVE</ThemedText>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -450,15 +471,18 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalScrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
-    alignItems: "center",
+    padding: 20,
   },
   modal: {
     backgroundColor: AppColors.surface,
     borderRadius: 14,
     padding: 20,
-    width: "85%",
+    width: "100%",
     gap: 10,
   },
   modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },

@@ -19,7 +19,9 @@ import { useTransactionStore } from "@/store/useTransactionStore";
 import { updateTransaction } from "@/db/queries/transactions";
 import { addKeywordsToCategory } from "@/db/queries/categories";
 import type { TransactionType } from "@/types";
+import { formatMoneyINR } from "@/types";
 import { AppColors } from "@/constants/theme";
+import { listPendingRecoveries, createSettlements, type PendingRecovery } from "@/db/queries/settlements";
 
 type UIType = "income" | "expense" | "transfer" | "settlement";
 
@@ -66,13 +68,29 @@ export default function EditTransactionScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // Recovery mapping state
+  const [pendingRecoveries, setPendingRecoveries] = useState<PendingRecovery[]>([]);
+  const [allocations, setAllocations] = useState<Record<number, string>>({});
+  const [selectedRecoveries, setSelectedRecoveries] = useState<Set<number>>(new Set());
+
+  const uiType: UIType = draft ? txTypeToUI(draft.type) : "expense";
+
+  useEffect(() => {
+    if (uiType === "settlement") {
+      void listPendingRecoveries().then((res) => {
+        setPendingRecoveries(res.filter(r => r.remaining > 0));
+      });
+    } else {
+      setSelectedRecoveries(new Set());
+      setAllocations({});
+    }
+  }, [uiType]);
+
   useEffect(() => {
     if (!draft) return;
     setAmountStr(String(draft.rawAmount));
     setActualStr(String(draft.actualAmount));
   }, [draft?.id]);
-
-  const uiType: UIType = draft ? txTypeToUI(draft.type) : "expense";
 
   const setUIType = (t: UIType) => {
     const mapped: TransactionType = t;
@@ -97,6 +115,30 @@ export default function EditTransactionScreen() {
     }
   }, [amount]);
 
+  const handleToggleRecovery = (id: number) => {
+    const newSet = new Set(selectedRecoveries);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+      const newAlloc = { ...allocations };
+      delete newAlloc[id];
+      setAllocations(newAlloc);
+      setSelectedRecoveries(newSet);
+    } else {
+      newSet.add(id);
+      setSelectedRecoveries(newSet);
+      // Auto split
+      const splitAmount = amount / newSet.size;
+      const newAlloc = { ...allocations };
+      for (const selId of newSet) {
+        const rec = pendingRecoveries.find(r => r.tx.id === selId);
+        if (rec) {
+          newAlloc[selId] = String(Math.min(splitAmount, rec.remaining));
+        }
+      }
+      setAllocations(newAlloc);
+    }
+  };
+
   const canSave =
     Boolean(draft) &&
     amount > 0 &&
@@ -105,6 +147,8 @@ export default function EditTransactionScreen() {
         ? draft.accountId != null &&
           draft.toAccountId != null &&
           draft.accountId !== draft.toAccountId
+        : uiType === "settlement"
+        ? draft.accountId != null && selectedRecoveries.size > 0
         : draft.accountId != null && draft.categoryId != null
       : false);
 
@@ -130,21 +174,43 @@ export default function EditTransactionScreen() {
 
   const handleSave = async () => {
     try {
+      let finalMerchant = draft.merchant.trim() || draft.notes.trim();
+      if (uiType === "settlement") {
+        const selArr = Array.from(selectedRecoveries);
+        if (selArr.length === 1) {
+          const rec = pendingRecoveries.find(r => r.tx.id === selArr[0]);
+          if (rec) finalMerchant = `Recovery: ${rec.tx.merchant}`;
+        } else if (selArr.length > 1) {
+          finalMerchant = "Multiple Recoveries";
+        }
+      }
+
       const patch: Parameters<typeof updateTransaction>[1] = {
         rawAmount: draft.rawAmount,
         actualAmount: draft.isShared ? Number(actualStr) || draft.actualAmount : draft.rawAmount,
         isShared: uiType === "expense" ? draft.isShared : false,
         type: draft.type,
-        categoryId: uiType !== "transfer" ? draft.categoryId : null,
+        categoryId: uiType !== "transfer" && uiType !== "settlement" ? draft.categoryId : null,
         accountId: draft.accountId,
         toAccountId: uiType === "transfer" ? draft.toAccountId : null,
-        merchant: draft.merchant.trim() || draft.notes.trim(),
+        merchant: finalMerchant,
         notes: draft.notes,
         date: draft.date,
         isExcluded: uiType === "transfer" || draft.type === "ignored" || draft.type === "settlement",
         source: "manual",
       };
       await updateTransaction(draft.id ?? idNum, patch);
+
+      if (uiType === "settlement") {
+        const inputs = Array.from(selectedRecoveries)
+          .map((id) => ({
+            incomeTxId: draft.id ?? idNum,
+            expenseTxId: id,
+            amount: parseFloat(allocations[id] ?? "0") || 0,
+          }))
+          .filter((s) => s.amount > 0);
+        await createSettlements(inputs);
+      }
 
       if (uiType === "expense" && draft.categoryId) {
         // Only add the merchant name as keywords, NOT the full SMS body.
@@ -251,7 +317,7 @@ export default function EditTransactionScreen() {
         )}
 
         {/* Category (Income/Expense) */}
-        {uiType !== "transfer" && (
+        {uiType !== "transfer" && uiType !== "settlement" && (
           <View style={styles.pickerCol}>
             <ThemedText style={styles.pickerLabel}>Category</ThemedText>
             <FlatList
@@ -274,6 +340,52 @@ export default function EditTransactionScreen() {
                 );
               }}
             />
+          </View>
+        )}
+
+        {/* Pending Recoveries Pick List (Settlement only) */}
+        {uiType === "settlement" && (
+          <View style={styles.pickerCol}>
+            <ThemedText style={styles.pickerLabel}>Select Recoveries</ThemedText>
+            {pendingRecoveries.length === 0 ? (
+              <ThemedText style={styles.noRecoveriesText}>No pending recoveries available.</ThemedText>
+            ) : (
+              <View style={styles.recoveriesList}>
+                {pendingRecoveries.map((r) => {
+                  const isChecked = selectedRecoveries.has(r.tx.id);
+                  return (
+                    <View key={r.tx.id} style={[styles.recoveryRow, isChecked && styles.recoveryRowActive]}>
+                      <TouchableOpacity
+                        style={styles.recoveryRowSelect}
+                        onPress={() => handleToggleRecovery(r.tx.id)}>
+                        <MaterialIcons
+                          name={isChecked ? "check-box" : "check-box-outline-blank"}
+                          size={24}
+                          color={isChecked ? AppColors.primary : AppColors.textSecondary}
+                        />
+                        <View style={styles.recoveryRowInfo}>
+                          <ThemedText style={styles.recoveryRowMerchant} numberOfLines={1}>{r.tx.merchant}</ThemedText>
+                          <ThemedText style={styles.recoveryRowRemaining}>
+                            Remaining: {formatMoneyINR(r.remaining)}
+                          </ThemedText>
+                        </View>
+                      </TouchableOpacity>
+                      
+                      {isChecked && (
+                        <TextInput
+                          style={styles.recoveryAllocInput}
+                          value={allocations[r.tx.id] ?? ""}
+                          onChangeText={(v) => setAllocations((prev) => ({ ...prev, [r.tx.id]: v }))}
+                          keyboardType="numeric"
+                          placeholder="0"
+                          placeholderTextColor={AppColors.textSecondary}
+                        />
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
         )}
 
@@ -419,6 +531,47 @@ const styles = StyleSheet.create({
   },
   typeChipActive: {
     borderBottomColor: AppColors.primary,
+  },
+  padInputBox: {
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 48,
+    borderBottomWidth: 2,
+    borderBottomColor: AppColors.border,
+    paddingBottom: 4,
+    marginBottom: 8,
+  },
+  padInputBoxActive: { borderBottomColor: AppColors.primary },
+  padInputText: { fontSize: 32, fontWeight: "700", color: AppColors.text, letterSpacing: 1 },
+  recoveriesList: { gap: 8, paddingHorizontal: 16, marginTop: 4 },
+  noRecoveriesText: { paddingHorizontal: 16, color: AppColors.textSecondary, fontStyle: "italic" },
+  recoveryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: AppColors.surface,
+    borderWidth: 1,
+    borderColor: AppColors.borderLight,
+    borderRadius: 8,
+    padding: 10,
+    gap: 12,
+  },
+  recoveryRowActive: { borderColor: AppColors.primary },
+  recoveryRowSelect: { flexDirection: "row", alignItems: "center", flex: 1, gap: 10 },
+  recoveryRowInfo: { flex: 1 },
+  recoveryRowMerchant: { fontSize: 14, fontWeight: "600", color: AppColors.text },
+  recoveryRowRemaining: { fontSize: 11, color: AppColors.expense, marginTop: 2 },
+  recoveryAllocInput: {
+    width: 80,
+    borderWidth: 1,
+    borderColor: AppColors.border,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    fontSize: 14,
+    color: AppColors.text,
+    textAlign: "right",
+    backgroundColor: AppColors.background,
   },
   typeChipText: {
     fontSize: 12,

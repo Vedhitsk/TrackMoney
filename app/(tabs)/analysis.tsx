@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useFocusEffect } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
 import { DonutChart } from "@/components/donut-chart";
@@ -27,6 +28,13 @@ export default function AnalysisScreen() {
     void loadCategories();
     void refreshAllTransactions();
   }, []);
+
+  // Re-fetch when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      void refreshAllTransactions();
+    }, [refreshAllTransactions]),
+  );
 
   const year = anchor.getFullYear();
   const month = anchor.getMonth();

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -142,11 +144,20 @@ export default function CategoriesScreen() {
 
       {/* Form Modal */}
       <Modal visible={showForm} transparent animationType="fade" onRequestClose={() => setShowForm(false)}>
+        <KeyboardAvoidingView
+          style={styles.modalKav}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setShowForm(false)}>
-          <View style={styles.modal} onStartShouldSetResponder={() => true}>
+          <ScrollView
+            contentContainerStyle={styles.modalScrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.modal} onStartShouldSetResponder={() => true}>
             <ThemedText style={styles.modalTitle}>
               {editId ? "Edit Category" : "Add Category"}
             </ThemedText>
@@ -197,7 +208,9 @@ export default function CategoriesScreen() {
               <ThemedText style={styles.saveBtnText}>SAVE</ThemedText>
             </TouchableOpacity>
           </View>
+          </ScrollView>
         </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -265,17 +278,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-  modalOverlay: {
+  modalKav: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
     justifyContent: "center",
     alignItems: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalScrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
+    width: "100%",
+  },
   modal: {
     backgroundColor: AppColors.surface,
-    borderRadius: 14,
-    padding: 20,
-    width: "85%",
+    borderRadius: 18,
+    padding: 24,
+    width: "88%",
+    alignSelf: "center",
     gap: 10,
   },
   modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },

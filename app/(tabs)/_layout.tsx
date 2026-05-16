@@ -7,9 +7,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppColors } from "@/constants/theme";
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();  
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
+      backBehavior="none"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: AppColors.tabActive,
