@@ -19,6 +19,7 @@ import {
     saveRecordsFilterPrefs,
 } from "@/lib/recordsFilterPrefs";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { useShallow } from "zustand/react/shallow";
 import type { Transaction } from "@/types";
 import { formatMoneyINR } from "@/types";
 import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
@@ -128,7 +129,19 @@ export default function RecordsScreen() {
     allTransactions,
     refreshAllTransactions,
     loadingAllTransactions,
-  } = useTransactionStore();
+  } = useTransactionStore(
+    useShallow((state) => ({
+      categories: state.categories,
+      loadCategories: state.loadCategories,
+      accounts: state.accounts,
+      loadAccounts: state.loadAccounts,
+      pendingTransactions: state.pendingTransactions,
+      refreshPendingTransactions: state.refreshPendingTransactions,
+      allTransactions: state.allTransactions,
+      refreshAllTransactions: state.refreshAllTransactions,
+      loadingAllTransactions: state.loadingAllTransactions,
+    }))
+  );
 
   const [anchor, setAnchor] = useState(new Date());
   const [filterMode, setFilterMode] = useState<FilterMode>("month");
