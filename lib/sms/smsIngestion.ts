@@ -1,4 +1,4 @@
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { DeviceEventEmitter, NativeModules, Platform, PermissionsAndroid } from "react-native";
 
 import { db } from "@/db/client";
@@ -23,7 +23,10 @@ async function lookupMerchantContext(
     const rows = await db
       .select()
       .from(transactions)
-      .where(and(eq(transactions.merchant, merchant), eq(transactions.source, 'manual')))
+      .where(and(
+        sql`LOWER(TRIM(${transactions.merchant})) = LOWER(TRIM(${merchant}))`,
+        eq(transactions.source, 'manual')
+      ))
       .orderBy(desc(transactions.createdAt))
       .limit(1);
     if (rows.length === 0) return null;
@@ -102,8 +105,8 @@ async function processSms(senderAddress: string, body: string): Promise<void> {
       const draftWithCtx = ctx
         ? {
             ...regexResult.draft,
-            categoryId: regexResult.draft.categoryId ?? ctx.categoryId,
-            accountId: regexResult.draft.accountId ?? ctx.accountId,
+            categoryId: ctx.categoryId ?? regexResult.draft.categoryId,
+            accountId: ctx.accountId ?? regexResult.draft.accountId,
           }
         : regexResult.draft;
       if (ctx) {
@@ -200,8 +203,8 @@ async function processSms(senderAddress: string, body: string): Promise<void> {
     if (ctxFallback) {
       finalDraft = {
         ...finalDraft,
-        categoryId: finalDraft.categoryId ?? ctxFallback.categoryId,
-        accountId: finalDraft.accountId ?? ctxFallback.accountId,
+        categoryId: ctxFallback.categoryId ?? finalDraft.categoryId,
+        accountId: ctxFallback.accountId ?? finalDraft.accountId,
       };
       await logAppEvent("info", "SMS Processor: Context memory applied (fallback path)", { merchant: finalDraft.merchant });
     }
