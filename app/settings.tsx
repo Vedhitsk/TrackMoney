@@ -1,3 +1,6 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
+import { useThemeStore } from '@/store/useThemeStore';
 import React, { useState } from "react";
 import {
   Alert,
@@ -16,15 +19,16 @@ import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import * as DocumentPicker from "expo-document-picker";
-import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import { File, Paths } from "expo-file-system";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 import { ThemedText } from "@/components/themed-text";
 import { exportTrackMoneyData, importTrackMoneyData } from "@/lib/serialization/trackmoney";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { parseSmsOffline } from "@/lib/sms/smsParser";
 import { insertTransaction } from "@/db/queries/transactions";
-import { AppColors } from "@/constants/theme";
+
 
 type SettingItem = {
   icon: keyof typeof MaterialIcons.glyphMap;
@@ -37,6 +41,9 @@ type SettingItem = {
 };
 
 export default function SettingsScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -150,7 +157,21 @@ export default function SettingsScreen() {
     }
   };
 
+  const themeStore = useThemeStore();
+
   const sections: { title: string; items: SettingItem[] }[] = [
+    {
+      title: "Appearance",
+      items: [
+        {
+          icon: "brightness-4",
+          label: "Theme",
+          sub: `Current: ${themeStore.theme.charAt(0).toUpperCase() + themeStore.theme.slice(1)}`,
+          rightElement: <ThemeToggle />,
+          noArrow: true,
+        },
+      ],
+    },
     {
       title: "Data",
       items: [
@@ -165,7 +186,7 @@ export default function SettingsScreen() {
           label: "Import Data",
           sub: "Replace all data from JSON file",
           onPress: onImport,
-          color: AppColors.expense,
+          color: theme.expense,
         },
       ],
     },
@@ -213,7 +234,7 @@ export default function SettingsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color={AppColors.text} />
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Settings</ThemedText>
         <View style={{ width: 24 }} />
@@ -233,7 +254,7 @@ export default function SettingsScreen() {
                   <MaterialIcons
                     name={item.icon}
                     size={22}
-                    color={item.color ?? AppColors.primary}
+                    color={item.color ?? theme.primary}
                   />
                 </View>
                 <View style={styles.rowInfo}>
@@ -243,7 +264,7 @@ export default function SettingsScreen() {
                 {item.rightElement ? (
                   item.rightElement
                 ) : item.noArrow ? null : (
-                  <MaterialIcons name="chevron-right" size={22} color={AppColors.textSecondary} />
+                  <MaterialIcons name="chevron-right" size={22} color={theme.textSecondary} />
                 )}
               </TouchableOpacity>
             ))}
@@ -269,7 +290,7 @@ export default function SettingsScreen() {
               value={simulateText}
               onChangeText={setSimulateText}
               placeholder="Paste your bank SMS here..."
-              placeholderTextColor={AppColors.textSecondary}
+              placeholderTextColor={theme.textSecondary}
               multiline
               textAlignVertical="top"
             />
@@ -284,8 +305,8 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: AppColors.background, paddingTop: 48 },
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 48 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -293,15 +314,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: theme.border,
   },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
+  headerTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
   scroll: { paddingBottom: 40 },
   section: { paddingTop: 16, paddingHorizontal: 16 },
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
     letterSpacing: 0.5,
     marginBottom: 8,
     textTransform: "uppercase",
@@ -309,28 +330,28 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 10,
     padding: 14,
     marginBottom: 8,
     gap: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderLight,
+    borderColor: theme.borderLight,
   },
   rowDisabled: { opacity: 0.5 },
   rowIcon: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
   rowInfo: { flex: 1, gap: 2 },
-  rowLabel: { fontSize: 15, fontWeight: "600", color: AppColors.text },
-  rowSub: { fontSize: 12, color: AppColors.textSecondary },
+  rowLabel: { fontSize: 15, fontWeight: "600", color: theme.text },
+  rowSub: { fontSize: 12, color: theme.textSecondary },
   statusWrap: { paddingHorizontal: 16, paddingTop: 10 },
-  statusText: { fontSize: 13, color: AppColors.primary, fontWeight: "600" },
+  statusText: { fontSize: 13, color: theme.primary, fontWeight: "600" },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.35)",
@@ -338,29 +359,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modal: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 14,
     padding: 20,
     width: "85%",
     gap: 10,
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
-  fieldLabel: { fontSize: 13, fontWeight: "600", color: AppColors.textSecondary, marginTop: 4 },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
+  fieldLabel: { fontSize: 13, fontWeight: "600", color: theme.textSecondary, marginTop: 4 },
   input: {
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: AppColors.text,
+    color: theme.text,
   },
   saveBtn: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 6,
   },
-  saveBtnText: { color: AppColors.white, fontSize: 15, fontWeight: "700" },
+  saveBtnText: { color: theme.white, fontSize: 15, fontWeight: "700" },
 });

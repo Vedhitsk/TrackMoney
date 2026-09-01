@@ -1,12 +1,16 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import { Tabs } from "expo-router";
 import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AppColors } from "@/constants/theme";
+
 
 export default function TabLayout() {
+  const theme = useAppTheme();
+
   const insets = useSafeAreaInsets();
 
   return (
@@ -14,12 +18,12 @@ export default function TabLayout() {
       backBehavior="none"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: AppColors.tabActive,
-        tabBarInactiveTintColor: AppColors.tabInactive,
+        tabBarActiveTintColor: theme.tabActive,
+        tabBarInactiveTintColor: theme.tabInactive,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: AppColors.white,
-          borderTopColor: AppColors.border,
+          backgroundColor: theme.white,
+          borderTopColor: theme.border,
           height: 58 + insets.bottom,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 6,
           paddingTop: 8,

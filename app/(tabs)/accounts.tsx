@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
@@ -15,7 +17,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 import { formatMoneyINR } from "@/types";
 import type { AccountWithBalance } from "@/db/queries/accounts";
 import { countActiveRecoveries } from "@/db/queries/settlements";
@@ -23,6 +25,9 @@ import { countActiveRecoveries } from "@/db/queries/settlements";
 const ACCOUNT_ICONS = ["💳", "💵", "👛", "🏦", "📱", "💰", "🏧", "🪙"];
 
 export default function AccountsScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const router = useRouter();
   const [accounts, setAccounts] = useState<AccountWithBalance[]>([]);
   const [loading, setLoading] = useState(false);
@@ -119,11 +124,7 @@ export default function AccountsScreen() {
       {/* Total Balance Card */}
       <View style={styles.totalCard}>
         <ThemedText style={styles.totalLabel}>TOTAL BALANCE</ThemedText>
-        <ThemedText
-          style={[
-            styles.totalValue,
-            { color: totalBalance >= 0 ? AppColors.income : AppColors.expense },
-          ]}>
+        <ThemedText style={styles.totalValue}>
           {formatMoneyINR(totalBalance)}
         </ThemedText>
       </View>
@@ -150,7 +151,7 @@ export default function AccountsScreen() {
                   styles.cardBalance,
                   {
                     color:
-                      item.currentBalance >= 0 ? AppColors.income : AppColors.expense,
+                      item.currentBalance >= 0 ? theme.income : theme.expense,
                   },
                 ]}>
                 {formatMoneyINR(item.currentBalance)}
@@ -168,7 +169,7 @@ export default function AccountsScreen() {
           <TouchableOpacity
             style={styles.recoveriesBtn}
             onPress={() => router.push("/recoveries")}>
-            <MaterialIcons name="people" size={20} color={AppColors.primary} />
+            <MaterialIcons name="people" size={20} color={theme.primary} />
             <ThemedText style={styles.recoveriesBtnText}>View Pending Recoveries</ThemedText>
             {recoveryCount > 0 && (
               <View style={styles.recoveriesBadge}>
@@ -181,7 +182,7 @@ export default function AccountsScreen() {
 
       {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={openAdd}>
-        <MaterialIcons name="add" size={28} color={AppColors.white} />
+        <MaterialIcons name="add" size={28} color={theme.white} />
       </TouchableOpacity>
 
       {/* Form Modal */}
@@ -210,7 +211,7 @@ export default function AccountsScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="e.g. HDFC Card"
-                placeholderTextColor={AppColors.textSecondary}
+                placeholderTextColor={theme.textSecondary}
                 returnKeyType="done"
               />
 
@@ -233,7 +234,7 @@ export default function AccountsScreen() {
                 onChangeText={setBalanceStr}
                 keyboardType="numeric"
                 placeholder="0"
-                placeholderTextColor={AppColors.textSecondary}
+                placeholderTextColor={theme.textSecondary}
                 returnKeyType="done"
               />
 
@@ -249,14 +250,14 @@ export default function AccountsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: AppColors.background, paddingTop: 48 },
-  header: { paddingHorizontal: 16, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: AppColors.text },
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 48 },
+  header: { alignItems: "center", paddingHorizontal: 16, paddingBottom: 8 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: theme.text },
   totalCard: {
     marginHorizontal: 16,
     marginVertical: 10,
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
     borderRadius: 14,
     padding: 20,
     alignItems: "center",
@@ -270,35 +271,35 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 26,
     fontWeight: "700",
-    color: AppColors.white,
+    color: theme.white,
     marginTop: 4,
   },
   listContent: { paddingHorizontal: 16, paddingBottom: 80, gap: 8 },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 12,
     padding: 14,
     gap: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderLight,
+    borderColor: theme.borderLight,
   },
   cardIcon: {
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
   cardIconText: { fontSize: 22 },
   cardInfo: { flex: 1, gap: 2 },
-  cardName: { fontSize: 16, fontWeight: "600", color: AppColors.text },
-  cardInitial: { fontSize: 12, color: AppColors.textSecondary },
+  cardName: { fontSize: 16, fontWeight: "600", color: theme.text },
+  cardInitial: { fontSize: 12, color: theme.textSecondary },
   cardRight: { alignItems: "flex-end", gap: 2 },
   cardBalance: { fontSize: 16, fontWeight: "700" },
-  cardSub: { fontSize: 11, color: AppColors.textSecondary },
+  cardSub: { fontSize: 11, color: theme.textSecondary },
   center: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 60 },
   recoveriesBtn: {
     flexDirection: "row",
@@ -308,14 +309,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 80,
     padding: 16,
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
   },
-  recoveriesBtnText: { flex: 1, fontSize: 15, fontWeight: "600", color: AppColors.primary },
+  recoveriesBtnText: { flex: 1, fontSize: 15, fontWeight: "600", color: theme.primary },
   recoveriesBadge: {
-    backgroundColor: AppColors.expense,
+    backgroundColor: theme.expense,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
   },
   recoveriesBadgeText: { color: "#fff", fontSize: 12, fontWeight: "800" },
 
-  emptyText: { fontSize: 16, fontWeight: "600", color: AppColors.textSecondary },
+  emptyText: { fontSize: 16, fontWeight: "600", color: theme.textSecondary },
   fab: {
     position: "absolute",
     bottom: 24,
@@ -333,7 +334,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: AppColors.fab,
+    backgroundColor: theme.fab,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
@@ -362,40 +363,40 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   modal: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 18,
     padding: 24,
     width: "88%",
     gap: 10,
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
-  fieldLabel: { fontSize: 13, fontWeight: "600", color: AppColors.textSecondary, marginTop: 4 },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
+  fieldLabel: { fontSize: 13, fontWeight: "600", color: theme.textSecondary, marginTop: 4 },
   input: {
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: AppColors.text,
+    color: theme.text,
   },
   iconGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginVertical: 4 },
   iconCell: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: AppColors.borderLight,
+    backgroundColor: theme.borderLight,
     justifyContent: "center",
     alignItems: "center",
   },
-  iconCellActive: { backgroundColor: AppColors.primaryLight, borderWidth: 2, borderColor: AppColors.primary },
+  iconCellActive: { backgroundColor: theme.primaryLight, borderWidth: 2, borderColor: theme.primary },
   iconText: { fontSize: 20 },
   saveBtn: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 6,
   },
-  saveBtnText: { color: AppColors.white, fontSize: 15, fontWeight: "700" },
+  saveBtnText: { color: theme.white, fontSize: 15, fontWeight: "700" },
 });

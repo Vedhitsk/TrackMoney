@@ -490,3 +490,21 @@ npm run lint
 
 EAS project ID: `1af0a8d9-23f3-4f52-9f8f-bf547aaa169b`
 Android package: `com.trackmoney.app`
+
+---
+
+## UI Architecture & Theming
+
+### 1. Dynamic Theming (Dark Mode)
+- **Theme Definition:** constants/theme.ts exports LightColors and DarkColors unified under a ThemeColors type.
+- **Hook:** hooks/useAppTheme.ts merges user preference from Zustand (useThemeStore.ts) with system OS scheme (useColorScheme) to return the active dynamic palette.
+- **Rules:** Never hardcode hex colors or inline static styles. Use dynamic stylesheet generators:
+  `	ypescript
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
+  const getStyles = (theme: ThemeColors) => StyleSheet.create({ ... })
+  `
+- **Navigation:** <ThemeProvider> in pp/_layout.tsx consumes the dynamic theme, and <Stack> is wrapped in a <View style={{ backgroundColor: theme.background }}> to prevent native grey screen transitions during stack animations.
+- **Headers Layout:** All tab screen headers (Records, Analysis, Budgets, Accounts, Categories) are centered. The main Records tab header features the Settings gear on the top-left (with slide_from_left navigation) and the Search icon on the top-right.
+

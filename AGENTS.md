@@ -34,3 +34,8 @@ Expo React Native app with TypeScript, Drizzle ORM, and SQLite. Handles sensitiv
 - Two SMS ingestion paths run simultaneously: BroadcastReceiver (real-time) and Inbox Backfill (on app open). A `processingLock` Set and `sms_log` DB check prevent double processing.
 
 <!-- /bmad:context -->
+
+## UI & Styling Conventions
+- **No Hardcoded Colors:** Never use static \StyleSheet.create()\ or hardcoded hex colors. The app uses a dynamic System/Light/Dark mode. Always inject the active theme via \const theme = useAppTheme()\ and use a factory function: \const getStyles = (theme: ThemeColors) => StyleSheet.create({...})\.
+- **Navigation Transitions:** Expo Router stack animations (like \slide_from_left\) can expose a grey OS window background on Android during the transition. The root \<Stack>\ in \_layout.tsx\ must remain wrapped in a themed \<View>\ to prevent this glitch.
+

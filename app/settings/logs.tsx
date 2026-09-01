@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,10 +13,13 @@ import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 import { listAppLogs, clearAppLogs } from "@/lib/logger";
 
 export default function LogsScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const router = useRouter();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,17 +47,17 @@ export default function LogsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color={AppColors.text} />
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>System Logs</ThemedText>
         <TouchableOpacity onPress={handleClear}>
-          <MaterialIcons name="delete-sweep" size={24} color={AppColors.expense} />
+          <MaterialIcons name="delete-sweep" size={24} color={theme.expense} />
         </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={AppColors.primary} />
+          <ActivityIndicator color={theme.primary} />
         </View>
       ) : logs.length === 0 ? (
         <View style={styles.center}>
@@ -67,10 +72,10 @@ export default function LogsScreen() {
             const date = new Date(item.createdAt).toLocaleTimeString();
             const color =
               item.level === "error"
-                ? AppColors.expense
+                ? theme.expense
                 : item.level === "warn"
                 ? "#E69138"
-                : AppColors.primary;
+                : theme.primary;
 
             return (
               <View style={styles.logCard}>
@@ -95,8 +100,8 @@ export default function LogsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: AppColors.background, paddingTop: 48 },
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 48 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -104,18 +109,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: theme.border,
   },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
+  headerTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  emptyText: { color: AppColors.textSecondary },
+  emptyText: { color: theme.textSecondary },
   list: { padding: 16, gap: 12 },
   logCard: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: AppColors.borderLight,
+    borderColor: theme.borderLight,
   },
   logHeader: {
     flexDirection: "row",
@@ -123,8 +128,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   logLevel: { fontSize: 12, fontWeight: "800" },
-  logTime: { fontSize: 10, color: AppColors.textSecondary },
-  logMsg: { fontSize: 14, fontWeight: "600", color: AppColors.text },
+  logTime: { fontSize: 10, color: theme.textSecondary },
+  logMsg: { fontSize: 14, fontWeight: "600", color: theme.text },
   detailsBox: {
     marginTop: 8,
     padding: 8,

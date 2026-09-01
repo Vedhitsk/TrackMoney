@@ -1,9 +1,11 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useState } from "react";
 import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 
 type Props = {
   value: Date;
@@ -44,6 +46,8 @@ export function DatePickerModal({
   onSelect: (d: Date) => void;
   onClose: () => void;
 }) {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
   const [viewYear, setViewYear] = useState(value.getFullYear());
   const [viewMonth, setViewMonth] = useState(value.getMonth());
 
@@ -99,13 +103,13 @@ export function DatePickerModal({
           {/* Month/Year header */}
           <View style={styles.navRow}>
             <TouchableOpacity onPress={goPrev}>
-              <MaterialIcons name="chevron-left" size={28} color={AppColors.text} />
+              <MaterialIcons name="chevron-left" size={28} color={theme.text} />
             </TouchableOpacity>
             <ThemedText style={styles.navLabel}>
               {MONTH_NAMES[viewMonth]} {viewYear}
             </ThemedText>
             <TouchableOpacity onPress={goNext}>
-              <MaterialIcons name="chevron-right" size={28} color={AppColors.text} />
+              <MaterialIcons name="chevron-right" size={28} color={theme.text} />
             </TouchableOpacity>
           </View>
 
@@ -166,6 +170,8 @@ export function TimePickerModal({
   onSelect: (d: Date) => void;
   onClose: () => void;
 }) {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
   const [hour, setHour] = useState(value.getHours());
   const [minute, setMinute] = useState(value.getMinutes());
 
@@ -193,11 +199,11 @@ export function TimePickerModal({
             {/* Hour */}
             <View style={styles.timeCol}>
               <TouchableOpacity onPress={incHour} style={styles.timeArrow}>
-                <MaterialIcons name="keyboard-arrow-up" size={30} color={AppColors.text} />
+                <MaterialIcons name="keyboard-arrow-up" size={30} color={theme.text} />
               </TouchableOpacity>
               <ThemedText style={styles.timeDigit}>{pad(hour)}</ThemedText>
               <TouchableOpacity onPress={decHour} style={styles.timeArrow}>
-                <MaterialIcons name="keyboard-arrow-down" size={30} color={AppColors.text} />
+                <MaterialIcons name="keyboard-arrow-down" size={30} color={theme.text} />
               </TouchableOpacity>
             </View>
 
@@ -206,11 +212,11 @@ export function TimePickerModal({
             {/* Minute */}
             <View style={styles.timeCol}>
               <TouchableOpacity onPress={incMin} style={styles.timeArrow}>
-                <MaterialIcons name="keyboard-arrow-up" size={30} color={AppColors.text} />
+                <MaterialIcons name="keyboard-arrow-up" size={30} color={theme.text} />
               </TouchableOpacity>
               <ThemedText style={styles.timeDigit}>{pad(minute)}</ThemedText>
               <TouchableOpacity onPress={decMin} style={styles.timeArrow}>
-                <MaterialIcons name="keyboard-arrow-down" size={30} color={AppColors.text} />
+                <MaterialIcons name="keyboard-arrow-down" size={30} color={theme.text} />
               </TouchableOpacity>
             </View>
           </View>
@@ -224,7 +230,7 @@ export function TimePickerModal({
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.35)",
@@ -232,7 +238,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   card: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 16,
     width: 320,
@@ -246,7 +252,7 @@ const styles = StyleSheet.create({
   navLabel: {
     fontSize: 16,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
   },
   weekRow: {
     flexDirection: "row",
@@ -257,7 +263,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     fontWeight: "700",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   grid: {
     flexDirection: "row",
@@ -270,19 +276,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dayCellSelected: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
     borderRadius: 20,
   },
   dayText: {
     fontSize: 14,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   dayTextSelected: {
-    color: AppColors.white,
+    color: theme.white,
   },
   dayTextDisabled: {
-    color: AppColors.borderLight,
+    color: theme.borderLight,
   },
   todayBtn: {
     alignSelf: "center",
@@ -290,17 +296,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 24,
     borderRadius: 8,
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
   },
   todayBtnText: {
     fontSize: 14,
     fontWeight: "700",
-    color: AppColors.primary,
+    color: theme.primary,
   },
   timeTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     textAlign: "center",
     marginBottom: 16,
   },
@@ -320,10 +326,10 @@ const styles = StyleSheet.create({
   timeDigit: {
     fontSize: 36,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     minWidth: 60,
     textAlign: "center",
-    backgroundColor: AppColors.borderLight,
+    backgroundColor: theme.borderLight,
     borderRadius: 10,
     paddingVertical: 8,
     overflow: "hidden",
@@ -331,7 +337,7 @@ const styles = StyleSheet.create({
   timeColon: {
     fontSize: 32,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
   },
   doneBtn: {
     alignSelf: "center",
@@ -339,11 +345,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 32,
     borderRadius: 8,
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
   },
   doneBtnText: {
     fontSize: 14,
     fontWeight: "700",
-    color: AppColors.white,
+    color: theme.white,
   },
 });

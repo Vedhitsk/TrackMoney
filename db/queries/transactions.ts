@@ -142,3 +142,11 @@ export async function sumSpendTotalsForMonth(year: number, month: number): Promi
 
   return { total, byCategoryId };
 }
+export async function getCategoryTransactions(categoryId: number, year: number, month: number): Promise<Transaction[]> {
+  const rows = await db.select().from(transactions).where(eq(transactions.categoryId, categoryId));
+  const filtered = rows.filter((r: any) => {
+    const d = toDate(r.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+  return filtered.map(mapTransactionRow).sort((a, b) => b.date.getTime() - a.date.getTime());
+}

@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -20,7 +22,7 @@ import { updateTransaction } from "@/db/queries/transactions";
 import { addKeywordsToCategory } from "@/db/queries/categories";
 import type { TransactionType } from "@/types";
 import { formatMoneyINR } from "@/types";
-import { AppColors } from "@/constants/theme";
+
 import { listPendingRecoveries, createSettlements, type PendingRecovery } from "@/db/queries/settlements";
 
 type UIType = "income" | "expense" | "transfer" | "settlement";
@@ -42,6 +44,9 @@ function txTypeToUI(type: TransactionType): UIType {
 }
 
 export default function EditTransactionScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const idNum = Number(params.id);
@@ -156,7 +161,7 @@ export default function EditTransactionScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.center}>
-          <ActivityIndicator color={AppColors.primary} />
+          <ActivityIndicator color={theme.primary} />
         </View>
       </View>
     );
@@ -166,7 +171,7 @@ export default function EditTransactionScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.center}>
-          <ThemedText style={{ color: AppColors.textSecondary }}>Transaction not found.</ThemedText>
+          <ThemedText style={{ color: theme.textSecondary }}>Transaction not found.</ThemedText>
         </View>
       </View>
     );
@@ -232,12 +237,12 @@ export default function EditTransactionScreen() {
       {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.topBarBtn}>
-          <MaterialIcons name="close" size={20} color={AppColors.expense} />
-          <ThemedText style={[styles.topBarText, { color: AppColors.expense }]}>CANCEL</ThemedText>
+          <MaterialIcons name="close" size={20} color={theme.expense} />
+          <ThemedText style={[styles.topBarText, { color: theme.expense }]}>CANCEL</ThemedText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.topBarBtn} disabled={!canSave} onPress={handleSave}>
-          <MaterialIcons name="check" size={20} color={canSave ? AppColors.primary : AppColors.textSecondary} />
-          <ThemedText style={[styles.topBarText, { color: canSave ? AppColors.primary : AppColors.textSecondary }]}>
+          <MaterialIcons name="check" size={20} color={canSave ? theme.primary : theme.textSecondary} />
+          <ThemedText style={[styles.topBarText, { color: canSave ? theme.primary : theme.textSecondary }]}>
             SAVE
           </ThemedText>
         </TouchableOpacity>
@@ -253,7 +258,7 @@ export default function EditTransactionScreen() {
                 key={t}
                 style={[styles.typeChip, active && styles.typeChipActive]}
                 onPress={() => setUIType(t)}>
-                {active && <MaterialIcons name="check-circle" size={13} color={AppColors.primary} />}
+                {active && <MaterialIcons name="check-circle" size={13} color={theme.primary} />}
                 <ThemedText style={[styles.typeChipText, active && styles.typeChipActiveText]}>
                   {t === "settlement" ? "SETTLE" : t.toUpperCase()}
                 </ThemedText>
@@ -361,7 +366,7 @@ export default function EditTransactionScreen() {
                         <MaterialIcons
                           name={isChecked ? "check-box" : "check-box-outline-blank"}
                           size={24}
-                          color={isChecked ? AppColors.primary : AppColors.textSecondary}
+                          color={isChecked ? theme.primary : theme.textSecondary}
                         />
                         <View style={styles.recoveryRowInfo}>
                           <ThemedText style={styles.recoveryRowMerchant} numberOfLines={1}>{r.tx.merchant}</ThemedText>
@@ -378,7 +383,7 @@ export default function EditTransactionScreen() {
                           onChangeText={(v) => setAllocations((prev) => ({ ...prev, [r.tx.id]: v }))}
                           keyboardType="numeric"
                           placeholder="0"
-                          placeholderTextColor={AppColors.textSecondary}
+                          placeholderTextColor={theme.textSecondary}
                         />
                       )}
                     </View>
@@ -398,7 +403,7 @@ export default function EditTransactionScreen() {
             setDraftField("merchant", v.split(",")[0]?.trim() || "");
           }}
           placeholder="Add notes..."
-          placeholderTextColor={AppColors.textSecondary}
+          placeholderTextColor={theme.textSecondary}
           multiline
         />
 
@@ -418,7 +423,7 @@ export default function EditTransactionScreen() {
               <MaterialIcons
                 name={draft.isShared ? "check-box" : "check-box-outline-blank"}
                 size={22}
-                color={draft.isShared ? AppColors.primary : AppColors.textSecondary}
+                color={draft.isShared ? theme.primary : theme.textSecondary}
               />
               <ThemedText style={styles.sharedLabel}>Shared expense</ThemedText>
             </TouchableOpacity>
@@ -434,7 +439,7 @@ export default function EditTransactionScreen() {
                     if (Number.isFinite(n)) setDraftField("actualAmount", n);
                   }}
                   keyboardType="decimal-pad"
-                  placeholderTextColor={AppColors.textSecondary}
+                  placeholderTextColor={theme.textSecondary}
                 />
               </View>
             )}
@@ -447,13 +452,13 @@ export default function EditTransactionScreen() {
         {/* Date / Time */}
         <View style={styles.dateRow}>
           <TouchableOpacity style={styles.datePill} onPress={() => setShowDatePicker(true)}>
-            <MaterialIcons name="calendar-today" size={16} color={AppColors.primary} />
+            <MaterialIcons name="calendar-today" size={16} color={theme.primary} />
             <ThemedText style={styles.dateText}>
               {draft.date.toLocaleDateString("en-IN", { month: "short", day: "2-digit", year: "numeric" })}
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity style={styles.datePill} onPress={() => setShowTimePicker(true)}>
-            <MaterialIcons name="access-time" size={16} color={AppColors.primary} />
+            <MaterialIcons name="access-time" size={16} color={theme.primary} />
             <ThemedText style={styles.dateText}>
               {draft.date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
             </ThemedText>
@@ -478,10 +483,10 @@ export default function EditTransactionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: theme.background,
     paddingTop: 48,
   },
   center: {
@@ -496,7 +501,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: theme.border,
   },
   topBarBtn: {
     flexDirection: "row",
@@ -530,56 +535,56 @@ const styles = StyleSheet.create({
     borderBottomColor: "transparent",
   },
   typeChipActive: {
-    borderBottomColor: AppColors.primary,
+    borderBottomColor: theme.primary,
   },
   padInputBox: {
     alignItems: "center",
     justifyContent: "center",
     minHeight: 48,
     borderBottomWidth: 2,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: theme.border,
     paddingBottom: 4,
     marginBottom: 8,
   },
-  padInputBoxActive: { borderBottomColor: AppColors.primary },
-  padInputText: { fontSize: 32, fontWeight: "700", color: AppColors.text, letterSpacing: 1 },
+  padInputBoxActive: { borderBottomColor: theme.primary },
+  padInputText: { fontSize: 32, fontWeight: "700", color: theme.text, letterSpacing: 1 },
   recoveriesList: { gap: 8, paddingHorizontal: 16, marginTop: 4 },
-  noRecoveriesText: { paddingHorizontal: 16, color: AppColors.textSecondary, fontStyle: "italic" },
+  noRecoveriesText: { paddingHorizontal: 16, color: theme.textSecondary, fontStyle: "italic" },
   recoveryRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderWidth: 1,
-    borderColor: AppColors.borderLight,
+    borderColor: theme.borderLight,
     borderRadius: 8,
     padding: 10,
     gap: 12,
   },
-  recoveryRowActive: { borderColor: AppColors.primary },
+  recoveryRowActive: { borderColor: theme.primary },
   recoveryRowSelect: { flexDirection: "row", alignItems: "center", flex: 1, gap: 10 },
   recoveryRowInfo: { flex: 1 },
-  recoveryRowMerchant: { fontSize: 14, fontWeight: "600", color: AppColors.text },
-  recoveryRowRemaining: { fontSize: 11, color: AppColors.expense, marginTop: 2 },
+  recoveryRowMerchant: { fontSize: 14, fontWeight: "600", color: theme.text },
+  recoveryRowRemaining: { fontSize: 11, color: theme.expense, marginTop: 2 },
   recoveryAllocInput: {
     width: 80,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 6,
     fontSize: 14,
-    color: AppColors.text,
+    color: theme.text,
     textAlign: "right",
-    backgroundColor: AppColors.background,
+    backgroundColor: theme.background,
   },
   typeChipText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   typeChipActiveText: {
-    color: AppColors.primary,
+    color: theme.primary,
   },
   pickerCol: {
     gap: 6,
@@ -587,7 +592,7 @@ const styles = StyleSheet.create({
   pickerLabel: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -602,12 +607,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: AppColors.border,
-    backgroundColor: AppColors.surface,
+    borderColor: theme.border,
+    backgroundColor: theme.surface,
   },
   chipActive: {
-    borderColor: AppColors.primary,
-    backgroundColor: AppColors.primaryLight,
+    borderColor: theme.primary,
+    backgroundColor: theme.primaryLight,
   },
   chipIcon: {
     fontSize: 16,
@@ -615,20 +620,20 @@ const styles = StyleSheet.create({
   chipName: {
     fontSize: 13,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   chipNameActive: {
-    color: AppColors.primary,
+    color: theme.primary,
   },
   notesInput: {
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    backgroundColor: AppColors.surface,
-    color: AppColors.text,
+    backgroundColor: theme.surface,
+    color: theme.text,
     minHeight: 52,
     textAlignVertical: "top",
   },
@@ -643,7 +648,7 @@ const styles = StyleSheet.create({
   sharedLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   sharedInput: {
     flexDirection: "row",
@@ -653,18 +658,18 @@ const styles = StyleSheet.create({
   },
   sharedSubLabel: {
     fontSize: 13,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   shareAmountInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 15,
-    backgroundColor: AppColors.surface,
-    color: AppColors.text,
+    backgroundColor: theme.surface,
+    color: theme.text,
   },
   dateRow: {
     flexDirection: "row",
@@ -679,13 +684,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 8,
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
   },
   dateText: {
     fontSize: 13,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
     fontWeight: "600",
   },
 });

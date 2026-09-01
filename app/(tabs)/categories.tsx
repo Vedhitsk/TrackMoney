@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -15,7 +17,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTransactionStore } from "@/store/useTransactionStore";
-import { AppColors } from "@/constants/theme";
+
 import type { Category } from "@/types";
 
 const CATEGORY_ICONS = [
@@ -32,6 +34,9 @@ const CATEGORY_COLORS = [
 ];
 
 export default function CategoriesScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const { categories, loadCategories } = useTransactionStore();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -139,7 +144,7 @@ export default function CategoriesScreen() {
 
       {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={openAdd}>
-        <MaterialIcons name="add" size={28} color={AppColors.white} />
+        <MaterialIcons name="add" size={28} color={theme.white} />
       </TouchableOpacity>
 
       {/* Form Modal */}
@@ -168,7 +173,7 @@ export default function CategoriesScreen() {
               value={name}
               onChangeText={setName}
               placeholder="e.g. Food & Dining"
-              placeholderTextColor={AppColors.textSecondary}
+              placeholderTextColor={theme.textSecondary}
             />
 
             <ThemedText style={styles.fieldLabel}>Icon</ThemedText>
@@ -216,21 +221,22 @@ export default function CategoriesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: AppColors.background, paddingTop: 48 },
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 48 },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: AppColors.text },
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16,
+      paddingBottom: 12,
+      gap: 8,
+    },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: theme.text },
   countBadge: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppColors.white,
-    backgroundColor: AppColors.primary,
+    color: theme.white,
+    backgroundColor: theme.primary,
     paddingHorizontal: 10,
     paddingVertical: 2,
     borderRadius: 12,
@@ -256,12 +262,12 @@ const styles = StyleSheet.create({
   gridLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
     textAlign: "center",
   },
   center: { justifyContent: "center", alignItems: "center", paddingTop: 60, gap: 8 },
-  emptyText: { fontSize: 16, fontWeight: "600", color: AppColors.textSecondary },
-  mutedText: { fontSize: 13, color: AppColors.textSecondary },
+  emptyText: { fontSize: 16, fontWeight: "600", color: theme.textSecondary },
+  mutedText: { fontSize: 13, color: theme.textSecondary },
   fab: {
     position: "absolute",
     bottom: 24,
@@ -269,7 +275,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: AppColors.fab,
+    backgroundColor: theme.fab,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
@@ -298,38 +304,38 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   modal: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 18,
     padding: 24,
     width: "88%",
     alignSelf: "center",
     gap: 10,
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: AppColors.text },
-  fieldLabel: { fontSize: 13, fontWeight: "600", color: AppColors.textSecondary, marginTop: 4 },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: theme.text },
+  fieldLabel: { fontSize: 13, fontWeight: "600", color: theme.textSecondary, marginTop: 4 },
   input: {
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: AppColors.text,
+    color: theme.text,
   },
   pickerScroll: { maxHeight: 46, marginVertical: 4 },
   pickerCell: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: AppColors.borderLight,
+    backgroundColor: theme.borderLight,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,
   },
   pickerCellActive: {
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
     borderWidth: 2,
-    borderColor: AppColors.primary,
+    borderColor: theme.primary,
   },
   pickerEmoji: { fontSize: 20 },
   colorGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginVertical: 4 },
@@ -342,14 +348,14 @@ const styles = StyleSheet.create({
   },
   colorCellActive: {
     borderWidth: 3,
-    borderColor: AppColors.text,
+    borderColor: theme.text,
   },
   saveBtn: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 6,
   },
-  saveBtnText: { color: AppColors.white, fontSize: 15, fontWeight: "700" },
+  saveBtnText: { color: theme.white, fontSize: 15, fontWeight: "700" },
 });

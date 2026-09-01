@@ -33,28 +33,54 @@
 ## 4. Key Work Completed in Recent Session
 
 ### A. Navigation & Touch Responsiveness Optimization
-- **Problem:** Main records screen (`app/(tabs)/index.tsx`) felt laggy on button clicks in release builds due to whole-store destructuring from `useTransactionStore`, triggering full-component and list re-renders on every background state change.
-- **Fix:** Switched `index.tsx` to use Zustand's `useShallow` selector map. Tap events and UI thread operations now execute without thread blocking.
-- **Commit:** `213309f` (*fix: resolve navigation lag in main screen using useShallow*)
+- **Problem:** Main records screen (`app/(tabs)/index.tsx`) felt laggy on button clicks in release builds due to whole-store destructuring from `useTransactionStore`.
+- **Fix:** Switched `index.tsx` to use Zustand's `useShallow` selector map.
+- **Commit:** `213309f`
 
 ### B. Merchant Context Memory & Learning Fix
-- **Problem:** When users manually accepted/categorized a transaction from a new merchant, subsequent SMS messages from that merchant failed to inherit the user-selected category.
-- **Root Causes:**
-  1. `lookupMerchantContext` query used a strict case-sensitive `eq(transactions.merchant, merchant)` check. Slight variations in AI casing or whitespace caused misses.
-  2. Fallback logic prioritized the AI's category guess over historical database records (`finalDraft.categoryId ?? ctx.categoryId`).
-- **Fix:**
-  1. Updated `lookupMerchantContext` in `lib/sms/smsIngestion.ts` to use case-insensitive, trimmed matching: `sql`LOWER(TRIM(${transactions.merchant})) = LOWER(TRIM(${merchant}))``.
-  2. Updated priority logic in Layer 1 and Layer 3 so that manual database context memory strictly overrides AI/Regex guesses: `ctx.categoryId ?? finalDraft.categoryId`.
-- **Commit:** `79297a8` (*fix: make merchant context case-insensitive and override AI*)
+- **Problem:** Subsequent SMS from a merchant did not inherit manual user-assigned categories.
+- **Fix:** Made `lookupMerchantContext` query case-insensitive and ensured historical DB memory strictly overrides AI guesses.
+- **Commit:** `79297a8`
 
 ### C. Repository Structure & BMad Setup
-- Configured BMad workspace, `AGENTS.md`, `rules.md`, `spec.md`, `skills.md`, and created implementation specs in `_bmad-output/implementation-artifacts/`.
-- Finalized architecture spine in `planning_artifacts/architecture/architecture-TrackMoney-2026-08-30/ARCHITECTURE-SPINE.md`.
-- **Commit:** `b81fba8` (*chore: add BMad artifacts, agents config, and implementation specs*)
+- Configured BMad workspace, `AGENTS.md`, `rules.md`, `spec.md`, `skills.md`, and created architecture spine in `planning_artifacts/architecture/`.
+- **Commit:** `b81fba8`
+
+### D. Category Details Screen & Log Details Modal
+- **Feature Overview:**
+  - Added dedicated drill-down Category Details screen (`app/category-details.tsx`) accessible by tapping categories in Analytics (`app/(tabs)/analysis.tsx`) and budget cards in Budgets (`app/(tabs)/budgets.tsx`).
+  - Added a dedicated edit button on budget cards so card body click exclusively handles drill-down navigation.
+- **Category Details Layout & Functionality:**
+  - **Header:** Clean top app bar showing category icon and category name.
+  - **Dual Donut Chart Card (Dark Theme Card):**
+    - Left Donut: Category Expense % relative to the entire month's total expenses across all categories.
+    - Right Donut: Category Income % relative to the entire month's total income across all categories.
+    - Top of card: Displays the active month (e.g., "September 2026") followed by a subtle horizontal divider line.
+    - Footer: Shows `Total Amount: +/-<amount>` (net: Income - Expense), colored green for positive and red for negative.
+  - **Record Count & Cycle Sort:** Header displays `{count} records` and a cycle sort button toggling between `NEW TO OLD` ➔ `OLD TO NEW` ➔ `ONLY EXPENSES` ➔ `ONLY INCOME`.
+  - **Transaction List:** Grouped by date, lists both income (`+`) and expense (`-`) transactions without notes. Explicitly displays "My share: +/-₹X" under the account name for shared expenses where `actualAmount !== rawAmount`.
+- **Log Details Popup (`components/log-details-modal.tsx`):**
+  - Displays full transaction details upon tapping a log item (type, date/time, bold semibold amount, account badge, category badge, and full SMS/notes text).
+  - Contains Edit and Delete actions (with confirmation dialog). Omitted duplicate action icon.
+- **Component & Query Updates:**
+  - Added `getCategoryTransactions(categoryId, year, month)` in `db/queries/transactions.ts`.
+  - Added `centerTextColor` prop to `components/donut-chart.tsx` to ensure high contrast text inside dark and light containers.
 
 ---
 
-## 5. Outstanding Tasks & Next Chat Handoff
-1. **Remote Push:** Run `git push origin master` in an authenticated terminal (current local branch is ahead by 3 commits: `213309f`, `79297a8`, `b81fba8`).
-2. **Release Verification:** Build new release APK (`--variant release`) to verify snappy navigation and merchant auto-categorization.
-3. **Future Explorations:** Prepare specification for on-device SLM (Gemma) pipeline.
+## 5. Key Work Completed in Current Session (Goal 2: Dark Mode)
+
+### Full Dark Mode Implementation & UI Polish
+- **Theme Definition:** Refactored `constants/theme.ts` to export `LightColors` and `DarkColors` with a cohesive palette, and aliased them under `ThemeColors`.
+- **Dynamic Hooks:** Created `hooks/useAppTheme.ts` to combine `useThemeStore` and `react-native`'s `useColorScheme`, returning the active dynamic palette based on OS setting or explicit user choice (Light/Dark/System).
+- **Global Refactoring:** Programmatically refactored 17 screens and components (including `index.tsx`, `settings.tsx`, modals, charts, etc.) using a Python script. All `StyleSheet.create` instances were converted to dynamic `getStyles(theme)` generators, and functional components were updated to inject `const theme = useAppTheme(); const styles = getStyles(theme);`.
+- **Status & Navigation Bar:** Updated `app/_layout.tsx` to dynamically switch the `StatusBar` style (`light` vs `dark`) and `ThemeProvider` based on the active scheme to prevent camouflage. Wrapped the navigation `<Stack>` in a `<View>` with `theme.background` to prevent grey screen glitches during native stack transitions.
+- **Interactive Toggle:** Added an "Appearance" section in `app/settings.tsx` with a beautifully animated Theme slider button (Sun/Moon icons) powered by Zustand. Corrected outputRange padding for perfect symmetry.
+- **UI Readability Polish:** Enhanced `app/category-details.tsx` by adding dynamic borders (`theme.borderLight`) to separate list items and section headers. Updated the donut chart card to use `theme.surface` and explicit borders. Fixed total balance text contrast on the Accounts screen by enforcing `theme.white` over the primary card background.
+- **Tab Header Layout:** Centered all tab titles (`Analysis`, `Budgets`, `Accounts`, `Categories`). For the main `Records` tab, placed the Settings gear icon on the top-left and the Search icon on the top-right. Restored `slide_from_left` animation for the Settings screen to intuitively match the icon's physical location.
+
+---
+
+## 6. Outstanding Tasks & Handoff Summary
+1. **Remote Push:** Run `git push origin master` in an authenticated terminal.
+2. **Release Build & Verification:** Build `--variant release` to verify all latest features.

@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
@@ -7,19 +9,24 @@ import {
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
 import { DonutChart } from "@/components/donut-chart";
 import { useTransactionStore } from "@/store/useTransactionStore";
-import { AppColors } from "@/constants/theme";
+
 import { formatMoneyINR } from "@/types";
 
 type ViewType = "expense" | "income";
 
 export default function AnalysisScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const { categories, loadCategories, allTransactions, refreshAllTransactions } =
     useTransactionStore();
+
+  const router = useRouter();
 
   const [anchor, setAnchor] = useState(new Date());
   const [viewType, setViewType] = useState<ViewType>("expense");
@@ -95,11 +102,11 @@ export default function AnalysisScreen() {
       {/* Month Navigator */}
       <View style={styles.monthNav}>
         <TouchableOpacity onPress={prevMonth}>
-          <MaterialIcons name="chevron-left" size={30} color={AppColors.text} />
+          <MaterialIcons name="chevron-left" size={30} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.monthLabel}>{monthLabel}</ThemedText>
         <TouchableOpacity onPress={nextMonth}>
-          <MaterialIcons name="chevron-right" size={30} color={AppColors.text} />
+          <MaterialIcons name="chevron-right" size={30} color={theme.text} />
         </TouchableOpacity>
       </View>
 
@@ -144,7 +151,7 @@ export default function AnalysisScreen() {
             keyExtractor={(item) => String(item.categoryId ?? "none")}
             contentContainerStyle={styles.catList}
             renderItem={({ item }) => (
-              <View style={styles.catRow}>
+              <TouchableOpacity style={styles.catRow} onPress={() => router.push(`/category-details?categoryId=${item.categoryId}&year=${year}&month=${month}`)}>
                 <View style={[styles.catDot, { backgroundColor: item.color }]} />
                 <ThemedText style={styles.catIcon}>{item.icon}</ThemedText>
                 <View style={styles.catInfo}>
@@ -164,7 +171,7 @@ export default function AnalysisScreen() {
                   </ThemedText>
                   <ThemedText style={styles.catPct}>{item.pct.toFixed(1)}%</ThemedText>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
           />
         )}
@@ -173,20 +180,21 @@ export default function AnalysisScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: theme.background,
     paddingTop: 48,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingBottom: 8,
+    },
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
   },
   monthNav: {
     flexDirection: "row",
@@ -198,7 +206,7 @@ const styles = StyleSheet.create({
   monthLabel: {
     fontSize: 15,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
     minWidth: 140,
     textAlign: "center",
   },
@@ -209,24 +217,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
   },
   toggleBtn: {
     flex: 1,
     paddingVertical: 10,
     alignItems: "center",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
   },
   toggleBtnActive: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
   },
   toggleText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   toggleTextActive: {
-    color: AppColors.white,
+    color: theme.white,
   },
   scroll: {
     paddingBottom: 30,
@@ -241,7 +249,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   catList: {
     paddingHorizontal: 16,
@@ -250,12 +258,12 @@ const styles = StyleSheet.create({
   catRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 10,
     padding: 12,
     gap: 10,
     borderWidth: 1,
-    borderColor: AppColors.borderLight,
+    borderColor: theme.borderLight,
   },
   catDot: {
     width: 10,
@@ -272,11 +280,11 @@ const styles = StyleSheet.create({
   catName: {
     fontSize: 14,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   catBarBg: {
     height: 4,
-    backgroundColor: AppColors.borderLight,
+    backgroundColor: theme.borderLight,
     borderRadius: 2,
   },
   catBar: {
@@ -290,10 +298,10 @@ const styles = StyleSheet.create({
   catAmount: {
     fontSize: 14,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
   },
   catPct: {
     fontSize: 11,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
 });

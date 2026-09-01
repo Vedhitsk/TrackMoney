@@ -1,13 +1,15 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import React from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { backfillFromInbox } from "@/lib/sms/smsIngestion";
-import { AppColors } from "@/constants/theme";
+
 import { ensureTablesExist } from "@/db/init";
 import { PermissionModal } from "@/components/permission-modal";
 import { Alert, Linking, PermissionsAndroid, LogBox } from "react-native";
@@ -16,23 +18,26 @@ LogBox.ignoreLogs(["new NativeEventEmitter()"]);
 // AppRegistry.registerHeadlessTask moved to index.js for better reliability
 
 
-const MyMoneyLightTheme = {
-  ...DefaultTheme,
+const getNavigationTheme = (themeColors: ThemeColors, isDark: boolean) => ({
+  ...(isDark ? DarkTheme : DefaultTheme),
   colors: {
-    ...DefaultTheme.colors,
-    background: AppColors.background,
-    card: AppColors.surface,
-    text: AppColors.text,
-    border: AppColors.border,
-    primary: AppColors.primary,
+    ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+    background: themeColors.background,
+    card: themeColors.surface,
+    text: themeColors.text,
+    border: themeColors.border,
+    primary: themeColors.primary,
   },
-};
+});
 
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
 export default function RootLayout() {
+  const theme = useAppTheme();
+  const colorScheme = useColorScheme();
+
   const [showPermissions, setShowPermissions] = React.useState(false);
 
   React.useEffect(() => {
@@ -96,21 +101,24 @@ export default function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={MyMoneyLightTheme}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: AppColors.background },
-        }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="transaction/new" options={{ animation: "slide_from_bottom" }} />
-        <Stack.Screen name="transaction/[id]" options={{ animation: "slide_from_right" }} />
-        <Stack.Screen name="transaction/pending" options={{ animation: "slide_from_right" }} />
-        <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />
-        <Stack.Screen name="settings/logs" options={{ animation: "slide_from_right" }} />
-        <Stack.Screen name="recoveries" options={{ animation: "slide_from_right" }} />
-      </Stack>
-      <StatusBar style="dark" />
+    <ThemeProvider value={getNavigationTheme(theme, colorScheme === "dark")}>
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.background },
+          }}
+        >
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="transaction/new" options={{ animation: "slide_from_bottom" }} />
+          <Stack.Screen name="transaction/[id]" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="transaction/pending" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />
+          <Stack.Screen name="settings/logs" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="recoveries" options={{ animation: "slide_from_right" }} />
+        </Stack>
+      </View>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <PermissionModal 
         visible={showPermissions} 
         onGrant={handleGrantPermissions} 

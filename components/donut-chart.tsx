@@ -1,8 +1,10 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Path, Circle } from "react-native-svg";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 
 type Slice = {
   value: number;
@@ -16,6 +18,7 @@ type Props = {
   strokeWidth?: number;
   centerLabel?: string;
   centerSub?: string;
+  centerTextColor?: string;
 };
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
@@ -36,7 +39,11 @@ export function DonutChart({
   strokeWidth = 28,
   centerLabel,
   centerSub,
+  centerTextColor,
 }: Props) {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const total = data.reduce((s, d) => s + d.value, 0);
   const cx = size / 2;
   const cy = size / 2;
@@ -50,14 +57,20 @@ export function DonutChart({
             cx={cx}
             cy={cy}
             r={r}
-            stroke={AppColors.border}
+            stroke={theme.border}
             strokeWidth={strokeWidth}
             fill="none"
           />
         </Svg>
         <View style={styles.center}>
-          <ThemedText style={styles.centerLabel}>{centerLabel ?? "0"}</ThemedText>
-          {centerSub ? <ThemedText style={styles.centerSub}>{centerSub}</ThemedText> : null}
+          <ThemedText style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}>
+            {centerLabel ?? "0"}
+          </ThemedText>
+          {centerSub ? (
+            <ThemedText style={[styles.centerSub, centerTextColor ? { color: centerTextColor } : undefined]}>
+              {centerSub}
+            </ThemedText>
+          ) : null}
         </View>
       </View>
     );
@@ -103,14 +116,20 @@ export function DonutChart({
         })}
       </Svg>
       <View style={styles.center}>
-        <ThemedText style={styles.centerLabel}>{centerLabel ?? "0"}</ThemedText>
-        {centerSub ? <ThemedText style={styles.centerSub}>{centerSub}</ThemedText> : null}
+        <ThemedText style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}>
+          {centerLabel ?? "0"}
+        </ThemedText>
+        {centerSub ? (
+          <ThemedText style={[styles.centerSub, centerTextColor ? { color: centerTextColor } : undefined]}>
+            {centerSub}
+          </ThemedText>
+        ) : null}
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   wrapper: {
     position: "relative",
     alignItems: "center",
@@ -124,11 +143,11 @@ const styles = StyleSheet.create({
   centerLabel: {
     fontSize: 20,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
   },
   centerSub: {
     fontSize: 12,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 2,
   },
 });

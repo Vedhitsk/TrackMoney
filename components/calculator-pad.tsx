@@ -1,8 +1,10 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 
 type Props = {
   value: string;
@@ -10,6 +12,9 @@ type Props = {
 };
 
 export function CalculatorPad({ value, onChange }: Props) {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const handlePress = (key: string) => {
     if (key === "C") {
       onChange("0");
@@ -68,7 +73,7 @@ export function CalculatorPad({ value, onChange }: Props) {
           {value}
         </ThemedText>
         <TouchableOpacity onPress={() => handlePress("⌫")} style={styles.backspace}>
-          <MaterialIcons name="backspace" size={24} color={AppColors.textSecondary} />
+          <MaterialIcons name="backspace" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -104,16 +109,16 @@ export function CalculatorPad({ value, onChange }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     gap: 6,
   },
   display: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -123,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 32,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     textAlign: "right",
   },
   backspace: {
@@ -139,25 +144,25 @@ const styles = StyleSheet.create({
     aspectRatio: 1.6,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: AppColors.calculator,
+    backgroundColor: theme.calculator,
     borderRadius: 8,
   },
   keyText: {
     fontSize: 20,
     fontWeight: "700",
-    color: AppColors.white,
+    color: theme.white,
   },
   operatorKey: {
-    backgroundColor: AppColors.calculatorDark,
+    backgroundColor: theme.calculatorDark,
   },
   operatorKeyText: {
     fontSize: 22,
-    color: AppColors.white,
+    color: theme.white,
   },
   equalsKey: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: theme.primary,
   },
   equalsKeyText: {
-    color: AppColors.white,
+    color: theme.white,
   },
 });

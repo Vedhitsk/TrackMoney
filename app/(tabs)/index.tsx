@@ -1,3 +1,5 @@
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { ThemeColors } from '@/constants/theme';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,7 +15,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+
 import {
     loadRecordsFilterPrefs,
     saveRecordsFilterPrefs,
@@ -118,6 +120,9 @@ function formatLabel(anchor: Date, mode: FilterMode): string {
 }
 
 export default function RecordsScreen() {
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
+
   const router = useRouter();
   const {
     categories,
@@ -253,23 +258,25 @@ export default function RecordsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/settings")}>
-          <MaterialIcons name="menu" size={26} color={AppColors.text} />
+          <MaterialIcons name="settings" size={26} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>TrackMoney</ThemedText>
-        <MaterialIcons name="search" size={26} color={AppColors.text} />
+        <TouchableOpacity>
+          <MaterialIcons name="search" size={26} color={theme.text} />
+        </TouchableOpacity>
       </View>
 
       {/* Date Navigator + Filter */}
       <View style={styles.navRow}>
         <TouchableOpacity onPress={goPrev}>
-          <MaterialIcons name="chevron-left" size={30} color={AppColors.text} />
+          <MaterialIcons name="chevron-left" size={30} color={theme.text} />
         </TouchableOpacity>
         <ThemedText style={styles.navLabel}>{label}</ThemedText>
         <TouchableOpacity onPress={goNext}>
-          <MaterialIcons name="chevron-right" size={30} color={AppColors.text} />
+          <MaterialIcons name="chevron-right" size={30} color={theme.text} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setShowFilterMenu(true)} style={styles.filterBtn}>
-          <MaterialIcons name="tune" size={22} color={AppColors.primary} />
+          <MaterialIcons name="tune" size={22} color={theme.primary} />
         </TouchableOpacity>
       </View>
 
@@ -277,13 +284,13 @@ export default function RecordsScreen() {
       <View style={styles.summaryBar}>
         <View style={styles.summaryItem}>
           <ThemedText style={styles.summaryLabel}>EXPENSE</ThemedText>
-          <ThemedText style={[styles.summaryValue, { color: AppColors.expense }]}>
+          <ThemedText style={[styles.summaryValue, { color: theme.expense }]}>
             {formatMoneyINR(totalExpense)}
           </ThemedText>
         </View>
         <View style={styles.summaryItem}>
           <ThemedText style={styles.summaryLabel}>INCOME</ThemedText>
-          <ThemedText style={[styles.summaryValue, { color: AppColors.income }]}>
+          <ThemedText style={[styles.summaryValue, { color: theme.income }]}>
             {formatMoneyINR(totalIncome)}
           </ThemedText>
         </View>
@@ -296,7 +303,7 @@ export default function RecordsScreen() {
       {/* Pending Review Banner */}
       {pendingCount > 0 && (
         <TouchableOpacity style={styles.pendingBanner} onPress={() => router.push("/transaction/pending")}>
-          <MaterialIcons name="info-outline" size={18} color={AppColors.primary} />
+          <MaterialIcons name="info-outline" size={18} color={theme.primary} />
           <ThemedText style={styles.pendingText}>
             {pendingCount} transaction{pendingCount > 1 ? "s" : ""} need review
           </ThemedText>
@@ -306,7 +313,7 @@ export default function RecordsScreen() {
       {/* Transaction List */}
       {loadingAllTransactions ? (
         <View style={styles.center}>
-          <ActivityIndicator color={AppColors.primary} />
+          <ActivityIndicator color={theme.primary} />
         </View>
       ) : sections.length === 0 ? (
         <View style={styles.center}>
@@ -330,10 +337,10 @@ export default function RecordsScreen() {
             const isIncome = item.type === "income";
             const isTransfer = item.type === "transfer";
             const amountColor = isExpense
-              ? AppColors.expense
+              ? theme.expense
               : isIncome
-                ? AppColors.income
-                : AppColors.textSecondary;
+                ? theme.income
+                : theme.textSecondary;
             const sign = isExpense ? "-" : isIncome ? "+" : "";
 
             return (
@@ -364,7 +371,7 @@ export default function RecordsScreen() {
                   style={styles.txDeleteBtn}
                   onPress={() => handleDeleteTransaction(item)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                  <MaterialIcons name="delete-outline" size={22} color={AppColors.textSecondary} />
+                  <MaterialIcons name="delete-outline" size={22} color={theme.textSecondary} />
                 </TouchableOpacity>
               </View>
             );
@@ -376,7 +383,7 @@ export default function RecordsScreen() {
       <TouchableOpacity
         style={styles.fab}
         onPress={() => router.push("/transaction/new")}>
-        <MaterialIcons name="add" size={28} color={AppColors.white} />
+        <MaterialIcons name="add" size={28} color={theme.white} />
       </TouchableOpacity>
 
       {/* Filter Mode Modal */}
@@ -402,7 +409,7 @@ export default function RecordsScreen() {
                     setShowFilterMenu(false);
                   }}>
                   {active && (
-                    <MaterialIcons name="check" size={18} color={AppColors.primary} />
+                    <MaterialIcons name="check" size={18} color={theme.primary} />
                   )}
                   <ThemedText
                     style={[
@@ -421,10 +428,10 @@ export default function RecordsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: theme.background,
     paddingTop: 48,
   },
   header: {
@@ -437,7 +444,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     fontStyle: "italic",
   },
   navRow: {
@@ -450,7 +457,7 @@ const styles = StyleSheet.create({
   navLabel: {
     fontSize: 15,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
     minWidth: 140,
     textAlign: "center",
   },
@@ -464,7 +471,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: theme.border,
   },
   summaryItem: {
     alignItems: "center",
@@ -472,20 +479,20 @@ const styles = StyleSheet.create({
   summaryLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
     letterSpacing: 0.5,
   },
   summaryValue: {
     fontSize: 14,
     fontWeight: "700",
     marginTop: 2,
-    color: AppColors.text,
+    color: theme.text,
   },
   pendingBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
     marginHorizontal: 16,
     marginTop: 10,
     padding: 10,
@@ -494,7 +501,7 @@ const styles = StyleSheet.create({
   pendingText: {
     fontSize: 13,
     fontWeight: "600",
-    color: AppColors.primary,
+    color: theme.primary,
   },
   center: {
     flex: 1,
@@ -505,11 +512,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: "600",
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   mutedText: {
     fontSize: 13,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   listContent: {
     paddingHorizontal: 16,
@@ -518,12 +525,12 @@ const styles = StyleSheet.create({
   dateHeader: {
     fontSize: 14,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     marginTop: 16,
     marginBottom: 8,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.borderLight,
+    borderBottomColor: theme.borderLight,
   },
   txRow: {
     flexDirection: "row",
@@ -545,11 +552,11 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: theme.border,
   },
   txIconText: {
     fontSize: 20,
@@ -561,11 +568,11 @@ const styles = StyleSheet.create({
   txCategory: {
     fontSize: 15,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   txAccount: {
     fontSize: 12,
-    color: AppColors.textSecondary,
+    color: theme.textSecondary,
   },
   txAmount: {
     fontSize: 15,
@@ -578,7 +585,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: AppColors.fab,
+    backgroundColor: theme.fab,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
@@ -594,7 +601,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   filterModal: {
-    backgroundColor: AppColors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 14,
     padding: 20,
     width: 240,
@@ -603,7 +610,7 @@ const styles = StyleSheet.create({
   filterTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: AppColors.text,
+    color: theme.text,
     marginBottom: 8,
   },
   filterOption: {
@@ -615,14 +622,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   filterOptionActive: {
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: theme.primaryLight,
   },
   filterOptionText: {
     fontSize: 15,
     fontWeight: "600",
-    color: AppColors.text,
+    color: theme.text,
   },
   filterOptionTextActive: {
-    color: AppColors.primary,
+    color: theme.primary,
   },
 });
