@@ -242,7 +242,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  grid: { paddingHorizontal: 12, paddingBottom: 80 },
+  grid: { paddingHorizontal: 12, paddingBottom: 100 },
   gridRow: { gap: 0 },
   gridItem: {
     flex: 1,
@@ -270,7 +270,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   mutedText: { fontSize: 13, color: theme.textSecondary },
   fab: {
     position: "absolute",
-    bottom: 24,
+    bottom: 96,
     right: 20,
     width: 56,
     height: 56,

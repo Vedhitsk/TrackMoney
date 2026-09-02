@@ -447,7 +447,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 8 },
   emptyText: { fontSize: 16, fontWeight: "600", color: theme.textSecondary },
   mutedText: { fontSize: 13, color: theme.textSecondary },
-  listContent: { paddingHorizontal: 16, paddingBottom: 80, gap: 8 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 100, gap: 8 },
   budgetCard: {
     backgroundColor: theme.surface,
     borderRadius: 10,

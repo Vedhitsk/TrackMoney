@@ -237,7 +237,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     color: theme.white,
   },
   scroll: {
-    paddingBottom: 30,
+    paddingBottom: 100,
   },
   chartWrap: {
     alignItems: "center",

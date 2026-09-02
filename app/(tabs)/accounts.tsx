@@ -274,7 +274,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     color: theme.white,
     marginTop: 4,
   },
-  listContent: { paddingHorizontal: 16, paddingBottom: 80, gap: 8 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 100, gap: 8 },
   card: {
     flexDirection: "row",
     alignItems: "center",

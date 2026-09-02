@@ -1,37 +1,16 @@
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { ThemeColors } from '@/constants/theme';
 import { Tabs } from "expo-router";
 import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { HapticTab } from "@/components/haptic-tab";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { FloatingTabBar } from "@/components/floating-tab-bar";
 
 export default function TabLayout() {
-  const theme = useAppTheme();
-
-  const insets = useSafeAreaInsets();
-
   return (
     <Tabs
       backBehavior="none"
+      tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.tabActive,
-        tabBarInactiveTintColor: theme.tabInactive,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-          backgroundColor: theme.white,
-          borderTopColor: theme.border,
-          height: 58 + insets.bottom,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 6,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-        },
       }}>
       <Tabs.Screen
         name="index"
