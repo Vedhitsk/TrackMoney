@@ -17,12 +17,6 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
 
           const onPress = () => {
             try {
@@ -60,19 +54,16 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
               testID={options.tabBarButtonTestID}
               onPress={onPress}
               onLongPress={onLongPress}
-              activeOpacity={0.75}
-              style={[styles.tabItem, isFocused && styles.tabItemActive]}
+              activeOpacity={0.7}
+              style={styles.tabSlot}
             >
-              {options.tabBarIcon?.({
-                focused: isFocused,
-                color,
-                size: 22,
-              })}
-              {isFocused && (
-                <Text numberOfLines={1} style={[styles.tabLabel, { color }]}>
-                  {typeof label === 'string' ? label : route.name}
-                </Text>
-              )}
+              <View style={[styles.iconContainer, isFocused && styles.iconContainerActive]}>
+                {options.tabBarIcon?.({
+                  focused: isFocused,
+                  color,
+                  size: 24,
+                })}
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -87,23 +78,23 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
       position: 'absolute',
       left: 0,
       right: 0,
-      bottom: Math.max(bottomInset, 10) + 6,
+      bottom: Math.max(bottomInset, 12) + 8,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 16,
+      paddingHorizontal: 20,
     },
     pill: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'space-around',
       backgroundColor: theme.surfaceElevated,
-      height: 64,
+      height: 60,
       borderRadius: 999,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingHorizontal: 8,
+      paddingHorizontal: 10,
       width: '100%',
-      maxWidth: 480,
+      maxWidth: 420,
       ...Platform.select({
         ios: {
           shadowColor: theme.shadow,
@@ -116,26 +107,21 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
         },
       }),
     },
-    tabItem: {
+    tabSlot: {
       flex: 1,
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 8,
-      paddingHorizontal: 4,
-      borderRadius: 999,
     },
-    tabItemActive: {
-      flexDirection: 'row',
-      gap: 6,
+    iconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    iconContainerActive: {
       backgroundColor: theme.primaryMuted,
-      paddingHorizontal: 12,
-      flex: 1.35,
-    },
-    tabLabel: {
-      fontSize: 11,
-      fontWeight: '700',
-      letterSpacing: 0.3,
     },
   });
 
