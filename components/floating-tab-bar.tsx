@@ -86,15 +86,14 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
     pill: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
       backgroundColor: theme.surfaceElevated,
       height: 64,
-      borderRadius: 999,
+      borderRadius: 32,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingHorizontal: 8,
+      paddingHorizontal: 6,
       width: '100%',
-      maxWidth: 440,
+      maxWidth: 420,
       ...Platform.select({
         ios: {
           shadowColor: theme.shadow,
@@ -112,14 +111,14 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 6,
     },
     iconContainer: {
       width: 48,
       height: 48,
-      borderRadius: 999,
+      borderRadius: 24,
       alignItems: 'center',
       justifyContent: 'center',
+      overflow: 'hidden',
     },
     iconContainerActive: {
       backgroundColor: theme.warningMuted,
