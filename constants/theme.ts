@@ -8,9 +8,9 @@ export const DarkColors = {
   surfaceSubtle:    '#1C1C21',
 
   // ── Brand / Primary ────────────────────────────────
-  primary:          '#00E5A0',
-  primaryDim:       '#00C48A',
-  primaryMuted:     '#0A3D2E',
+  primary:          '#F59E0B',
+  primaryDim:       '#D97706',
+  primaryMuted:     '#3D2A00',
 
   // ── Semantic ───────────────────────────────────────
   income:           '#00E5A0',
@@ -27,7 +27,7 @@ export const DarkColors = {
 
   // ── Borders ────────────────────────────────────────
   border:           '#2C2C34',
-  borderFocus:      '#00E5A0',
+  borderFocus:      '#F59E0B',
   overlay:          'rgba(0,0,0,0.72)',
   shadow:           'rgba(0,0,0,0.6)',
 
@@ -36,14 +36,14 @@ export const DarkColors = {
 
   // ── Backward-compatible aliases (keep all existing screens compiling) ──
   text:             '#F0F0F2',   // = textPrimary
-  primaryLight:     '#0A3D2E',   // = primaryMuted
+  primaryLight:     '#3D2A00',   // = primaryMuted
   borderLight:      '#2C2C34',   // = border (subtle alias)
-  progressGreen:    '#00E5A0',   // = primary / income
+  progressGreen:    '#00E5A0',   // = income
   progressRed:      '#FF5C5C',   // = expense
-  calculator:       '#00C48A',   // = primaryDim
-  calculatorDark:   '#009E70',
-  fab:              '#00E5A0',   // = primary
-  tabActive:        '#00E5A0',   // = primary
+  calculator:       '#222228',   // = surfaceElevated
+  calculatorDark:   '#1C1C21',   // = surfaceSubtle
+  fab:              '#F59E0B',   // = primary
+  tabActive:        '#F59E0B',   // = primary
   tabInactive:      '#8A8A96',   // = textSecondary
   white:            '#18181C',   // = surface (used as "inverted white" in dark mode)
 };
@@ -56,9 +56,9 @@ export const LightColors = {
   surfaceSubtle:    '#FAFAF8',
 
   // ── Brand / Primary ────────────────────────────────
-  primary:          '#059669',
-  primaryDim:       '#047857',
-  primaryMuted:     '#D1FAE5',
+  primary:          '#D97706',
+  primaryDim:       '#B45309',
+  primaryMuted:     '#FEF3C7',
 
   // ── Semantic ───────────────────────────────────────
   income:           '#059669',
@@ -75,7 +75,7 @@ export const LightColors = {
 
   // ── Borders ────────────────────────────────────────
   border:           '#E2E8F0',
-  borderFocus:      '#059669',
+  borderFocus:      '#D97706',
   overlay:          'rgba(0,0,0,0.5)',
   shadow:           'rgba(0,0,0,0.1)',
 
@@ -84,14 +84,14 @@ export const LightColors = {
 
   // ── Backward-compatible aliases ────────────────────
   text:             '#0F172A',   // = textPrimary
-  primaryLight:     '#D1FAE5',   // = primaryMuted
+  primaryLight:     '#FEF3C7',   // = primaryMuted
   borderLight:      '#F1F5F9',   // lighter than border — disabled/subtle rule lines
-  progressGreen:    '#059669',   // = primary / income
+  progressGreen:    '#059669',   // = income
   progressRed:      '#DC2626',   // = expense
-  calculator:       '#059669',   // = primary
-  calculatorDark:   '#047857',   // = primaryDim
-  fab:              '#059669',   // = primary
-  tabActive:        '#059669',   // = primary
+  calculator:       '#FAFAF8',   // = surfaceSubtle
+  calculatorDark:   '#F0EFEB',   // = surfaceElevated (darker in light mode)
+  fab:              '#D97706',   // = primary
+  tabActive:        '#D97706',   // = primary
   tabInactive:      '#94A3B8',
   white:            '#FFFFFF',   // = surface
 };
