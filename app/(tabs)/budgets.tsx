@@ -470,7 +470,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   bar: { height: 5, borderRadius: 3 },
   fab: {
     position: "absolute",
-    bottom: 24,
+    bottom: 96,
     right: 20,
     width: 56,
     height: 56,

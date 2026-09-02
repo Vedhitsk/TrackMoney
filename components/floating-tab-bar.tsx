@@ -43,7 +43,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             });
           };
 
-          const color = isFocused ? theme.primary : theme.textSecondary;
+          const color = isFocused ? theme.warning : theme.textSecondary;
 
           return (
             <TouchableOpacity
@@ -81,20 +81,20 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
       bottom: Math.max(bottomInset, 12) + 8,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 20,
+      paddingHorizontal: 16,
     },
     pill: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-around',
+      justifyContent: 'space-between',
       backgroundColor: theme.surfaceElevated,
-      height: 60,
+      height: 64,
       borderRadius: 999,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingHorizontal: 10,
+      paddingHorizontal: 8,
       width: '100%',
-      maxWidth: 420,
+      maxWidth: 440,
       ...Platform.select({
         ios: {
           shadowColor: theme.shadow,
@@ -112,16 +112,17 @@ const getStyles = (theme: ThemeColors, bottomInset: number) =>
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
+      paddingVertical: 6,
     },
     iconContainer: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
+      width: 48,
+      height: 48,
+      borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
     },
     iconContainerActive: {
-      backgroundColor: theme.primaryMuted,
+      backgroundColor: theme.warningMuted,
     },
   });
 
