@@ -505,6 +505,6 @@ Android package: `com.trackmoney.app`
 
   const getStyles = (theme: ThemeColors) => StyleSheet.create({ ... })
   `
-- **Navigation:** <ThemeProvider> in pp/_layout.tsx consumes the dynamic theme, and <Stack> is wrapped in a <View style={{ backgroundColor: theme.background }}> to prevent native grey screen transitions during stack animations.
+- **Navigation:** <ThemeProvider> in app/_layout.tsx consumes the dynamic theme, and <Stack> is wrapped in a <View style={{ backgroundColor: theme.background }}> to prevent native grey screen transitions during stack animations.
 - **Headers Layout:** All tab screen headers (Records, Analysis, Budgets, Accounts, Categories) are centered. The main Records tab header features the Settings gear on the top-left (with slide_from_left navigation) and the Search icon on the top-right.
 
