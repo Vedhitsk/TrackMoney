@@ -5,7 +5,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     DeviceEventEmitter,
     Modal,
     SectionList,
@@ -224,28 +223,6 @@ export default function RecordsScreen() {
 
   const label = formatLabel(anchor, filterMode);
 
-  const handleDeleteTransaction = useCallback(
-    (item: Transaction) => {
-      Alert.alert(
-        "Delete transaction",
-        "Remove this transaction permanently?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              const { deleteTransaction } = await import("@/db/queries/transactions");
-              await deleteTransaction(item.id);
-              await refreshAllTransactions();
-            },
-          },
-        ],
-      );
-    },
-    [refreshAllTransactions],
-  );
-
   const filterOptions: { mode: FilterMode; label: string }[] = [
     { mode: "day", label: "Daily" },
     { mode: "week", label: "Weekly" },
@@ -343,35 +320,58 @@ export default function RecordsScreen() {
                 : theme.textSecondary;
             const sign = isExpense ? "-" : isIncome ? "+" : "";
 
+            const title = item.merchant || item.notes || (isTransfer ? "Transfer" : catName);
+            const timeStr = item.date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
             return (
-              <View style={styles.txRow}>
+              <View style={styles.txRowWrapper}>
                 <TouchableOpacity
-                  style={styles.txRowMain}
+                  style={styles.txCard}
+                  activeOpacity={0.7}
                   onPress={() => router.push(`/transaction/${item.id}`)}>
-                  <View style={styles.txIcon}>
+                  
+                  <View style={styles.txIconContainer}>
                     <ThemedText style={styles.txIconText}>
                       {isTransfer ? "🔄" : icon}
                     </ThemedText>
                   </View>
-                  <View style={styles.txInfo}>
-                    <ThemedText style={styles.txCategory} numberOfLines={1}>
-                      {isTransfer ? "Transfer" : catName}
+                  
+                  <View style={styles.txMainContent}>
+                    <ThemedText style={styles.txTitle} numberOfLines={1}>
+                      {title}
                     </ThemedText>
-                    <ThemedText style={styles.txAccount} numberOfLines={1}>
-                      {isTransfer ? "Account transfer" : accountName}
-                      {item.isShared ? " · Shared" : ""}
-                      {item.type === "settlement" ? " · Settled" : item.isExcluded && !isTransfer ? " · Excluded" : ""}
-                    </ThemedText>
+                    
+                    <View style={styles.txBadgesRow}>
+                      <View style={styles.txCategoryBadge}>
+                        <ThemedText style={styles.txCategoryBadgeText} numberOfLines={1}>
+                          {isTransfer ? "Transfer" : catName}
+                        </ThemedText>
+                      </View>
+                      
+                      <View style={styles.txAccountBadge}>
+                        <ThemedText style={styles.txAccountBadgeText} numberOfLines={1}>
+                          {isTransfer ? "Account transfer" : accountName}
+                          {item.isShared ? " · Shared" : ""}
+                          {item.type === "settlement" ? " · Settled" : item.isExcluded && !isTransfer ? " · Excluded" : ""}
+                        </ThemedText>
+                      </View>
+                      
+                      <ThemedText style={styles.txTimestamp}>
+                        {timeStr}
+                      </ThemedText>
+                    </View>
                   </View>
-                  <ThemedText style={[styles.txAmount, { color: amountColor }]}>
-                    {sign}{formatMoneyINR(item.actualAmount)}
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.txDeleteBtn}
-                  onPress={() => handleDeleteTransaction(item)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                  <MaterialIcons name="delete-outline" size={22} color={theme.textSecondary} />
+                  
+                  <View style={styles.txAmountContainer}>
+                    <ThemedText style={[styles.txAmount, { color: amountColor }]}>
+                      {sign}{formatMoneyINR(item.actualAmount)}
+                    </ThemedText>
+                    {(item.parseStatus === "needs_review" || item.parseStatus === "failed") && (
+                      <View style={styles.txNeedsReviewBadge}>
+                        <ThemedText style={styles.txNeedsReviewText}>NEEDS REVIEW</ThemedText>
+                      </View>
+                    )}
+                  </View>
                 </TouchableOpacity>
               </View>
             );
@@ -468,10 +468,19 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   summaryBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.border,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    backgroundColor: theme.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.border,
+    elevation: 2,
+    shadowColor: theme.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   summaryItem: {
     alignItems: "center",
@@ -487,6 +496,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     fontWeight: "700",
     marginTop: 2,
     color: theme.text,
+    fontVariant: ["tabular-nums"],
   },
   pendingBanner: {
     flexDirection: "row",
@@ -532,51 +542,97 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.borderLight,
   },
-  txRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 6,
-    gap: 4,
-  },
-  txRowMain: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+  txRowWrapper: {
     paddingVertical: 4,
   },
-  txDeleteBtn: {
-    padding: 6,
-  },
-  txIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: theme.surface,
-    justifyContent: "center",
+  txCard: {
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: theme.surface,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
     borderColor: theme.border,
+    elevation: 2,
+    shadowColor: theme.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  txIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: theme.surfaceSubtle,
+    justifyContent: "center",
+    alignItems: "center",
   },
   txIconText: {
-    fontSize: 20,
+    fontSize: 24,
   },
-  txInfo: {
+  txMainContent: {
     flex: 1,
-    gap: 2,
+    marginHorizontal: 8,
+    gap: 4,
   },
-  txCategory: {
+  txTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: theme.text,
+    color: theme.textPrimary,
   },
-  txAccount: {
-    fontSize: 12,
+  txBadgesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  txCategoryBadge: {
+    backgroundColor: theme.primaryMuted,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+    flexShrink: 1,
+  },
+  txCategoryBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: theme.primary,
+  },
+  txAccountBadge: {
+    backgroundColor: theme.surfaceElevated,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+    flexShrink: 1,
+  },
+  txAccountBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
     color: theme.textSecondary,
   },
+  txTimestamp: {
+    fontSize: 12,
+    color: theme.textMuted,
+    marginLeft: 4,
+  },
+  txAmountContainer: {
+    alignItems: "flex-end",
+    gap: 4,
+  },
   txAmount: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
+  },
+  txNeedsReviewBadge: {
+    backgroundColor: theme.warningMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  txNeedsReviewText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: theme.warning,
   },
   fab: {
     position: "absolute",
@@ -589,7 +645,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
-    shadowColor: "#000",
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
