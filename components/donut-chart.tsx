@@ -65,8 +65,12 @@ export function DonutChart({
             fill="none"
           />
         </Svg>
-        <View style={styles.center}>
-          <ThemedText style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}>
+        <View style={[styles.center, { width: size * 0.62 }]}>
+          <ThemedText
+            style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {centerLabel ?? "0"}
           </ThemedText>
           {centerSub ? (
@@ -121,8 +125,12 @@ export function DonutChart({
           );
         })}
       </Svg>
-      <View style={styles.center}>
-        <ThemedText style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}>
+      <View style={[styles.center, { width: size * 0.62 }]}>
+        <ThemedText
+          style={[styles.centerLabel, centerTextColor ? { color: centerTextColor } : undefined]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
           {centerLabel ?? "0"}
         </ThemedText>
         {centerSub ? (

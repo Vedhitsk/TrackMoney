@@ -1,11 +1,11 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { Spacing, ThemeColors, Typography } from '@/constants/theme';
+import { IconPalette, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 
-import { Badge, Card, ListRow } from "@/components/ui";
+import { Card, CountBadge, ListRow } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -44,6 +44,7 @@ export default function ManageScreen() {
 
   const items: {
     icon: React.ComponentProps<typeof MaterialIcons>["name"];
+    color: string;
     label: string;
     subtitle: string;
     onPress: () => void;
@@ -51,18 +52,21 @@ export default function ManageScreen() {
   }[] = [
     {
       icon: "credit-card",
+      color: IconPalette.blue,
       label: "Accounts",
       subtitle: `${accounts.length} account${accounts.length === 1 ? "" : "s"}`,
       onPress: () => router.push("/accounts"),
     },
     {
       icon: "category",
+      color: IconPalette.purple,
       label: "Categories",
       subtitle: `${categories.length} categor${categories.length === 1 ? "y" : "ies"}`,
       onPress: () => router.push("/categories"),
     },
     {
       icon: "pending-actions",
+      color: IconPalette.amber,
       label: "Pending Review",
       subtitle: pendingCount > 0 ? `${pendingCount} awaiting review` : "All caught up",
       onPress: () => router.push("/transaction/pending"),
@@ -70,6 +74,7 @@ export default function ManageScreen() {
     },
     {
       icon: "settings",
+      color: IconPalette.slate,
       label: "Settings",
       subtitle: "Appearance, data, automation",
       onPress: () => router.push("/settings"),
@@ -86,13 +91,13 @@ export default function ManageScreen() {
             <TouchableOpacity style={styles.row} onPress={item.onPress}>
               <ListRow
                 leading={
-                  <View style={[styles.rowIcon, { backgroundColor: theme.primaryLight }]}>
-                    <MaterialIcons name={item.icon} size={20} color={theme.primary} />
+                  <View style={[styles.rowIcon, { backgroundColor: `${item.color}22` }]}>
+                    <MaterialIcons name={item.icon} size={20} color={item.color} />
                   </View>
                 }
                 title={item.label}
                 subtitle={item.subtitle}
-                trailing={item.badge ? <Badge label={String(item.badge)} tone="danger" /> : undefined}
+                trailing={item.badge ? <CountBadge count={item.badge} /> : undefined}
                 showChevron
               />
             </TouchableOpacity>

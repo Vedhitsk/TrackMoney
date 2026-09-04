@@ -2,7 +2,6 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -19,6 +18,7 @@ import { useRouter } from "expo-router";
 
 import { IconTile, SectionLabel } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 
 import type { Category } from "@/types";
 
@@ -75,7 +75,7 @@ export default function CategoriesScreen() {
       (c) => c.name.toLowerCase() === trimmed.toLowerCase() && c.id !== editId,
     );
     if (duplicate) {
-      Alert.alert("Duplicate name", `A category named "${duplicate.name}" already exists.`);
+      showAppAlert("Duplicate name", `A category named "${duplicate.name}" already exists.`);
       return;
     }
 
@@ -91,7 +91,7 @@ export default function CategoriesScreen() {
   };
 
   const handleDelete = (cat: Category) => {
-    Alert.alert(
+    showAppAlert(
       "Delete category",
       `Delete "${cat.name}"? Transactions using it will become uncategorized.`,
       [

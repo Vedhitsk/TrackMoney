@@ -3,6 +3,7 @@ export { SegmentedControl } from './segmented-control';
 export { Chip } from './chip';
 export { ProgressBar } from './progress-bar';
 export { Badge } from './badge';
+export { CountBadge } from './count-badge';
 export { ListRow } from './list-row';
 export { IconTile } from './icon-tile';
 export { AmountText } from './amount-text';

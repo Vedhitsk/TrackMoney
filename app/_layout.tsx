@@ -12,7 +12,9 @@ import { backfillFromInbox } from "@/lib/sms/smsIngestion";
 
 import { ensureTablesExist } from "@/db/init";
 import { PermissionModal } from "@/components/permission-modal";
-import { Alert, Linking, PermissionsAndroid, LogBox } from "react-native";
+import { AppAlert } from "@/components/app-alert";
+import { showAppAlert } from "@/store/useAlertStore";
+import { Linking, PermissionsAndroid, LogBox } from "react-native";
 LogBox.ignoreLogs(["new NativeEventEmitter()"]);
 
 // AppRegistry.registerHeadlessTask moved to index.js for better reliability
@@ -86,8 +88,8 @@ export default function RootLayout() {
         void backfillFromInbox();
         
         // 3. Battery Optimization Suggestion
-        Alert.alert(
-          "One Last Step 🔋",
+        showAppAlert(
+          "One last step",
           "Android might stop background tracking to save battery. For best results, please set Battery Optimization to 'Unrestricted' for TrackMoney.",
           [
             { text: "Skip", style: "cancel" },
@@ -121,10 +123,11 @@ export default function RootLayout() {
         </Stack>
       </View>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <PermissionModal 
-        visible={showPermissions} 
-        onGrant={handleGrantPermissions} 
+      <PermissionModal
+        visible={showPermissions}
+        onGrant={handleGrantPermissions}
       />
+      <AppAlert />
     </ThemeProvider>
   );
 }

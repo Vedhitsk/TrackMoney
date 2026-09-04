@@ -2,7 +2,6 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -21,6 +20,7 @@ import { AmountText, Card, ListRow, SectionLabel } from "@/components/ui";
 import type { AccountWithBalance } from "@/db/queries/accounts";
 import { countActiveRecoveries } from "@/db/queries/settlements";
 import { formatMoneyINR } from "@/types";
+import { showAppAlert } from "@/store/useAlertStore";
 
 const ACCOUNT_ICONS = ["💳", "💵", "👛", "🏦", "📱", "💰", "🏧", "🪙"];
 
@@ -85,7 +85,7 @@ export default function AccountsScreen() {
   };
 
   const handleDelete = (a: AccountWithBalance) => {
-    Alert.alert("Delete account", `Delete "${a.name}"? Transactions linked to it won't be deleted.`, [
+    showAppAlert("Delete account", `Delete "${a.name}"? Transactions linked to it won't be deleted.`, [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",

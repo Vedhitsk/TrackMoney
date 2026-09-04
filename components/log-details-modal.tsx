@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Modal, Alert } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 
@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { formatMoneyINR, Transaction } from "@/types";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 
 type Props = {
   visible: boolean;
@@ -29,7 +30,7 @@ export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess
   const headerColor = isExpense ? theme.expense : theme.income;
 
   const handleDelete = () => {
-    Alert.alert("Delete Transaction", "Are you sure you want to delete this transaction?", [
+    showAppAlert("Delete Transaction", "Are you sure you want to delete this transaction?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",

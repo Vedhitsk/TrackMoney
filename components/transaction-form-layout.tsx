@@ -8,11 +8,12 @@ import {
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { Radius, Spacing, ThemeColors } from "@/constants/theme";
+import { Radius, Spacing, Typography } from "@/constants/theme";
 import { CalculatorPad } from "@/components/calculator-pad";
-import { Chip, SectionLabel } from "@/components/ui";
+import { Card, Chip, SectionLabel, SegmentedControl } from "@/components/ui";
 import { formatMoneyINR } from "@/types";
 import type { PendingRecovery } from "@/db/queries/settlements";
 
@@ -70,6 +71,36 @@ const TYPE_OPTIONS: { value: UIType; label: string }[] = [
   { value: "settlement", label: "Settle" },
 ];
 
+function AccountChips({
+  label,
+  items,
+  selectedId,
+  onSelect,
+}: {
+  label: string;
+  items: PickerItem[];
+  selectedId: number | null;
+  onSelect: (id: number) => void;
+}) {
+  const theme = useAppTheme();
+  return (
+    <View style={styles.listRow}>
+      <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>{label}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+        {items.map((item) => (
+          <Chip
+            key={item.id}
+            label={item.name}
+            icon={item.icon}
+            selected={item.id === selectedId}
+            onPress={() => onSelect(item.id)}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 /**
  * Shared single-page Add/Edit Transaction layout. Deliberately NOT wrapped in
  * a page-level ScrollView: the amount readout, type toggle, and keypad stay
@@ -111,10 +142,22 @@ export function TransactionFormLayout({
   onCancel,
 }: Props) {
   const theme = useAppTheme();
-  const styles = getStyles(theme);
+  const insets = useSafeAreaInsets();
+  const isTransfer = uiType === "transfer";
+  const isSettlement = uiType === "settlement";
+  const isExpense = uiType === "expense";
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.background,
+          paddingTop: Math.max(insets.top, 16) + 8,
+          paddingBottom: Math.max(insets.bottom, 12) + 12,
+        },
+      ]}
+    >
       <View style={styles.topBar}>
         <TouchableOpacity onPress={onCancel} style={styles.topBarBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <MaterialIcons name="close" size={22} color={theme.textSecondary} />
@@ -127,44 +170,16 @@ export function TransactionFormLayout({
         </TouchableOpacity>
       </View>
 
-      <View style={styles.typeRow}>
-        {TYPE_OPTIONS.map((opt) => {
-          const active = uiType === opt.value;
-          return (
-            <TouchableOpacity
-              key={opt.value}
-              style={[styles.typePill, active && { backgroundColor: theme.segmentActiveBg }]}
-              onPress={() => onChangeType(opt.value)}>
-              <Text style={[styles.typePillText, { color: active ? theme.segmentActiveText : theme.segmentInactiveText }]}>
-                {opt.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <SegmentedControl style={styles.typeSegment} options={TYPE_OPTIONS} value={uiType} onChange={onChangeType} />
+
+      <View style={styles.amountWrap}>
+        <Text style={[styles.amountText, { color: theme.text }]} numberOfLines={1} adjustsFontSizeToFit>
+          ₹{amountStr}
+        </Text>
       </View>
 
-      <View style={styles.pickerCol}>
-        <SectionLabel>{uiType === "transfer" ? "From" : "Account"}</SectionLabel>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-          {accounts.map((a) => (
-            <Chip key={a.id} label={a.name} icon={a.icon} selected={a.id === accountId} onPress={() => onSelectAccount(a.id)} />
-          ))}
-        </ScrollView>
-      </View>
-
-      {uiType === "transfer" && (
-        <View style={styles.pickerCol}>
-          <SectionLabel>To</SectionLabel>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-            {toAccounts.map((a) => (
-              <Chip key={a.id} label={a.name} icon={a.icon} selected={a.id === toAccountId} onPress={() => onSelectToAccount(a.id)} />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {uiType !== "transfer" && uiType !== "settlement" && (
-        <View style={styles.pickerCol}>
+      {!isTransfer && !isSettlement && (
+        <View style={styles.section}>
           <SectionLabel>Category</SectionLabel>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
             {categories.map((c) => (
@@ -174,18 +189,18 @@ export function TransactionFormLayout({
         </View>
       )}
 
-      {uiType === "settlement" && (
-        <View style={styles.pickerCol}>
+      {isSettlement && (
+        <View style={styles.section}>
           <SectionLabel>Select recoveries</SectionLabel>
           {pendingRecoveries.length === 0 ? (
-            <Text style={styles.mutedText}>No pending recoveries available.</Text>
+            <Text style={[styles.mutedText, { color: theme.textSecondary }]}>No pending recoveries available.</Text>
           ) : (
             <ScrollView style={styles.recoveriesScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
               <View style={styles.recoveriesList}>
                 {pendingRecoveries.map((r) => {
                   const checked = selectedRecoveries.has(r.tx.id);
                   return (
-                    <View key={r.tx.id} style={[styles.recoveryRow, checked && { borderColor: theme.primary }]}>
+                    <View key={r.tx.id} style={[styles.recoveryRow, { borderColor: checked ? theme.primary : theme.border }]}>
                       <TouchableOpacity style={styles.recoveryRowSelect} onPress={() => onToggleRecovery(r.tx.id)}>
                         <MaterialIcons
                           name={checked ? "check-box" : "check-box-outline-blank"}
@@ -193,7 +208,7 @@ export function TransactionFormLayout({
                           color={checked ? theme.primary : theme.textSecondary}
                         />
                         <View style={styles.recoveryRowInfo}>
-                          <Text style={styles.recoveryRowMerchant} numberOfLines={1}>{r.tx.merchant}</Text>
+                          <Text style={[styles.recoveryRowMerchant, { color: theme.text }]} numberOfLines={1}>{r.tx.merchant}</Text>
                           <Text style={[styles.recoveryRowRemaining, { color: theme.expense }]}>
                             Remaining: {formatMoneyINR(r.remaining)}
                           </Text>
@@ -201,7 +216,7 @@ export function TransactionFormLayout({
                       </TouchableOpacity>
                       {checked && (
                         <TextInput
-                          style={styles.recoveryAllocInput}
+                          style={[styles.recoveryAllocInput, { borderColor: theme.border, color: theme.text, backgroundColor: theme.background }]}
                           value={allocations[r.tx.id] ?? ""}
                           onChangeText={(v) => onChangeAllocation(r.tx.id, v)}
                           keyboardType="numeric"
@@ -218,33 +233,64 @@ export function TransactionFormLayout({
         </View>
       )}
 
-      <View style={styles.detailRow}>
-        <Text style={styles.detailLabel}>Note</Text>
-        <TextInput
-          style={styles.notesInput}
-          value={notes}
-          onChangeText={onChangeNotes}
-          placeholder="Add a note"
-          placeholderTextColor={theme.textTertiary}
-          numberOfLines={1}
-        />
-      </View>
+      <Card style={styles.listCard} noPadding>
+        {isTransfer ? (
+          <>
+            <AccountChips label="From" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
+            <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+            <AccountChips label="To" items={toAccounts} selectedId={toAccountId} onSelect={onSelectToAccount} />
+          </>
+        ) : (
+          <AccountChips label="Account" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
+        )}
 
-      {uiType === "expense" && (
-        <View style={styles.sharedRow}>
+        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+        <TouchableOpacity style={styles.detailRow} onPress={onPressDate}>
+          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Date</Text>
+          <View style={styles.detailValueRow}>
+            <MaterialIcons name="calendar-today" size={14} color={theme.textSecondary} />
+            <Text style={[styles.detailValue, { color: theme.text }]}>{dateLabel}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+        <TouchableOpacity style={styles.detailRow} onPress={onPressTime}>
+          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Time</Text>
+          <View style={styles.detailValueRow}>
+            <MaterialIcons name="access-time" size={14} color={theme.textSecondary} />
+            <Text style={[styles.detailValue, { color: theme.text }]}>{timeLabel}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+        <View style={styles.detailRow}>
+          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Note</Text>
+          <TextInput
+            style={[styles.noteInput, { color: theme.text }]}
+            value={notes}
+            onChangeText={onChangeNotes}
+            placeholder="Add a note"
+            placeholderTextColor={theme.textTertiary}
+            numberOfLines={1}
+          />
+        </View>
+      </Card>
+
+      {isExpense && (
+        <View style={styles.sharedSection}>
           <TouchableOpacity style={styles.sharedToggle} onPress={onToggleShared}>
             <MaterialIcons
               name={isShared ? "check-box" : "check-box-outline-blank"}
               size={20}
               color={isShared ? theme.primary : theme.textSecondary}
             />
-            <Text style={styles.sharedLabel}>Shared expense</Text>
+            <Text style={[styles.sharedLabel, { color: theme.text }]}>Shared expense</Text>
           </TouchableOpacity>
           {isShared && (
             <View style={styles.sharedInputWrap}>
-              <Text style={styles.detailLabel}>Your share</Text>
+              <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Your share</Text>
               <TextInput
-                style={styles.shareAmountInput}
+                style={[styles.shareAmountInput, { borderColor: theme.border, color: theme.text }]}
                 value={actualAmountStr}
                 onChangeText={onChangeActualAmount}
                 keyboardType="decimal-pad"
@@ -255,78 +301,57 @@ export function TransactionFormLayout({
         </View>
       )}
 
-      <View style={styles.dateRow}>
-        <TouchableOpacity style={styles.datePill} onPress={onPressDate}>
-          <MaterialIcons name="calendar-today" size={14} color={theme.textSecondary} />
-          <Text style={styles.dateText}>{dateLabel}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.datePill} onPress={onPressTime}>
-          <MaterialIcons name="access-time" size={14} color={theme.textSecondary} />
-          <Text style={styles.dateText}>{timeLabel}</Text>
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.calculatorWrap}>
-        <CalculatorPad value={amountStr} onChange={onChangeAmount} />
+        <CalculatorPad value={amountStr} onChange={onChangeAmount} showDisplay={false} />
       </View>
     </View>
   );
 }
 
-const getStyles = (theme: ThemeColors) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.background,
-    paddingTop: 48,
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingBottom: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   topBarBtn: {
     padding: 4,
   },
   saveBtn: {
     borderRadius: Radius.pill,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 9,
   },
   saveBtnText: {
     fontSize: 14,
     fontWeight: "700",
   },
-  typeRow: {
-    flexDirection: "row",
-    backgroundColor: theme.segmentTrackBg,
-    borderRadius: Radius.pill,
-    padding: 4,
-    marginBottom: Spacing.sm,
+  typeSegment: {
+    marginBottom: Spacing.lg,
   },
-  typePill: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: Radius.pill,
+  amountWrap: {
     alignItems: "center",
+    marginBottom: Spacing.lg,
   },
-  typePillText: {
-    fontSize: 12,
-    fontWeight: "700",
+  amountText: {
+    ...Typography.hero,
+    fontSize: 40,
   },
-  pickerCol: {
-    marginBottom: Spacing.sm,
+  section: {
+    marginBottom: Spacing.md,
     gap: 6,
-  },
-  chipScroll: {
-    paddingVertical: 2,
   },
   mutedText: {
     fontSize: 13,
-    color: theme.textSecondary,
     fontStyle: "italic",
+  },
+  chipScroll: {
+    paddingVertical: 2,
   },
   recoveriesScroll: {
     maxHeight: 130,
@@ -338,53 +363,65 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: theme.surface,
     borderWidth: 1,
-    borderColor: theme.border,
     borderRadius: Radius.md,
     padding: 10,
     gap: 10,
   },
   recoveryRowSelect: { flexDirection: "row", alignItems: "center", flex: 1, gap: 8 },
   recoveryRowInfo: { flex: 1 },
-  recoveryRowMerchant: { fontSize: 13, fontWeight: "600", color: theme.text },
+  recoveryRowMerchant: { fontSize: 13, fontWeight: "600" },
   recoveryRowRemaining: { fontSize: 11, marginTop: 2 },
   recoveryAllocInput: {
     width: 74,
     borderWidth: 1,
-    borderColor: theme.border,
     borderRadius: Radius.sm,
     paddingHorizontal: 8,
     paddingVertical: 6,
     fontSize: 13,
-    color: theme.text,
     textAlign: "right",
-    backgroundColor: theme.background,
+  },
+  listCard: {
+    marginBottom: Spacing.sm,
+  },
+  listRow: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    gap: 6,
+  },
+  listRowLabel: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   detailRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.borderLight,
-    marginBottom: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
   },
-  detailLabel: {
-    fontSize: 13,
+  detailValueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  detailValue: {
+    fontSize: 14,
     fontWeight: "600",
-    color: theme.textSecondary,
   },
-  notesInput: {
+  noteInput: {
     flex: 1,
     marginLeft: Spacing.md,
     textAlign: "right",
     fontSize: 14,
-    color: theme.text,
   },
-  sharedRow: {
-    gap: 6,
-    marginBottom: Spacing.xs,
+  divider: {
+    height: 1,
+    marginHorizontal: Spacing.md,
+  },
+  sharedSection: {
+    gap: 8,
+    marginBottom: Spacing.md,
   },
   sharedToggle: {
     flexDirection: "row",
@@ -394,7 +431,6 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   sharedLabel: {
     fontSize: 13,
     fontWeight: "600",
-    color: theme.text,
   },
   sharedInputWrap: {
     flexDirection: "row",
@@ -404,35 +440,12 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   },
   shareAmountInput: {
     borderWidth: 1,
-    borderColor: theme.border,
     borderRadius: Radius.sm,
     paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 13,
-    color: theme.text,
     minWidth: 90,
     textAlign: "right",
-  },
-  dateRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 10,
-    marginBottom: Spacing.sm,
-  },
-  datePill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: Radius.pill,
-  },
-  dateText: {
-    fontSize: 12,
-    color: theme.textSecondary,
-    fontWeight: "600",
   },
   calculatorWrap: {
     flex: 1,

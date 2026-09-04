@@ -5,7 +5,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     DeviceEventEmitter,
     Modal,
     SectionList,
@@ -23,8 +22,10 @@ import {
     saveRecordsFilterPrefs,
 } from "@/lib/recordsFilterPrefs";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 import { useShallow } from "zustand/react/shallow";
 import type { Transaction } from "@/types";
+import { formatMoneyINR } from "@/types";
 import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
 
 type FilterMode = "day" | "week" | "month" | "year";
@@ -227,8 +228,33 @@ export default function ActivityScreen() {
     });
   }, [inRange, typeFilter, search, categories]);
 
-  const sections = groupByDate(filtered);
+  const sections = useMemo(() => {
+    return groupByDate(filtered).map((section) => {
+      const total =
+        typeFilter === "all"
+          ? section.data.reduce(
+              (s, t) => s + (t.type === "income" ? t.actualAmount : t.type === "expense" ? -t.actualAmount : 0),
+              0,
+            )
+          : section.data.reduce((s, t) => s + t.actualAmount, 0);
+      return { ...section, total };
+    });
+  }, [filtered, typeFilter]);
   const pendingCount = pendingTransactions.length;
+
+  const sectionTotalColor = (total: number) => {
+    if (typeFilter === "transfer") return theme.textSecondary;
+    if (typeFilter === "income") return theme.income;
+    if (typeFilter === "expense") return theme.expense;
+    return total >= 0 ? theme.income : theme.expense;
+  };
+
+  const sectionTotalLabel = (total: number) => {
+    if (typeFilter === "transfer") return formatMoneyINR(total);
+    if (typeFilter === "income") return `+${formatMoneyINR(total)}`;
+    if (typeFilter === "expense") return `-${formatMoneyINR(total)}`;
+    return `${total >= 0 ? "+" : "-"}${formatMoneyINR(Math.abs(total))}`;
+  };
 
   const goPrev = useCallback(() => setAnchor((a) => navigateAnchor(a, filterMode, -1)), [filterMode]);
   const goNext = useCallback(() => setAnchor((a) => navigateAnchor(a, filterMode, 1)), [filterMode]);
@@ -236,7 +262,7 @@ export default function ActivityScreen() {
 
   const handleDeleteTransaction = useCallback(
     (item: Transaction) => {
-      Alert.alert(
+      showAppAlert(
         "Delete transaction",
         "Remove this transaction permanently?",
         [
@@ -332,7 +358,12 @@ export default function ActivityScreen() {
           stickySectionHeadersEnabled={false}
           contentContainerStyle={styles.listContent}
           renderSectionHeader={({ section }) => (
-            <SectionLabel style={styles.dateHeader}>{section.title}</SectionLabel>
+            <View style={styles.dateHeaderRow}>
+              <SectionLabel style={styles.dateHeader}>{section.title}</SectionLabel>
+              <Text style={[styles.dateHeaderTotal, { color: sectionTotalColor(section.total) }]}>
+                {sectionTotalLabel(section.total)}
+              </Text>
+            </View>
           )}
           renderItem={({ item }) => {
             const icon = getCategoryIcon(item.categoryId, categories);
@@ -490,9 +521,20 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: 100,
   },
-  dateHeader: {
+  dateHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
+  },
+  dateHeader: {
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  dateHeaderTotal: {
+    fontSize: 12,
+    fontWeight: "700",
   },
   modalOverlay: {
     flex: 1,

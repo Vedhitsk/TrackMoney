@@ -75,12 +75,12 @@ export default function CategoryDetailsScreen() {
 
   const expenseChartData = [
     { label: category?.name ?? "", value: categoryExpense, color: theme.expense },
-    { label: "Other", value: Math.max(0, globalExpense - categoryExpense), color: theme.borderLight }
+    { label: "Other", value: Math.max(0, globalExpense - categoryExpense), color: theme.ringTrack }
   ];
 
   const incomeChartData = [
     { label: category?.name ?? "", value: categoryIncome, color: theme.income },
-    { label: "Other", value: Math.max(0, globalIncome - categoryIncome), color: theme.borderLight }
+    { label: "Other", value: Math.max(0, globalIncome - categoryIncome), color: theme.ringTrack }
   ];
 
   const sortOrder = SORT_OPTIONS[sortIndex];

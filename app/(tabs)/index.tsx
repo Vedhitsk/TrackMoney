@@ -2,8 +2,10 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { AppState, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { DonutChart } from "@/components/donut-chart";
 import {
@@ -16,7 +18,7 @@ import {
   SegmentedControl,
 } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
-import { formatMoneyINR } from "@/types";
+import { formatMoneyINR, formatMoneyINRWhole } from "@/types";
 
 type PeriodMode = "week" | "month" | "year";
 
@@ -76,6 +78,7 @@ export default function HomeScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const {
     categories,
@@ -96,12 +99,28 @@ export default function HomeScreen() {
   );
 
   const [mode, setMode] = useState<PeriodMode>("month");
+  const [balanceVisible, setBalanceVisible] = useState(false);
   const anchor = useMemo(() => new Date(), []);
 
   useEffect(() => {
     void loadCategories();
     void refreshAllTransactions();
     void refreshPendingTransactions();
+  }, []);
+
+  // Re-hide the balance whenever Home loses focus (switching tabs) or the app
+  // goes to the background (e.g. the user presses the device Home button).
+  useFocusEffect(
+    useCallback(() => {
+      return () => setBalanceVisible(false);
+    }, []),
+  );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next !== "active") setBalanceVisible(false);
+    });
+    return () => sub.remove();
   }, []);
 
   useFocusEffect(
@@ -169,7 +188,7 @@ export default function HomeScreen() {
     }
     const palette = theme.chartPalette;
     return Array.from(map.entries())
-      .map(([catId, amount], i) => {
+      .map(([catId, amount]) => {
         const cat = catId != null ? categories.find((c) => c.id === catId) : null;
         return {
           label: cat?.name ?? "Everything else",
@@ -183,15 +202,21 @@ export default function HomeScreen() {
   const pendingCount = pendingTransactions.length;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
       <Text style={styles.headerTitle}>TrackMoney</Text>
 
       <SectionLabel style={styles.heroLabel}>
         NET CASH FLOW · {periodLabel(anchor, mode)}
       </SectionLabel>
-      <View style={styles.heroRow}>
-        <Text style={[styles.heroValue, { color: theme.text }]}>{formatMoneyINR(net)}</Text>
-        {trendPct !== 0 && (
+      <TouchableOpacity
+        style={styles.heroRow}
+        activeOpacity={0.7}
+        onPress={() => setBalanceVisible((v) => !v)}
+      >
+        <Text style={[styles.heroValue, { color: theme.text }]}>
+          {balanceVisible ? formatMoneyINR(net) : "•••••"}
+        </Text>
+        {balanceVisible && trendPct !== 0 && (
           <View
             style={[
               styles.trendChip,
@@ -203,10 +228,11 @@ export default function HomeScreen() {
             </Text>
           </View>
         )}
-      </View>
+        <MaterialIcons name={balanceVisible ? "visibility" : "visibility-off"} size={18} color={theme.textTertiary} />
+      </TouchableOpacity>
 
       <View style={styles.chartWrap}>
-        <CashFlowLineChart data={chartPoints} height={150} calloutLabel={calloutLabel} />
+        <CashFlowLineChart data={chartPoints} height={130} calloutLabel={calloutLabel} />
       </View>
 
       <SegmentedControl
@@ -247,18 +273,18 @@ export default function HomeScreen() {
           <View style={styles.donutRow}>
             <DonutChart
               data={donutData}
-              size={150}
-              strokeWidth={22}
-              centerLabel={formatMoneyINR(totalExpense)}
+              size={140}
+              strokeWidth={20}
+              centerLabel={formatMoneyINRWhole(totalExpense)}
               centerSub="Spent"
             />
-            <View style={styles.legendWrap}>
+            <ScrollView style={styles.legendWrap} showsVerticalScrollIndicator={false}>
               <DonutLegend data={donutData} showAmount={false} />
-            </View>
+            </ScrollView>
           </View>
         </Card>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -266,11 +292,8 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
-  },
-  content: {
-    paddingTop: 56,
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 100,
+    paddingBottom: Spacing.lg,
   },
   headerTitle: {
     ...Typography.title,
@@ -316,14 +339,15 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   },
   donutCard: {
     marginTop: Spacing.lg,
+    flex: 1,
   },
   donutLabel: {
     marginBottom: Spacing.md,
   },
   donutRow: {
     flexDirection: "row",
-    alignItems: "center",
     gap: Spacing.lg,
+    flex: 1,
   },
   legendWrap: {
     flex: 1,

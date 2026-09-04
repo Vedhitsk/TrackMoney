@@ -1,12 +1,13 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ThemeColors } from '@/constants/theme';
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { DatePickerModal, TimePickerModal } from "@/components/date-time-picker";
 import { TransactionFormLayout, type UIType } from "@/components/transaction-form-layout";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 import { updateTransaction } from "@/db/queries/transactions";
 import { addKeywordsToCategory } from "@/db/queries/categories";
 import type { TransactionType } from "@/types";
@@ -208,7 +209,7 @@ export default function EditTransactionScreen() {
       await store.refreshAllTransactions();
       router.replace("/(tabs)");
     } catch (e) {
-      Alert.alert("Failed to save", e instanceof Error ? e.message : "Unknown error");
+      showAppAlert("Failed to save", e instanceof Error ? e.message : "Unknown error");
     }
   };
 

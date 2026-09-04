@@ -3,7 +3,6 @@ import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -17,6 +16,7 @@ import { AmountText, Badge, Card, ProgressBar, SectionLabel } from "@/components
 import { formatMoneyINR } from "@/types";
 import { listPendingRecoveries, type PendingRecovery } from "@/db/queries/settlements";
 import { updateTransaction } from "@/db/queries/transactions";
+import { showAppAlert } from "@/store/useAlertStore";
 
 export default function RecoveriesScreen() {
   const theme = useAppTheme();
@@ -87,7 +87,7 @@ function RecoveryCard({ item, onRefresh }: { item: PendingRecovery; onRefresh: (
   const pct = item.pendingRecovery > 0 ? Math.min(1, item.alreadyRecovered / item.pendingRecovery) : 1;
 
   const handleForgiveDebt = () => {
-    Alert.alert(
+    showAppAlert(
       "Mark as settled",
       `Are you sure you want to mark this as fully settled?\n\nThis will assume you paid the remaining ${formatMoneyINR(item.remaining)} yourself, adding it to your share of the expense.`,
       [
@@ -101,7 +101,7 @@ function RecoveryCard({ item, onRefresh }: { item: PendingRecovery; onRefresh: (
               await updateTransaction(item.tx.id, { actualAmount: newActualAmount });
               onRefresh();
             } catch {
-              Alert.alert("Error", "Failed to update transaction.");
+              showAppAlert("Error", "Failed to update transaction.");
             }
           },
         },

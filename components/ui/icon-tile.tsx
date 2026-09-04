@@ -12,7 +12,7 @@ type Props = {
 /** Colored rounded-square tile wrapping an emoji glyph (category/merchant icon). */
 export function IconTile({ emoji, color, size = 44, style }: Props) {
   const theme = useAppTheme();
-  const bg = color ? `${color}22` : theme.primaryMuted;
+  const bg = color ? `${color}33` : theme.primaryMuted;
 
   return (
     <View

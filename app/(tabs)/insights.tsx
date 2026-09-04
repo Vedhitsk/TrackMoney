@@ -3,7 +3,6 @@ import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -23,12 +22,14 @@ import {
   Card,
   Chip,
   DonutLegend,
+  IconTile,
   InsightCard,
   ProgressBar,
   SectionLabel,
   SegmentedControl,
 } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 import { formatMoneyINR } from "@/types";
 import type { BudgetWithCategory } from "@/db/queries/budgets";
 
@@ -247,7 +248,7 @@ export default function InsightsScreen() {
   };
 
   const handleDeleteBudget = (b: BudgetWithCategory) => {
-    Alert.alert("Delete Budget", `Remove budget for "${b.categoryName}"?`, [
+    showAppAlert("Delete Budget", `Remove budget for "${b.categoryName}"?`, [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
@@ -262,7 +263,7 @@ export default function InsightsScreen() {
   };
 
   const handleCopyFromPrevious = () => {
-    Alert.alert(
+    showAppAlert(
       "Copy from Previous Month",
       `Copy all budgets from ${prevMonthLabel} to ${monthLabel}? This will replace current budgets.`,
       [
@@ -272,7 +273,7 @@ export default function InsightsScreen() {
           onPress: async () => {
             const { copyBudgetsFromPreviousMonth } = await import("@/db/queries/budgets");
             const count = await copyBudgetsFromPreviousMonth(year, budgetMonth);
-            if (count === 0) Alert.alert("No budgets found", `${prevMonthLabel} has no budgets to copy.`);
+            if (count === 0) showAppAlert("No budgets found", `${prevMonthLabel} has no budgets to copy.`);
             await loadBudgets();
           },
         },
@@ -353,7 +354,11 @@ export default function InsightsScreen() {
               <SectionLabel style={styles.sectionTitleSpaced}>Category movement</SectionLabel>
               <View style={{ gap: Spacing.md }}>
                 {byCat.map((c) => (
-                  <View key={String(c.categoryId ?? "none")} style={styles.movementRow}>
+                  <TouchableOpacity
+                    key={String(c.categoryId ?? "none")}
+                    style={styles.movementRow}
+                    onPress={() => router.push(`/category-details?categoryId=${c.categoryId}&year=${year}&month=${month}`)}
+                  >
                     <Text style={styles.movementIcon}>{c.icon}</Text>
                     <View style={styles.movementInfo}>
                       <View style={styles.movementTop}>
@@ -370,7 +375,8 @@ export default function InsightsScreen() {
                       </View>
                       <ProgressBar progress={c.pct / 100} color={c.color} />
                     </View>
-                  </View>
+                    <MaterialIcons name="chevron-right" size={18} color={theme.textTertiary} />
+                  </TouchableOpacity>
                 ))}
               </View>
             </Card>
@@ -392,105 +398,109 @@ export default function InsightsScreen() {
           </View>
         </ScrollView>
       ) : (
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Card style={styles.summaryCard}>
-            <View style={styles.summaryRow}>
-              <View>
-                <SectionLabel>Budget</SectionLabel>
-                <Text style={styles.summaryValue}>{formatMoneyINR(totalBudget)}</Text>
+        <View style={styles.budgetPane}>
+          <ScrollView style={styles.budgetScroll} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+            <Card style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <View>
+                  <SectionLabel>Budget</SectionLabel>
+                  <Text style={styles.summaryValue}>{formatMoneyINR(totalBudget)}</Text>
+                </View>
+                <View style={{ alignItems: "flex-end" }}>
+                  <SectionLabel>Spent</SectionLabel>
+                  <Text style={[styles.summaryValue, { color: totalSpent > totalBudget ? theme.expense : theme.income }]}>
+                    {formatMoneyINR(totalSpent)}
+                  </Text>
+                </View>
               </View>
-              <View style={{ alignItems: "flex-end" }}>
-                <SectionLabel>Spent</SectionLabel>
-                <Text style={[styles.summaryValue, { color: totalSpent > totalBudget ? theme.expense : theme.income }]}>
-                  {formatMoneyINR(totalSpent)}
-                </Text>
+              <ProgressBar
+                style={styles.totalBar}
+                progress={totalBudget > 0 ? totalSpent / totalBudget : 0}
+                color={totalSpent > totalBudget ? theme.progressRed : theme.progressGreen}
+              />
+              <Text style={styles.remainingText}>
+                {totalBudget - totalSpent >= 0
+                  ? `${formatMoneyINR(totalBudget - totalSpent)} remaining`
+                  : `${formatMoneyINR(totalSpent - totalBudget)} over budget`}
+              </Text>
+            </Card>
+
+            {overBudgetCats.length > 0 && (
+              <InsightCard
+                style={styles.section}
+                tone="danger"
+                message={`${overBudgetCats.length} categor${overBudgetCats.length > 1 ? "ies are" : "y is"} over budget: ${overBudgetCats
+                  .map((b) => b.categoryName)
+                  .join(", ")}`}
+              />
+            )}
+
+            {loadingBudgets ? (
+              <ActivityIndicator color={theme.primary} style={{ marginTop: 30 }} />
+            ) : budgetsData.length === 0 ? (
+              <View style={styles.center}>
+                <Text style={styles.emptyText}>No budgets set for {monthLabel}</Text>
+                <Text style={styles.mutedText}>Tap "Add budget" below to create one</Text>
               </View>
-            </View>
-            <ProgressBar
-              style={styles.totalBar}
-              progress={totalBudget > 0 ? totalSpent / totalBudget : 0}
-              color={totalSpent > totalBudget ? theme.progressRed : theme.progressGreen}
-            />
-            <Text style={styles.remainingText}>
-              {totalBudget - totalSpent >= 0
-                ? `${formatMoneyINR(totalBudget - totalSpent)} remaining`
-                : `${formatMoneyINR(totalSpent - totalBudget)} over budget`}
-            </Text>
-          </Card>
-
-          {overBudgetCats.length > 0 && (
-            <InsightCard
-              style={styles.section}
-              tone="danger"
-              message={`${overBudgetCats.length} categor${overBudgetCats.length > 1 ? "ies are" : "y is"} over budget: ${overBudgetCats
-                .map((b) => b.categoryName)
-                .join(", ")}`}
-            />
-          )}
-
-          <TouchableOpacity style={styles.copyBtn} onPress={handleCopyFromPrevious}>
-            <MaterialIcons name="content-copy" size={16} color={theme.primary} />
-            <Text style={styles.copyBtnText}>Copy from previous month</Text>
-          </TouchableOpacity>
-
-          {loadingBudgets ? (
-            <ActivityIndicator color={theme.primary} style={{ marginTop: 30 }} />
-          ) : budgetsData.length === 0 ? (
-            <View style={styles.center}>
-              <Text style={styles.emptyText}>No budgets set for {monthLabel}</Text>
-              <Text style={styles.mutedText}>Tap below to add a category budget</Text>
-            </View>
-          ) : (
-            <View style={{ gap: Spacing.sm }}>
-              {budgetsData.map((item) => {
-                const spent = spentByCat.get(item.categoryId) ?? 0;
-                const pct = item.monthlyLimit > 0 ? spent / item.monthlyLimit : 0;
-                const isOver = spent > item.monthlyLimit;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.budgetCard}
-                    onPress={() => router.push(`/category-details?categoryId=${item.categoryId}&year=${year}&month=${budgetMonth - 1}`)}
-                  >
-                    <View style={styles.budgetHeader}>
-                      <Text style={styles.budgetIcon}>{item.categoryIcon}</Text>
-                      <View style={styles.budgetInfo}>
-                        <Text style={styles.budgetName}>{item.categoryName}</Text>
-                        <Text style={styles.budgetAmounts}>
-                          <Text style={{ color: isOver ? theme.expense : theme.text, fontWeight: "700" }}>
-                            {formatMoneyINR(spent)}
-                          </Text>
-                          {" / "}
-                          {formatMoneyINR(item.monthlyLimit)}
-                        </Text>
-                      </View>
-                      <TouchableOpacity onPress={() => openEdit(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                        <MaterialIcons name="edit" size={18} color={theme.textSecondary} />
-                      </TouchableOpacity>
+            ) : (
+              <View style={{ gap: Spacing.sm }}>
+                {budgetsData.map((item) => {
+                  const spent = spentByCat.get(item.categoryId) ?? 0;
+                  const pct = item.monthlyLimit > 0 ? spent / item.monthlyLimit : 0;
+                  const isOver = spent > item.monthlyLimit;
+                  return (
+                    <Card key={item.id} noPadding>
                       <TouchableOpacity
-                        onPress={() => handleDeleteBudget(item)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        style={{ marginLeft: 6 }}
+                        style={styles.budgetCard}
+                        onPress={() => router.push(`/category-details?categoryId=${item.categoryId}&year=${year}&month=${budgetMonth - 1}`)}
                       >
-                        <MaterialIcons name="delete-outline" size={18} color={theme.textSecondary} />
+                        <View style={styles.budgetHeader}>
+                          <IconTile emoji={item.categoryIcon} color={item.categoryColor} size={40} />
+                          <View style={styles.budgetInfo}>
+                            <Text style={styles.budgetName}>{item.categoryName}</Text>
+                            <Text style={styles.budgetAmounts}>
+                              <Text style={{ color: isOver ? theme.expense : theme.text, fontWeight: "700" }}>
+                                {formatMoneyINR(spent)}
+                              </Text>
+                              {" / "}
+                              {formatMoneyINR(item.monthlyLimit)}
+                            </Text>
+                          </View>
+                          <TouchableOpacity onPress={() => openEdit(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <MaterialIcons name="edit" size={17} color={theme.textSecondary} />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => handleDeleteBudget(item)}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            style={{ marginLeft: 4 }}
+                          >
+                            <MaterialIcons name="delete-outline" size={17} color={theme.textSecondary} />
+                          </TouchableOpacity>
+                        </View>
+                        <ProgressBar
+                          style={styles.budgetBar}
+                          progress={pct}
+                          color={isOver ? theme.progressRed : item.categoryColor}
+                        />
                       </TouchableOpacity>
-                    </View>
-                    <ProgressBar
-                      style={styles.budgetBar}
-                      progress={pct}
-                      color={isOver ? theme.progressRed : item.categoryColor}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
+                    </Card>
+                  );
+                })}
+              </View>
+            )}
+          </ScrollView>
 
-          <TouchableOpacity style={styles.addBudgetBtn} onPress={openAdd}>
-            <MaterialIcons name="add" size={18} color={theme.primary} />
-            <Text style={styles.addBudgetBtnText}>Add budget</Text>
-          </TouchableOpacity>
-        </ScrollView>
+          <View style={styles.budgetFooter}>
+            <TouchableOpacity style={styles.footerSecondaryBtn} onPress={handleCopyFromPrevious}>
+              <MaterialIcons name="content-copy" size={15} color={theme.textSecondary} />
+              <Text style={styles.footerSecondaryBtnText}>Copy previous</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.footerPrimaryBtn} onPress={openAdd}>
+              <MaterialIcons name="add" size={18} color="#FFFFFF" />
+              <Text style={styles.footerPrimaryBtnText}>Add budget</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       <Modal visible={showForm} transparent animationType="fade" onRequestClose={() => setShowForm(false)}>
@@ -572,42 +582,49 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   summaryValue: { fontSize: 20, fontWeight: "700", color: theme.text, marginTop: 2 },
   totalBar: { marginTop: Spacing.md },
   remainingText: { fontSize: 12, color: theme.textSecondary, marginTop: 6 },
-  copyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 10,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: theme.primary,
-    borderStyle: "dashed",
-  },
-  copyBtnText: { fontSize: 13, fontWeight: "600", color: theme.primary },
+  budgetPane: { flex: 1 },
+  budgetScroll: { flex: 1 },
   center: { alignItems: "center", paddingTop: 30, gap: 6 },
   emptyText: { fontSize: 15, fontWeight: "600", color: theme.textSecondary },
   mutedText: { fontSize: 13, color: theme.textSecondary },
   budgetCard: {
-    backgroundColor: theme.surface,
-    borderRadius: Radius.lg,
     padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: theme.border,
   },
   budgetHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
-  budgetIcon: { fontSize: 20 },
   budgetInfo: { flex: 1, gap: 2 },
   budgetName: { fontSize: 14, fontWeight: "600", color: theme.text },
   budgetAmounts: { fontSize: 12, color: theme.textSecondary },
   budgetBar: { marginTop: Spacing.sm },
-  addBudgetBtn: {
+  budgetFooter: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.borderLight,
+  },
+  footerSecondaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
     paddingVertical: 12,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.pill,
+    borderWidth: 1,
+    borderColor: theme.border,
   },
-  addBudgetBtnText: { fontSize: 14, fontWeight: "700", color: theme.primary },
+  footerSecondaryBtnText: { fontSize: 13, fontWeight: "600", color: theme.textSecondary },
+  footerPrimaryBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: Radius.pill,
+    backgroundColor: theme.primary,
+  },
+  footerPrimaryBtnText: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)" },
   modalScrollContent: { flexGrow: 1, justifyContent: "center", padding: 20 },
   modal: { backgroundColor: theme.surfaceElevated, borderRadius: Radius.lg, padding: 20, width: "100%", gap: 10 },

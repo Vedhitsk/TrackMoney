@@ -51,6 +51,10 @@ export const LightColors = {
 
   chartPalette: LIGHT_CHART_PALETTE,
 
+  // Contrasting "unfilled" track color for partial-ring / two-tone donut charts
+  // (must read clearly against both `surface` and `surfaceElevated`).
+  ringTrack: '#E4E1D8',
+
   white: '#FFFFFF',
   shadow: 'rgba(20,20,20,0.08)',
 };
@@ -94,6 +98,8 @@ export const DarkColors = {
   chipText: '#C9C9CE',
 
   chartPalette: DARK_CHART_PALETTE,
+
+  ringTrack: '#34343C',
 
   white: '#FFFFFF',
   shadow: 'rgba(0,0,0,0.5)',
@@ -162,6 +168,20 @@ export const Radius = {
   xl: 20,
   xxl: 24,
   pill: 999,
+} as const;
+
+/** Curated multi-color set for menu-row icon tiles (Settings, Manage, etc.) —
+ * modern, muted jewel tones, distinguishable from each other and from the
+ * single amber brand accent. Same hues in both themes. */
+export const IconPalette = {
+  blue: '#4C7EF3',
+  purple: '#8B5CF6',
+  teal: '#14B8A6',
+  pink: '#EC4899',
+  indigo: '#6366F1',
+  amber: '#F0A94A',
+  red: '#EF4444',
+  slate: '#64748B',
 } as const;
 
 export const Typography = {

@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
-  Alert,
   DeviceEventEmitter,
   FlatList,
   StyleSheet,
@@ -16,6 +15,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { AmountText, Badge, Card, IconTile } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 
 import type { Transaction } from "@/types";
 import { deleteTransaction, updateTransaction } from "@/db/queries/transactions";
@@ -62,7 +62,7 @@ export default function PendingTransactionsScreen() {
   const handleAccept = useCallback(
     async (item: Transaction) => {
       if (!item.categoryId || !item.accountId) {
-        Alert.alert(
+        showAppAlert(
           "Incomplete details",
           "This transaction is missing a category or account. Tap the card to edit and fill them in before accepting.",
           [
@@ -86,7 +86,7 @@ export default function PendingTransactionsScreen() {
 
   const handleDiscard = useCallback(
     (item: Transaction) => {
-      Alert.alert(
+      showAppAlert(
         "Discard transaction",
         "Are you sure you want to discard this auto-fetched transaction?",
         [

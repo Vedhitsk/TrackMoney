@@ -83,3 +83,12 @@ export function formatMoneyINR(value: number) {
     maximumFractionDigits: 2,
   }).format(value);
 }
+
+/** Whole-rupee formatting (no decimals) — for tight spaces like a donut center label. */
+export function formatMoneyINRWhole(value: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}

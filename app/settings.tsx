@@ -1,9 +1,8 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
+import { IconPalette, Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import { useThemeStore } from '@/store/useThemeStore';
 import React, { useState } from "react";
 import {
-  Alert,
   Modal,
   Platform,
   ScrollView,
@@ -24,16 +23,17 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Card, ListRow, SectionLabel } from "@/components/ui";
 import { exportTrackMoneyData, importTrackMoneyData } from "@/lib/serialization/trackmoney";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { showAppAlert } from "@/store/useAlertStore";
 import { parseSmsOffline } from "@/lib/sms/smsParser";
 import { insertTransaction } from "@/db/queries/transactions";
 
 
 type SettingItem = {
   icon: keyof typeof MaterialIcons.glyphMap;
+  color: string;
   label: string;
   sub: string;
   onPress?: () => void;
-  color?: string;
   rightElement?: React.ReactNode;
 };
 
@@ -65,13 +65,13 @@ export default function SettingsScreen() {
       writer.write(bytes);
       writer.close();
       if (Platform.OS === "android" && !(await Sharing.isAvailableAsync())) {
-        Alert.alert("Export saved", `Saved to: ${file.uri}`);
+        showAppAlert("Export saved", `Saved to: ${file.uri}`);
         return;
       }
       await Sharing.shareAsync(file.uri);
       setStatus("Export complete.");
     } catch (e) {
-      Alert.alert("Export failed", e instanceof Error ? e.message : "Unknown error");
+      showAppAlert("Export failed", e instanceof Error ? e.message : "Unknown error");
     } finally {
       setBusy(false);
     }
@@ -91,12 +91,12 @@ export default function SettingsScreen() {
       }
       const uri = result.assets?.[0]?.uri;
       if (!uri) {
-        Alert.alert("Import failed", "No file URI found.");
+        showAppAlert("Import failed", "No file URI found.");
         return;
       }
       const raw = await fetch(uri).then((r) => r.text());
       const parsed = JSON.parse(raw);
-      Alert.alert(
+      showAppAlert(
         "Confirm import",
         "Import will REPLACE all existing data. Continue?",
         [
@@ -114,7 +114,7 @@ export default function SettingsScreen() {
                 await store.refreshPendingTransactions();
                 setStatus("Import complete.");
               } catch (e) {
-                Alert.alert("Import failed", e instanceof Error ? e.message : "Unknown error");
+                showAppAlert("Import failed", e instanceof Error ? e.message : "Unknown error");
                 setStatus(null);
               } finally {
                 setBusy(false);
@@ -124,7 +124,7 @@ export default function SettingsScreen() {
         ],
       );
     } catch (e) {
-      Alert.alert("Import failed", e instanceof Error ? e.message : "Unknown error");
+      showAppAlert("Import failed", e instanceof Error ? e.message : "Unknown error");
       setBusy(false);
     }
   };
@@ -138,19 +138,19 @@ export default function SettingsScreen() {
         source: "sms",
       });
       if (!regexResult) {
-        Alert.alert("Simulate Failed", "Parser could not detect a valid transaction. Check that your SMS contains keywords like 'debited', 'credited', 'Rs.', etc.");
+        showAppAlert("Simulate Failed", "Parser could not detect a valid transaction. Check that your SMS contains keywords like 'debited', 'credited', 'Rs.', etc.");
         return;
       }
       const draft = regexResult.draft;
       await insertTransaction(draft);
       await useTransactionStore.getState().refreshPendingTransactions();
       setShowSimulateModal(false);
-      Alert.alert(
+      showAppAlert(
         "Success",
         `Parsed!\n\nAmount: ₹${draft.actualAmount}\nType: ${draft.type}\nMerchant: ${draft.merchant}\nStatus: ${draft.parseStatus}\n\nCheck the Pending dashboard!`
       );
     } catch (e) {
-      Alert.alert("Error", e instanceof Error ? e.message : "Unknown error");
+      showAppAlert("Error", e instanceof Error ? e.message : "Unknown error");
     }
   };
 
@@ -162,6 +162,7 @@ export default function SettingsScreen() {
       items: [
         {
           icon: "brightness-4",
+          color: IconPalette.indigo,
           label: "Theme",
           sub: `Current: ${themeStore.theme.charAt(0).toUpperCase() + themeStore.theme.slice(1)}`,
           rightElement: <ThemeToggle />,
@@ -173,16 +174,17 @@ export default function SettingsScreen() {
       items: [
         {
           icon: "file-upload",
+          color: IconPalette.teal,
           label: "Export Data",
           sub: "Save all data as JSON file",
           onPress: onExport,
         },
         {
           icon: "file-download",
+          color: IconPalette.red,
           label: "Import Data",
           sub: "Replace all data from JSON file",
           onPress: onImport,
-          color: theme.expense,
         },
       ],
     },
@@ -191,6 +193,7 @@ export default function SettingsScreen() {
       items: [
         {
           icon: "sms",
+          color: IconPalette.blue,
           label: "SMS Auto-Ingestion",
           sub:
             Platform.OS === "android"
@@ -200,12 +203,14 @@ export default function SettingsScreen() {
         },
         {
           icon: "science",
+          color: IconPalette.purple,
           label: "Simulate Incoming SMS",
           sub: "Test the parser with a custom SMS text",
           onPress: () => setShowSimulateModal(true),
         },
         {
           icon: "history",
+          color: IconPalette.slate,
           label: "System Logs",
           sub: "View background activity and errors",
           onPress: () => router.push("/settings/logs"),
@@ -217,6 +222,7 @@ export default function SettingsScreen() {
       items: [
         {
           icon: "info-outline",
+          color: IconPalette.slate,
           label: "TrackMoney v1.0",
           sub: "Developed by Vedhit Suresh\nEmail: vedhitsk2804@gmail.com",
         },
@@ -247,8 +253,8 @@ export default function SettingsScreen() {
                     onPress={item.onPress}>
                     <ListRow
                       leading={
-                        <View style={[styles.rowIcon, { backgroundColor: theme.primaryLight }]}>
-                          <MaterialIcons name={item.icon} size={20} color={item.color ?? theme.primary} />
+                        <View style={[styles.rowIcon, { backgroundColor: `${item.color}22` }]}>
+                          <MaterialIcons name={item.icon} size={20} color={item.color} />
                         </View>
                       }
                       title={item.label}
