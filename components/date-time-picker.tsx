@@ -1,5 +1,5 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { ThemeColors } from '@/constants/theme';
+import { Radius, ThemeColors } from '@/constants/theme';
 import React, { useState } from "react";
 import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -238,8 +238,8 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     alignItems: "center",
   },
   card: {
-    backgroundColor: theme.surface,
-    borderRadius: 16,
+    backgroundColor: theme.surfaceElevated,
+    borderRadius: Radius.lg,
     padding: 16,
     width: 320,
   },

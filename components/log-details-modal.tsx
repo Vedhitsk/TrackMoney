@@ -4,7 +4,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
-import { AppColors } from "@/constants/theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { formatMoneyINR, Transaction } from "@/types";
 import { useTransactionStore } from "@/store/useTransactionStore";
 
@@ -17,6 +17,7 @@ type Props = {
 
 export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess }: Props) {
   const router = useRouter();
+  const theme = useAppTheme();
   const { categories, accounts } = useTransactionStore();
 
   if (!transaction) return null;
@@ -25,7 +26,7 @@ export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess
   const account = accounts.find((a) => a.id === transaction.accountId);
 
   const isExpense = transaction.type === "expense";
-  const headerColor = isExpense ? AppColors.expense : AppColors.income;
+  const headerColor = isExpense ? theme.expense : theme.income;
 
   const handleDelete = () => {
     Alert.alert("Delete Transaction", "Are you sure you want to delete this transaction?", [

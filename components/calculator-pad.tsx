@@ -150,19 +150,19 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   keyText: {
     fontSize: 20,
     fontWeight: "700",
-    color: theme.white,
+    color: theme.text,
   },
   operatorKey: {
     backgroundColor: theme.calculatorDark,
   },
   operatorKeyText: {
     fontSize: 22,
-    color: theme.white,
+    color: theme.text,
   },
   equalsKey: {
     backgroundColor: theme.primary,
   },
   equalsKeyText: {
-    color: theme.white,
+    color: "#FFFFFF",
   },
 });

@@ -1,61 +1,24 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { ThemeColors } from '@/constants/theme';
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    ActivityIndicator,
-    Alert,
-    DeviceEventEmitter,
-    Modal,
-    SectionList,
-    StyleSheet,
-    TouchableOpacity,
-    View,
-} from "react-native";
-
-import { ThemedText } from "@/components/themed-text";
-
-import {
-    loadRecordsFilterPrefs,
-    saveRecordsFilterPrefs,
-} from "@/lib/recordsFilterPrefs";
-import { useTransactionStore } from "@/store/useTransactionStore";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
-import type { Transaction } from "@/types";
+
+import { DonutChart } from "@/components/donut-chart";
+import {
+  AmountText,
+  CashFlowLineChart,
+  Card,
+  DonutLegend,
+  InsightCard,
+  SectionLabel,
+  SegmentedControl,
+} from "@/components/ui";
+import { useTransactionStore } from "@/store/useTransactionStore";
 import { formatMoneyINR } from "@/types";
-import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
 
-type FilterMode = "day" | "week" | "month" | "year";
-
-function getCategoryLabel(categoryId: number | null, categories: { id: number; name: string }[]) {
-  if (!categoryId) return "Uncategorized";
-  return categories.find((c) => c.id === categoryId)?.name ?? "Uncategorized";
-}
-
-function getCategoryIcon(categoryId: number | null, categories: { id: number; icon: string }[]) {
-  if (!categoryId) return "💰";
-  return categories.find((c) => c.id === categoryId)?.icon ?? "💰";
-}
-
-function getAccountLabel(accountId: number | null, accounts: { id: number; name: string }[]) {
-  if (!accountId) return "No Account";
-  return accounts.find((a) => a.id === accountId)?.name ?? "No Account";
-}
-
-function groupByDate(txns: Transaction[]): { title: string; data: Transaction[] }[] {
-  const groups = new Map<string, Transaction[]>();
-  for (const tx of txns) {
-    const key = tx.date.toLocaleDateString("en-IN", {
-      month: "short",
-      day: "2-digit",
-      weekday: "long",
-    });
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(tx);
-  }
-  return Array.from(groups.entries()).map(([title, data]) => ({ title, data }));
-}
+type PeriodMode = "week" | "month" | "year";
 
 function startOfWeek(d: Date): Date {
   const day = d.getDay();
@@ -63,21 +26,15 @@ function startOfWeek(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), diff);
 }
 
-function endOfWeek(d: Date): Date {
-  const s = startOfWeek(d);
-  return new Date(s.getFullYear(), s.getMonth(), s.getDate() + 7);
-}
-
-function getRange(anchor: Date, mode: FilterMode): { start: Date; end: Date } {
+function getRange(anchor: Date, mode: PeriodMode): { start: Date; end: Date } {
   const y = anchor.getFullYear();
   const m = anchor.getMonth();
-  const d = anchor.getDate();
 
   switch (mode) {
-    case "day":
-      return { start: new Date(y, m, d), end: new Date(y, m, d + 1) };
-    case "week":
-      return { start: startOfWeek(anchor), end: endOfWeek(anchor) };
+    case "week": {
+      const s = startOfWeek(anchor);
+      return { start: s, end: new Date(s.getFullYear(), s.getMonth(), s.getDate() + 7) };
+    }
     case "month":
       return { start: new Date(y, m, 1), end: new Date(y, m + 1, 1) };
     case "year":
@@ -85,27 +42,23 @@ function getRange(anchor: Date, mode: FilterMode): { start: Date; end: Date } {
   }
 }
 
-function navigateAnchor(anchor: Date, mode: FilterMode, direction: -1 | 1): Date {
+function previousAnchor(anchor: Date, mode: PeriodMode): Date {
   const y = anchor.getFullYear();
   const m = anchor.getMonth();
   const d = anchor.getDate();
 
   switch (mode) {
-    case "day":
-      return new Date(y, m, d + direction);
     case "week":
-      return new Date(y, m, d + direction * 7);
+      return new Date(y, m, d - 7);
     case "month":
-      return new Date(y, m + direction, 1);
+      return new Date(y, m - 1, 1);
     case "year":
-      return new Date(y + direction, 0, 1);
+      return new Date(y - 1, 0, 1);
   }
 }
 
-function formatLabel(anchor: Date, mode: FilterMode): string {
+function periodLabel(anchor: Date, mode: PeriodMode): string {
   switch (mode) {
-    case "day":
-      return anchor.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
     case "week": {
       const s = startOfWeek(anchor);
       const e = new Date(s.getFullYear(), s.getMonth(), s.getDate() + 6);
@@ -113,318 +66,199 @@ function formatLabel(anchor: Date, mode: FilterMode): string {
       return `${fmt(s)} - ${fmt(e)}`;
     }
     case "month":
-      return anchor.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+      return anchor.toLocaleDateString("en-IN", { month: "long", year: "numeric" }).toUpperCase();
     case "year":
       return String(anchor.getFullYear());
   }
 }
 
-export default function RecordsScreen() {
+export default function HomeScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
-
   const router = useRouter();
+
   const {
     categories,
     loadCategories,
-    accounts,
-    loadAccounts,
     pendingTransactions,
     refreshPendingTransactions,
     allTransactions,
     refreshAllTransactions,
-    loadingAllTransactions,
   } = useTransactionStore(
     useShallow((state) => ({
       categories: state.categories,
       loadCategories: state.loadCategories,
-      accounts: state.accounts,
-      loadAccounts: state.loadAccounts,
       pendingTransactions: state.pendingTransactions,
       refreshPendingTransactions: state.refreshPendingTransactions,
       allTransactions: state.allTransactions,
       refreshAllTransactions: state.refreshAllTransactions,
-      loadingAllTransactions: state.loadingAllTransactions,
-    }))
+    })),
   );
 
-  const [anchor, setAnchor] = useState(new Date());
-  const [filterMode, setFilterMode] = useState<FilterMode>("month");
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [filterPrefsHydrated, setFilterPrefsHydrated] = useState(false);
+  const [mode, setMode] = useState<PeriodMode>("month");
+  const anchor = useMemo(() => new Date(), []);
 
   useEffect(() => {
     void loadCategories();
-    void loadAccounts();
-    void refreshPendingTransactions();
     void refreshAllTransactions();
+    void refreshPendingTransactions();
   }, []);
 
-  // Re-fetch when tab comes into focus (catches accepts/deletes from Pending Dashboard)
   useFocusEffect(
     useCallback(() => {
-      void refreshPendingTransactions();
       void refreshAllTransactions();
-    }, [refreshPendingTransactions, refreshAllTransactions]),
+      void refreshPendingTransactions();
+    }, [refreshAllTransactions, refreshPendingTransactions]),
   );
 
-  // Also update pending count in real-time when background task saves a new SMS transaction
-  useEffect(() => {
-    const sub = DeviceEventEmitter.addListener(SMS_TRANSACTION_EVENT, () => {
-      void refreshPendingTransactions();
+  const range = useMemo(() => getRange(anchor, mode), [anchor, mode]);
+  const prevRange = useMemo(() => getRange(previousAnchor(anchor, mode), mode), [anchor, mode]);
+
+  const inRange = useCallback(
+    (start: Date, end: Date) =>
+      allTransactions.filter((tx) => {
+        if (tx.isExcluded) return false;
+        const t = tx.date.getTime();
+        return t >= start.getTime() && t < end.getTime();
+      }),
+    [allTransactions],
+  );
+
+  const current = useMemo(() => inRange(range.start, range.end), [inRange, range]);
+  const previous = useMemo(() => inRange(prevRange.start, prevRange.end), [inRange, prevRange]);
+
+  const sum = (txns: typeof current, type: "expense" | "income") =>
+    txns.filter((t) => t.type === type).reduce((s, t) => s + t.actualAmount, 0);
+
+  const totalExpense = sum(current, "expense");
+  const totalIncome = sum(current, "income");
+  const net = totalIncome - totalExpense;
+
+  const prevNet = sum(previous, "income") - sum(previous, "expense");
+  const trendPct = prevNet !== 0 ? ((net - prevNet) / Math.abs(prevNet)) * 100 : net !== 0 ? 100 : 0;
+
+  // Cash flow line: cumulative net across buckets within the period.
+  const chartPoints = useMemo(() => {
+    const bucketCount = mode === "year" ? 12 : mode === "week" ? 7 : new Date(range.end.getTime() - 86400000).getDate();
+    const buckets = new Array(bucketCount).fill(0);
+    for (const tx of current) {
+      const idx = mode === "year" ? tx.date.getMonth() : Math.floor((tx.date.getTime() - range.start.getTime()) / 86400000);
+      if (idx < 0 || idx >= bucketCount) continue;
+      buckets[idx] += tx.type === "income" ? tx.actualAmount : tx.type === "expense" ? -tx.actualAmount : 0;
+    }
+    let running = 0;
+    return buckets.map((v, i) => {
+      running += v;
+      const label = mode === "year"
+        ? new Date(range.start.getFullYear(), i, 1).toLocaleDateString("en-IN", { month: "short" })
+        : String(i + 1);
+      return { label, value: running };
     });
-    return () => sub.remove();
-  }, [refreshPendingTransactions]);
+  }, [current, mode, range]);
 
-  useEffect(() => {
-    void (async () => {
-      const prefs = await loadRecordsFilterPrefs();
-      if (prefs) {
-        setFilterMode(prefs.filterMode);
-        // deliberately leaving out setAnchor to always default to today on fresh load
-      }
-      setFilterPrefsHydrated(true);
-    })();
-  }, []);
+  const lastPoint = chartPoints[chartPoints.length - 1];
+  const calloutLabel = lastPoint
+    ? `${mode === "year" ? lastPoint.label : `Day ${lastPoint.label}`} · ${formatMoneyINR(lastPoint.value)}`
+    : undefined;
 
-  useEffect(() => {
-    if (!filterPrefsHydrated) return;
-    void saveRecordsFilterPrefs(filterMode, anchor);
-  }, [filterMode, anchor, filterPrefsHydrated]);
+  const donutData = useMemo(() => {
+    const map = new Map<number | null, number>();
+    for (const tx of current) {
+      if (tx.type !== "expense") continue;
+      map.set(tx.categoryId, (map.get(tx.categoryId) ?? 0) + tx.actualAmount);
+    }
+    const palette = theme.chartPalette;
+    return Array.from(map.entries())
+      .map(([catId, amount], i) => {
+        const cat = catId != null ? categories.find((c) => c.id === catId) : null;
+        return {
+          label: cat?.name ?? "Everything else",
+          value: amount,
+          color: cat?.color ?? palette[palette.length - 1],
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+  }, [current, categories, theme.chartPalette]);
 
-  const range = useMemo(() => getRange(anchor, filterMode), [anchor, filterMode]);
-
-  const filtered = useMemo(() => {
-    const startMs = range.start.getTime();
-    const endMs = range.end.getTime();
-    return allTransactions.filter((tx) => {
-      const t = tx.date.getTime();
-      return t >= startMs && t < endMs;
-    });
-  }, [allTransactions, range]);
-
-  const totalExpense = filtered
-    .filter((t) => t.type === "expense" && !t.isExcluded)
-    .reduce((s, t) => s + t.actualAmount, 0);
-  const totalIncome = filtered
-    .filter((t) => t.type === "income" && !t.isExcluded)
-    .reduce((s, t) => s + t.actualAmount, 0);
-  const totalBalance = totalIncome - totalExpense;
-
-  const sections = groupByDate(filtered);
   const pendingCount = pendingTransactions.length;
 
-  const goPrev = useCallback(() => {
-    setAnchor((a) => navigateAnchor(a, filterMode, -1));
-  }, [filterMode]);
-
-  const goNext = useCallback(() => {
-    setAnchor((a) => navigateAnchor(a, filterMode, 1));
-  }, [filterMode]);
-
-  const label = formatLabel(anchor, filterMode);
-
-  const handleDeleteTransaction = useCallback(
-    (item: Transaction) => {
-      Alert.alert(
-        "Delete transaction",
-        "Remove this transaction permanently?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              const { deleteTransaction } = await import("@/db/queries/transactions");
-              await deleteTransaction(item.id);
-              await refreshAllTransactions();
-            },
-          },
-        ],
-      );
-    },
-    [refreshAllTransactions],
-  );
-
-  const filterOptions: { mode: FilterMode; label: string }[] = [
-    { mode: "day", label: "Daily" },
-    { mode: "week", label: "Weekly" },
-    { mode: "month", label: "Monthly" },
-    { mode: "year", label: "Yearly" },
-  ];
-
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/settings")}>
-          <MaterialIcons name="settings" size={26} color={theme.text} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>TrackMoney</ThemedText>
-        <TouchableOpacity>
-          <MaterialIcons name="search" size={26} color={theme.text} />
-        </TouchableOpacity>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.headerTitle}>TrackMoney</Text>
+
+      <SectionLabel style={styles.heroLabel}>
+        NET CASH FLOW · {periodLabel(anchor, mode)}
+      </SectionLabel>
+      <View style={styles.heroRow}>
+        <Text style={[styles.heroValue, { color: theme.text }]}>{formatMoneyINR(net)}</Text>
+        {trendPct !== 0 && (
+          <View
+            style={[
+              styles.trendChip,
+              { backgroundColor: trendPct >= 0 ? `${theme.income}22` : `${theme.expense}22` },
+            ]}
+          >
+            <Text style={{ color: trendPct >= 0 ? theme.income : theme.expense, fontSize: 12, fontWeight: "700" }}>
+              {trendPct >= 0 ? "▲" : "▼"} {Math.abs(trendPct).toFixed(0)}%
+            </Text>
+          </View>
+        )}
       </View>
 
-      {/* Date Navigator + Filter */}
-      <View style={styles.navRow}>
-        <TouchableOpacity onPress={goPrev}>
-          <MaterialIcons name="chevron-left" size={30} color={theme.text} />
-        </TouchableOpacity>
-        <ThemedText style={styles.navLabel}>{label}</ThemedText>
-        <TouchableOpacity onPress={goNext}>
-          <MaterialIcons name="chevron-right" size={30} color={theme.text} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowFilterMenu(true)} style={styles.filterBtn}>
-          <MaterialIcons name="tune" size={22} color={theme.primary} />
-        </TouchableOpacity>
+      <View style={styles.chartWrap}>
+        <CashFlowLineChart data={chartPoints} height={150} calloutLabel={calloutLabel} />
       </View>
 
-      {/* Summary Bar */}
-      <View style={styles.summaryBar}>
-        <View style={styles.summaryItem}>
-          <ThemedText style={styles.summaryLabel}>EXPENSE</ThemedText>
-          <ThemedText style={[styles.summaryValue, { color: theme.expense }]}>
-            {formatMoneyINR(totalExpense)}
-          </ThemedText>
-        </View>
-        <View style={styles.summaryItem}>
-          <ThemedText style={styles.summaryLabel}>INCOME</ThemedText>
-          <ThemedText style={[styles.summaryValue, { color: theme.income }]}>
-            {formatMoneyINR(totalIncome)}
-          </ThemedText>
-        </View>
-        <View style={styles.summaryItem}>
-          <ThemedText style={styles.summaryLabel}>TOTAL</ThemedText>
-          <ThemedText style={styles.summaryValue}>{formatMoneyINR(totalBalance)}</ThemedText>
-        </View>
+      <SegmentedControl
+        style={styles.segment}
+        value={mode}
+        onChange={setMode}
+        options={[
+          { value: "week", label: "Week" },
+          { value: "month", label: "Month" },
+          { value: "year", label: "Year" },
+        ]}
+      />
+
+      <View style={styles.summaryRow}>
+        <Card style={styles.summaryCard}>
+          <SectionLabel>In · {mode}</SectionLabel>
+          <AmountText amount={totalIncome} type="income" showSign={false} style={styles.summaryValue} />
+        </Card>
+        <Card style={styles.summaryCard}>
+          <SectionLabel>Out · {mode}</SectionLabel>
+          <AmountText amount={totalExpense} type="expense" showSign={false} style={styles.summaryValue} />
+        </Card>
       </View>
 
-      {/* Pending Review Banner */}
       {pendingCount > 0 && (
-        <TouchableOpacity style={styles.pendingBanner} onPress={() => router.push("/transaction/pending")}>
-          <MaterialIcons name="info-outline" size={18} color={theme.primary} />
-          <ThemedText style={styles.pendingText}>
-            {pendingCount} transaction{pendingCount > 1 ? "s" : ""} need review
-          </ThemedText>
-        </TouchableOpacity>
-      )}
-
-      {/* Transaction List */}
-      {loadingAllTransactions ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={theme.primary} />
-        </View>
-      ) : sections.length === 0 ? (
-        <View style={styles.center}>
-          <ThemedText style={styles.emptyText}>No transactions for this period</ThemedText>
-          <ThemedText style={styles.mutedText}>Tap + to add your first transaction</ThemedText>
-        </View>
-      ) : (
-        <SectionList
-          sections={sections}
-          keyExtractor={(item) => String(item.id)}
-          stickySectionHeadersEnabled={false}
-          contentContainerStyle={styles.listContent}
-          renderSectionHeader={({ section }) => (
-            <ThemedText style={styles.dateHeader}>{section.title}</ThemedText>
-          )}
-          renderItem={({ item }) => {
-            const icon = getCategoryIcon(item.categoryId, categories);
-            const catName = getCategoryLabel(item.categoryId, categories);
-            const accountName = getAccountLabel(item.accountId, accounts);
-            const isExpense = item.type === "expense";
-            const isIncome = item.type === "income";
-            const isTransfer = item.type === "transfer";
-            const amountColor = isExpense
-              ? theme.expense
-              : isIncome
-                ? theme.income
-                : theme.textSecondary;
-            const sign = isExpense ? "-" : isIncome ? "+" : "";
-
-            return (
-              <View style={styles.txRow}>
-                <TouchableOpacity
-                  style={styles.txRowMain}
-                  onPress={() => router.push(`/transaction/${item.id}`)}>
-                  <View style={styles.txIcon}>
-                    <ThemedText style={styles.txIconText}>
-                      {isTransfer ? "🔄" : icon}
-                    </ThemedText>
-                  </View>
-                  <View style={styles.txInfo}>
-                    <ThemedText style={styles.txCategory} numberOfLines={1}>
-                      {isTransfer ? "Transfer" : catName}
-                    </ThemedText>
-                    <ThemedText style={styles.txAccount} numberOfLines={1}>
-                      {isTransfer ? "Account transfer" : accountName}
-                      {item.isShared ? " · Shared" : ""}
-                      {item.type === "settlement" ? " · Settled" : item.isExcluded && !isTransfer ? " · Excluded" : ""}
-                    </ThemedText>
-                  </View>
-                  <ThemedText style={[styles.txAmount, { color: amountColor }]}>
-                    {sign}{formatMoneyINR(item.actualAmount)}
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.txDeleteBtn}
-                  onPress={() => handleDeleteTransaction(item)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                  <MaterialIcons name="delete-outline" size={22} color={theme.textSecondary} />
-                </TouchableOpacity>
-              </View>
-            );
-          }}
+        <InsightCard
+          style={styles.insight}
+          message={`${pendingCount} transaction${pendingCount > 1 ? "s" : ""} need review`}
+          actionLabel="Review"
+          onPress={() => router.push("/transaction/pending")}
+          onAction={() => router.push("/transaction/pending")}
         />
       )}
 
-      {/* FAB */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push("/transaction/new")}>
-        <MaterialIcons name="add" size={28} color={theme.white} />
-      </TouchableOpacity>
-
-      {/* Filter Mode Modal */}
-      <Modal
-        visible={showFilterMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowFilterMenu(false)}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowFilterMenu(false)}>
-          <View style={styles.filterModal} onStartShouldSetResponder={() => true}>
-            <ThemedText style={styles.filterTitle}>View by</ThemedText>
-            {filterOptions.map((opt) => {
-              const active = filterMode === opt.mode;
-              return (
-                <TouchableOpacity
-                  key={opt.mode}
-                  style={[styles.filterOption, active && styles.filterOptionActive]}
-                  onPress={() => {
-                    setFilterMode(opt.mode);
-                    setShowFilterMenu(false);
-                  }}>
-                  {active && (
-                    <MaterialIcons name="check" size={18} color={theme.primary} />
-                  )}
-                  <ThemedText
-                    style={[
-                      styles.filterOptionText,
-                      active && styles.filterOptionTextActive,
-                    ]}>
-                    {opt.label}
-                  </ThemedText>
-                </TouchableOpacity>
-              );
-            })}
+      {donutData.length > 0 && (
+        <Card style={styles.donutCard}>
+          <SectionLabel style={styles.donutLabel}>Spending breakdown</SectionLabel>
+          <View style={styles.donutRow}>
+            <DonutChart
+              data={donutData}
+              size={150}
+              strokeWidth={22}
+              centerLabel={formatMoneyINR(totalExpense)}
+              centerSub="Spent"
+            />
+            <View style={styles.legendWrap}>
+              <DonutLegend data={donutData} showAmount={false} />
+            </View>
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+        </Card>
+      )}
+    </ScrollView>
   );
 }
 
@@ -432,204 +266,66 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
-    paddingTop: 48,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+  content: {
+    paddingTop: 56,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: 100,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
+    ...Typography.title,
     color: theme.text,
-    fontStyle: "italic",
+    marginBottom: Spacing.lg,
   },
-  navRow: {
+  heroLabel: {
+    marginBottom: Spacing.xs,
+  },
+  heroRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 8,
-    gap: 10,
+    gap: Spacing.sm,
   },
-  navLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.text,
-    minWidth: 140,
-    textAlign: "center",
+  heroValue: {
+    ...Typography.hero,
   },
-  filterBtn: {
-    marginLeft: 4,
-    padding: 4,
-  },
-  summaryBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.border,
-  },
-  summaryItem: {
-    alignItems: "center",
-  },
-  summaryLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: theme.textSecondary,
-    letterSpacing: 0.5,
-  },
-  summaryValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginTop: 2,
-    color: theme.text,
-  },
-  pendingBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: theme.primaryLight,
-    marginHorizontal: 16,
-    marginTop: 10,
-    padding: 10,
-    borderRadius: 8,
-  },
-  pendingText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.primary,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: theme.textSecondary,
-  },
-  mutedText: {
-    fontSize: 13,
-    color: theme.textSecondary,
-  },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 80,
-  },
-  dateHeader: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: theme.text,
-    marginTop: 16,
-    marginBottom: 8,
-    paddingBottom: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.borderLight,
-  },
-  txRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 6,
-    gap: 4,
-  },
-  txRowMain: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+  trendChip: {
+    borderRadius: Radius.pill,
+    paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  txDeleteBtn: {
-    padding: 6,
+  chartWrap: {
+    marginTop: Spacing.lg,
   },
-  txIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: theme.surface,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: theme.border,
+  segment: {
+    marginTop: Spacing.md,
   },
-  txIconText: {
-    fontSize: 20,
+  summaryRow: {
+    flexDirection: "row",
+    gap: Spacing.md,
+    marginTop: Spacing.lg,
   },
-  txInfo: {
+  summaryCard: {
     flex: 1,
-    gap: 2,
-  },
-  txCategory: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.text,
-  },
-  txAccount: {
-    fontSize: 12,
-    color: theme.textSecondary,
-  },
-  txAmount: {
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 24,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: theme.fab,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  filterModal: {
-    backgroundColor: theme.surface,
-    borderRadius: 14,
-    padding: 20,
-    width: 240,
     gap: 6,
   },
-  filterTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.text,
-    marginBottom: 8,
+  summaryValue: {
+    fontSize: 18,
   },
-  filterOption: {
+  insight: {
+    marginTop: Spacing.lg,
+  },
+  donutCard: {
+    marginTop: Spacing.lg,
+  },
+  donutLabel: {
+    marginBottom: Spacing.md,
+  },
+  donutRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    gap: Spacing.lg,
   },
-  filterOptionActive: {
-    backgroundColor: theme.primaryLight,
-  },
-  filterOptionText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.text,
-  },
-  filterOptionTextActive: {
-    color: theme.primary,
+  legendWrap: {
+    flex: 1,
   },
 });

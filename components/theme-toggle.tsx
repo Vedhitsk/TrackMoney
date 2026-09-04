@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+import { Animated, Easing, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ThemeColors } from '@/constants/theme';
@@ -9,11 +9,10 @@ export function ThemeToggle() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const themeStore = useThemeStore();
-  
-  const computedMode = themeStore.theme === 'system' 
-    ? (theme.background === '#121212' ? 'dark' : 'light') 
-    : themeStore.theme;
-  
+  const osScheme = useColorScheme() ?? 'light';
+
+  const computedMode = themeStore.theme === 'system' ? osScheme : themeStore.theme;
+
   const handleToggle = () => {
     const next = computedMode === 'light' ? 'dark' : 'light';
     themeStore.setTheme(next);
@@ -32,23 +31,20 @@ export function ThemeToggle() {
 
   const thumbPosition = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 32], 
+    outputRange: [0, 32],
   });
 
-  const getIcon = () => {
-    return computedMode === 'dark' ? 'dark-mode' : 'light-mode';
-  };
+  const icon = computedMode === 'dark' ? 'dark-mode' : 'light-mode';
 
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={handleToggle} style={styles.track}>
-      {/* Background Icons */}
       <View style={styles.iconContainer}>
         <MaterialIcons name="light-mode" size={16} color={theme.textSecondary} style={{ opacity: computedMode === 'light' ? 0 : 0.5 }} />
         <MaterialIcons name="dark-mode" size={16} color={theme.textSecondary} style={{ opacity: computedMode === 'dark' ? 0 : 0.5 }} />
       </View>
 
       <Animated.View style={[styles.thumb, { transform: [{ translateX: thumbPosition }] }]}>
-        <MaterialIcons name={getIcon()} size={18} color={theme.primary} />
+        <MaterialIcons name={icon} size={18} color={theme.primary} />
       </Animated.View>
     </TouchableOpacity>
   );
@@ -59,7 +55,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     width: 64,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.border,
+    backgroundColor: theme.borderLight,
     justifyContent: 'center',
     padding: 2,
   },
@@ -77,7 +73,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: theme.surface,
+    backgroundColor: theme.surfaceElevated,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: "#000",

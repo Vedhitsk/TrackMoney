@@ -1,5 +1,5 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { ThemeColors } from '@/constants/theme';
+import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
 import {
@@ -8,16 +8,16 @@ import {
   DeviceEventEmitter,
   FlatList,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { ThemedText } from "@/components/themed-text";
+import { AmountText, Badge, Card, IconTile } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
 
 import type { Transaction } from "@/types";
-import { formatMoneyINR } from "@/types";
 import { deleteTransaction, updateTransaction } from "@/db/queries/transactions";
 import { SMS_TRANSACTION_EVENT } from "@/lib/sms/smsIngestion";
 
@@ -46,7 +46,6 @@ export default function PendingTransactionsScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  // Instant update when background task saves a new transaction
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener(SMS_TRANSACTION_EVENT, () => {
       void refreshPendingTransactions();
@@ -54,23 +53,21 @@ export default function PendingTransactionsScreen() {
     return () => sub.remove();
   }, [refreshPendingTransactions]);
 
-  // Refresh when this screen comes into focus (e.g. user edits then comes back)
   useFocusEffect(
     useCallback(() => {
       void refreshPendingTransactions();
     }, [refreshPendingTransactions]),
   );
 
-  // Directly accept if category+account already filled; otherwise prompt to edit first
   const handleAccept = useCallback(
     async (item: Transaction) => {
       if (!item.categoryId || !item.accountId) {
         Alert.alert(
-          "Incomplete Details",
-          "This transaction is missing a Category or Account. Tap the card to edit and fill them in before accepting.",
+          "Incomplete details",
+          "This transaction is missing a category or account. Tap the card to edit and fill them in before accepting.",
           [
             { text: "Cancel", style: "cancel" },
-            { text: "Edit Now", onPress: () => router.push(`/transaction/${item.id}`) },
+            { text: "Edit now", onPress: () => router.push(`/transaction/${item.id}`) },
           ]
         );
         return;
@@ -90,7 +87,7 @@ export default function PendingTransactionsScreen() {
   const handleDiscard = useCallback(
     (item: Transaction) => {
       Alert.alert(
-        "Discard Transaction",
+        "Discard transaction",
         "Are you sure you want to discard this auto-fetched transaction?",
         [
           { text: "Cancel", style: "cancel" },
@@ -116,16 +113,16 @@ export default function PendingTransactionsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <MaterialIcons name="arrow-back" size={26} color={theme.text} />
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <MaterialIcons name="arrow-back" size={22} color={theme.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Pending Review</ThemedText>
-        <View style={{ width: 40 }} />
+        <Text style={styles.headerTitle}>Pending Review</Text>
+        <View style={{ width: 22 }} />
       </View>
 
-      <ThemedText style={styles.subtitle}>
-        Tap a card to edit details. Tap ACCEPT to add to your records.
-      </ThemedText>
+      <Text style={styles.subtitle}>
+        Tap a card to edit details. Accept to add it to your records.
+      </Text>
 
       {loading ? (
         <View style={styles.center}>
@@ -133,8 +130,8 @@ export default function PendingTransactionsScreen() {
         </View>
       ) : pendingTransactions.length === 0 ? (
         <View style={styles.center}>
-          <MaterialIcons name="done-all" size={48} color={theme.primaryLight} />
-          <ThemedText style={styles.emptyText}>You're all caught up!</ThemedText>
+          <MaterialIcons name="done-all" size={44} color={theme.income} />
+          <Text style={styles.emptyText}>You're all caught up!</Text>
         </View>
       ) : (
         <FlatList
@@ -147,91 +144,72 @@ export default function PendingTransactionsScreen() {
             const accountName = getAccountLabel(item.accountId, accounts);
             const isExpense = item.type === "expense";
             const isIncome = item.type === "income";
-            const amountColor = isExpense
-              ? theme.expense
-              : isIncome
-                ? theme.income
-                : theme.textSecondary;
-            const sign = isExpense ? "-" : isIncome ? "+" : "";
             const hasCategory = !!item.categoryId;
             const hasAccount = !!item.accountId;
             const isComplete = hasCategory && hasAccount;
 
             const status = item.parseStatus;
             const isUnparsed = status === "needs_review";
-            const statusColor = status === "complete" ? "#22c55e" : status === "partial" ? "#f59e0b" : "#ef4444";
-            const statusLabel = status.toUpperCase();
+            const tone = status === "complete" ? "success" : status === "partial" ? "warning" : "danger";
 
             return (
-              <View style={[styles.card, isUnparsed && styles.cardUnparsed]}>
-                {/* Status Badge */}
-                <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-                  <ThemedText style={styles.statusBadgeText}>{statusLabel}</ThemedText>
-                  {item.parsedBy && (
-                    <ThemedText style={styles.parsedByText}>via {item.parsedBy.toUpperCase()}</ThemedText>
-                  )}
-                </View>
-
-                {/* Tappable area → edit screen */}
-                <TouchableOpacity
-                  style={styles.cardMain}
-                  onPress={() => router.push(`/transaction/${item.id}`)}>
+              <Card noPadding style={[styles.card, isUnparsed && { borderLeftWidth: 4, borderLeftColor: theme.expense }]}>
+                <TouchableOpacity style={styles.cardMain} onPress={() => router.push(`/transaction/${item.id}`)}>
                   <View style={styles.cardHeaderRow}>
-                    <View style={styles.txIcon}>
-                      <ThemedText style={styles.txIconText}>{icon}</ThemedText>
-                    </View>
+                    <IconTile emoji={icon} />
                     <View style={styles.txInfo}>
-                      <ThemedText style={styles.txCategory} numberOfLines={1}>
-                        {hasCategory ? catName : (isUnparsed ? "Unparsed" : "No Category")}
-                      </ThemedText>
-                      <ThemedText style={styles.txType}>
-                        {item.type.toUpperCase()} • {hasAccount ? accountName : "No Account"}
-                      </ThemedText>
+                      <Text style={styles.txCategory} numberOfLines={1}>
+                        {hasCategory ? catName : (isUnparsed ? "Unparsed" : "No category")}
+                      </Text>
+                      <Text style={styles.txType}>
+                        {item.type.toUpperCase()} · {hasAccount ? accountName : "No account"}
+                      </Text>
                     </View>
-                    <ThemedText style={[styles.txAmount, { color: amountColor }]}>
-                      {sign}{formatMoneyINR(item.actualAmount)}
-                    </ThemedText>
+                    <AmountText amount={item.actualAmount} type={isExpense ? "expense" : isIncome ? "income" : "neutral"} />
+                  </View>
+
+                  <View style={styles.badgeRow}>
+                    <Badge label={status.replace("_", " ")} tone={tone as any} />
+                    {item.parsedBy && <Text style={styles.parsedByText}>via {item.parsedBy.toUpperCase()}</Text>}
                   </View>
 
                   <View style={[styles.smsPreviewBox, isUnparsed && styles.smsPreviewBoxUnparsed]}>
-                    {isUnparsed && (
-                      <ThemedText style={styles.rawSmsLabel}>RAW SMS CONTENT:</ThemedText>
-                    )}
-                    <ThemedText style={[styles.smsPreviewText, isUnparsed && styles.smsPreviewTextUnparsed]} numberOfLines={isUnparsed ? undefined : 3}>
+                    {isUnparsed && <Text style={styles.rawSmsLabel}>RAW SMS CONTENT</Text>}
+                    <Text
+                      style={[styles.smsPreviewText, isUnparsed && styles.smsPreviewTextUnparsed]}
+                      numberOfLines={isUnparsed ? undefined : 3}
+                    >
                       {item.notes || "No SMS content found."}
-                    </ThemedText>
+                    </Text>
                   </View>
 
-                  {/* Completion hint */}
                   {!isComplete && (
                     <View style={styles.incompleteHint}>
                       <MaterialIcons name="edit" size={13} color={isUnparsed ? theme.expense : theme.primary} />
-                      <ThemedText style={[styles.incompleteHintText, isUnparsed && { color: theme.expense }]}>
-                        {isUnparsed ? "Tap to fill manually" : `Tap to assign ${!hasCategory ? "category" : ""}${!hasCategory && !hasAccount ? " & " : ""}${!hasAccount ? "account" : ""}`}
-                      </ThemedText>
+                      <Text style={[styles.incompleteHintText, isUnparsed && { color: theme.expense }]}>
+                        {isUnparsed
+                          ? "Tap to fill manually"
+                          : `Tap to assign ${!hasCategory ? "category" : ""}${!hasCategory && !hasAccount ? " & " : ""}${!hasAccount ? "account" : ""}`}
+                      </Text>
                     </View>
                   )}
                 </TouchableOpacity>
 
                 <View style={styles.actionRow}>
-                  <TouchableOpacity
-                    style={[styles.actionBtn, styles.rejectBtn]}
-                    onPress={() => handleDiscard(item)}>
-                    <MaterialIcons name="close" size={20} color={theme.expense} />
-                    <ThemedText style={[styles.actionBtnText, { color: theme.expense }]}>
-                      DISCARD
-                    </ThemedText>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleDiscard(item)}>
+                    <MaterialIcons name="close" size={18} color={theme.expense} />
+                    <Text style={[styles.actionBtnText, { color: theme.expense }]}>Discard</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.actionBtn, styles.acceptBtn, (!isComplete || isUnparsed) && styles.acceptBtnIncomplete]}
+                    style={[styles.actionBtn, { backgroundColor: (!isComplete || isUnparsed) ? theme.borderLight : theme.primary }]}
                     onPress={() => handleAccept(item)}>
-                    <MaterialIcons name="check" size={20} color={theme.white} />
-                    <ThemedText style={[styles.actionBtnText, { color: theme.white }]}>
-                      ACCEPT
-                    </ThemedText>
+                    <MaterialIcons name="check" size={18} color={(!isComplete || isUnparsed) ? theme.textSecondary : "#FFFFFF"} />
+                    <Text style={[styles.actionBtnText, { color: (!isComplete || isUnparsed) ? theme.textSecondary : "#FFFFFF" }]}>
+                      Accept
+                    </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </Card>
             );
           }}
         />
@@ -241,114 +219,49 @@ export default function PendingTransactionsScreen() {
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.background, paddingTop: 48 },
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 56 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
   },
   backBtn: { padding: 4, marginLeft: -4 },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: theme.text },
+  headerTitle: { ...Typography.subtitle, color: theme.text },
   subtitle: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
     fontSize: 13,
     color: theme.textSecondary,
     lineHeight: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.borderLight,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12 },
   emptyText: { fontSize: 16, fontWeight: "600", color: theme.textSecondary },
-  listContent: { padding: 16, gap: 16, paddingBottom: 80 },
-  card: {
-    backgroundColor: theme.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.borderLight,
-    overflow: "hidden",
-  },
-  cardUnparsed: { borderLeftWidth: 4, borderLeftColor: theme.expense },
-  statusBadge: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderBottomLeftRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    zIndex: 10,
-  },
-  statusBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
-  parsedByText: { color: "rgba(255,255,255,0.8)", fontSize: 8, fontWeight: "600" },
-  cardMain: { padding: 16, paddingTop: 20 },
-  cardHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  txIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: theme.background,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  txIconText: { fontSize: 20 },
+  listContent: { paddingHorizontal: Spacing.lg, gap: Spacing.md, paddingBottom: 80 },
+  card: { overflow: "hidden" },
+  cardMain: { padding: Spacing.md },
+  cardHeaderRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   txInfo: { flex: 1, gap: 2 },
-  txCategory: { fontSize: 16, fontWeight: "700", color: theme.text },
+  txCategory: { fontSize: 15, fontWeight: "700", color: theme.text },
   txType: { fontSize: 12, fontWeight: "600", color: theme.textSecondary },
-  txAmount: { fontSize: 18, fontWeight: "700" },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 10 },
+  parsedByText: { fontSize: 10, fontWeight: "700", color: theme.textTertiary },
   smsPreviewBox: {
-    marginTop: 12,
+    marginTop: 10,
     padding: 10,
     backgroundColor: theme.background,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 1,
     borderColor: theme.borderLight,
   },
-  smsPreviewBoxUnparsed: { backgroundColor: "rgba(239, 68, 68, 0.05)", borderColor: "rgba(239, 68, 68, 0.2)" },
+  smsPreviewBoxUnparsed: { borderColor: theme.expense },
   rawSmsLabel: { fontSize: 10, fontWeight: "800", color: theme.expense, marginBottom: 4 },
-  smsPreviewText: {
-    color: theme.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    fontStyle: "italic",
-  },
+  smsPreviewText: { color: theme.textSecondary, fontSize: 13, lineHeight: 18, fontStyle: "italic" },
   smsPreviewTextUnparsed: { color: theme.text, fontStyle: "normal", fontWeight: "500" },
-  incompleteHint: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 8,
-  },
-  incompleteHintText: {
-    fontSize: 12,
-    color: theme.primary,
-    fontWeight: "600",
-  },
-  actionRow: {
-    flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: theme.borderLight,
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    gap: 8,
-  },
-  rejectBtn: { backgroundColor: theme.surface },
-  acceptBtn: { backgroundColor: theme.primary },
-  acceptBtnIncomplete: { backgroundColor: theme.textSecondary },
-  actionBtnText: { fontSize: 14, fontWeight: "700" },
+  incompleteHint: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 },
+  incompleteHintText: { fontSize: 12, color: theme.primary, fontWeight: "600" },
+  actionRow: { flexDirection: "row", borderTopWidth: 1, borderTopColor: theme.borderLight },
+  actionBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: 12, gap: 8 },
+  actionBtnText: { fontSize: 13, fontWeight: "700" },
 });

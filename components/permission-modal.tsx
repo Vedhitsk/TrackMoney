@@ -1,5 +1,5 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { ThemeColors } from '@/constants/theme';
+import { Radius, Spacing, ThemeColors } from '@/constants/theme';
 import React from "react";
 import { Modal, StyleSheet, TouchableOpacity, View, ScrollView, Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -108,7 +108,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   card: {
     width: "100%",
     backgroundColor: theme.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 20,
     gap: 25,
     marginBottom: 40,
@@ -150,7 +150,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     width: "100%",
     backgroundColor: theme.primary,
     paddingVertical: 18,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     alignItems: "center",
     shadowColor: theme.primary,
     shadowOffset: { width: 0, height: 4 },

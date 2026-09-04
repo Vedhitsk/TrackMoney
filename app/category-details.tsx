@@ -1,11 +1,9 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ThemeColors } from '@/constants/theme';
 import React, { useEffect, useState, useMemo } from "react";
-import { View, StyleSheet, SectionList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, StyleSheet, SectionList, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-import { ThemedText } from "@/components/themed-text";
 
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { formatMoneyINR, Transaction } from "@/types";
@@ -77,12 +75,12 @@ export default function CategoryDetailsScreen() {
 
   const expenseChartData = [
     { label: category?.name ?? "", value: categoryExpense, color: theme.expense },
-    { label: "Other", value: Math.max(0, globalExpense - categoryExpense), color: "rgba(255,255,255,0.1)" }
+    { label: "Other", value: Math.max(0, globalExpense - categoryExpense), color: theme.borderLight }
   ];
 
   const incomeChartData = [
     { label: category?.name ?? "", value: categoryIncome, color: theme.income },
-    { label: "Other", value: Math.max(0, globalIncome - categoryIncome), color: "rgba(255,255,255,0.1)" }
+    { label: "Other", value: Math.max(0, globalIncome - categoryIncome), color: theme.borderLight }
   ];
 
   const sortOrder = SORT_OPTIONS[sortIndex];
@@ -136,16 +134,16 @@ export default function CategoryDetailsScreen() {
         <View style={styles.appBarCenter}>
           <View style={styles.appBarTitleRow}>
             <View style={[styles.appBarIconWrap, { backgroundColor: category.color }]}>
-              <ThemedText style={styles.appBarIcon}>{category.icon}</ThemedText>
+              <Text style={styles.appBarIcon}>{category.icon}</Text>
             </View>
             {/* By passing style={{ color: theme.text }} instead of dark/lightColor, we lock it to dark text on light bg */}
-            <ThemedText style={[styles.appBarTitle, { color: theme.text }]}>{category.name}</ThemedText>
+            <Text style={[styles.appBarTitle, { color: theme.text }]}>{category.name}</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.chartCard}>
-        <ThemedText style={styles.chartTitle}>{timeLabel}</ThemedText>
+        <Text style={styles.chartTitle}>{timeLabel}</Text>
         <View style={styles.chartRow}>
           <View style={styles.chartCol}>
             <DonutChart data={expenseChartData} size={130} strokeWidth={16} centerLabel={`${expensePct.toFixed(0)}%`} centerSub="Expenses" centerTextColor={theme.text} />
@@ -155,17 +153,17 @@ export default function CategoryDetailsScreen() {
           </View>
         </View>
         <View style={styles.chartFooter}>
-          <ThemedText style={styles.chartFooterText}>
-            Total Amount: <ThemedText style={{ color: netAmount >= 0 ? theme.income : theme.expense, fontWeight: "600", fontSize: 16 }}>{netAmount >= 0 ? "+" : "-"}{formatMoneyINR(Math.abs(netAmount))}</ThemedText>
-          </ThemedText>
+          <Text style={styles.chartFooterText}>
+            Total Amount: <Text style={{ color: netAmount >= 0 ? theme.income : theme.expense, fontWeight: "600", fontSize: 16 }}>{netAmount >= 0 ? "+" : "-"}{formatMoneyINR(Math.abs(netAmount))}</Text>
+          </Text>
         </View>
       </View>
 
       <View style={styles.listHeader}>
-        <ThemedText style={styles.recordCount}>{filteredTransactions.length} records</ThemedText>
+        <Text style={styles.recordCount}>{filteredTransactions.length} records</Text>
         <TouchableOpacity style={styles.sortBtn} onPress={handleToggleSort}>
           <MaterialIcons name="sort" size={18} color={theme.textSecondary} />
-          <ThemedText style={styles.sortText}>{sortLabels[sortOrder]}</ThemedText>
+          <Text style={styles.sortText}>{sortLabels[sortOrder]}</Text>
         </TouchableOpacity>
       </View>
 
@@ -178,7 +176,7 @@ export default function CategoryDetailsScreen() {
           contentContainerStyle={styles.listContent}
           renderSectionHeader={({ section: { title } }) => (
             <View style={styles.sectionHeader}>
-              <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
+              <Text style={styles.sectionTitle}>{title}</Text>
             </View>
           )}
           renderItem={({ item }) => {
@@ -189,15 +187,15 @@ export default function CategoryDetailsScreen() {
                 <View style={styles.logLeft}>
                   <View style={styles.logDot} />
                   <View>
-                    <ThemedText style={[styles.logAccount, { color: theme.text }]}>{acc?.name}</ThemedText>
+                    <Text style={[styles.logAccount, { color: theme.text }]}>{acc?.name}</Text>
                     {item.isShared && item.actualAmount !== item.rawAmount && (
-                       <ThemedText style={styles.logSharedSub}>My share: {isExpense ? "-" : "+"}{formatMoneyINR(item.actualAmount)}</ThemedText>
+                       <Text style={styles.logSharedSub}>My share: {isExpense ? "-" : "+"}{formatMoneyINR(item.actualAmount)}</Text>
                     )}
                   </View>
                 </View>
-                <ThemedText style={[styles.logAmount, { color: isExpense ? theme.expense : theme.income }]}>
+                <Text style={[styles.logAmount, { color: isExpense ? theme.expense : theme.income }]}>
                   {isExpense ? "-" : "+"}{formatMoneyINR(item.rawAmount)}
-                </ThemedText>
+                </Text>
               </TouchableOpacity>
             );
           }}

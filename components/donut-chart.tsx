@@ -16,6 +16,8 @@ type Props = {
   data: Slice[];
   size?: number;
   strokeWidth?: number;
+  /** Degree gap rendered between adjacent slices (rounded caps make this read as separated "chips"). */
+  gap?: number;
   centerLabel?: string;
   centerSub?: string;
   centerTextColor?: string;
@@ -36,7 +38,8 @@ function arcPath(cx: number, cy: number, r: number, startAngle: number, endAngle
 export function DonutChart({
   data,
   size = 200,
-  strokeWidth = 28,
+  strokeWidth = 30,
+  gap = 3,
   centerLabel,
   centerSub,
   centerTextColor,
@@ -76,21 +79,23 @@ export function DonutChart({
     );
   }
 
+  const visibleSlices = data.filter((d) => d.value > 0);
   let cumAngle = 0;
-  const slices = data
-    .filter((d) => d.value > 0)
-    .map((d) => {
-      const sweep = (d.value / total) * 360;
-      const startAngle = cumAngle;
-      cumAngle += sweep;
-      return { ...d, startAngle, endAngle: cumAngle, sweep };
-    });
+  const slices = visibleSlices.map((d) => {
+    const sweep = (d.value / total) * 360;
+    const startAngle = cumAngle;
+    cumAngle += sweep;
+    return { ...d, startAngle, endAngle: cumAngle, sweep };
+  });
+
+  const isSingleFullSlice = slices.length === 1 && slices[0].sweep >= 359.99;
+  const effectiveGap = isSingleFullSlice ? 0 : gap;
 
   return (
     <View style={[styles.wrapper, { width: size, height: size }]}>
       <Svg width={size} height={size}>
         {slices.map((s, i) => {
-          if (s.sweep >= 359.99) {
+          if (isSingleFullSlice) {
             return (
               <Circle
                 key={i}
@@ -103,10 +108,11 @@ export function DonutChart({
               />
             );
           }
+          const halfGap = s.sweep > effectiveGap * 2 ? effectiveGap / 2 : 0;
           return (
             <Path
               key={i}
-              d={arcPath(cx, cy, r, s.startAngle, s.endAngle)}
+              d={arcPath(cx, cy, r, s.startAngle + halfGap, s.endAngle - halfGap)}
               stroke={s.color}
               strokeWidth={strokeWidth}
               fill="none"
@@ -141,7 +147,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     justifyContent: "center",
   },
   centerLabel: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
     color: theme.text,
   },

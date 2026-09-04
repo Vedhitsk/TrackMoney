@@ -116,6 +116,8 @@ export default function RootLayout() {
           <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />
           <Stack.Screen name="settings/logs" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="recoveries" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="accounts" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="categories" options={{ animation: "slide_from_right" }} />
         </Stack>
       </View>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
