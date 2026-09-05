@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
 
-// Chart/legend palette shared by donut & bar charts (rich copper-amber led,
-// matches the reference fintech mockups: amber is the single "hero" accent,
-// the rest are muted functional/category hues).
-const DARK_CHART_PALETTE = ['#D6811F', '#F2555A', '#3AD1B0', '#3DDC84', '#7C8CF0', '#98989F'];
-const LIGHT_CHART_PALETTE = ['#B36B1A', '#D64550', '#2BB6A3', '#1FA463', '#6E7BE0', '#9A9AA1'];
+// Chart/legend palette shared by donut & bar charts (rich violet-led,
+// matches the fintech reference mockups' single "hero" accent, the rest are
+// muted functional/category hues).
+const DARK_CHART_PALETTE = ['#9D6FFF', '#F2555A', '#3AD1B0', '#3DDC84', '#F0A94A', '#98989F'];
+const LIGHT_CHART_PALETTE = ['#7C3AED', '#D64550', '#2BB6A3', '#1FA463', '#D6811F', '#9A9AA1'];
 
 export const LightColors = {
   background: '#F5F4F0',
@@ -14,12 +14,12 @@ export const LightColors = {
   textSecondary: '#6B6B72',
   textTertiary: '#9A9AA1',
 
-  // Single brand accent (rich copper-amber) — used for the FAB, hero chart
+  // Single brand accent (rich violet-purple) — used for the FAB, hero chart
   // line/fill, and the largest donut slice. NOT used for active tabs/segments
   // — those use an inverted high-contrast pill instead (see segmentActiveBg).
-  primary: '#B36B1A',
-  primaryLight: '#F5E4CC',
-  primaryMuted: 'rgba(179,107,26,0.14)',
+  primary: '#7C3AED',
+  primaryLight: '#EDE4FB',
+  primaryMuted: 'rgba(124,58,237,0.14)',
 
   expense: '#D64550',
   income: '#1FA463',
@@ -33,7 +33,7 @@ export const LightColors = {
   calculator: '#FFFFFF',
   calculatorDark: '#F1EFE9',
 
-  fab: '#B36B1A',
+  fab: '#7C3AED',
   tabActive: '#14141A',
   tabInactive: '#9A9AA1',
 
@@ -68,9 +68,9 @@ export const DarkColors = {
   textSecondary: '#98989F',
   textTertiary: '#6B6B72',
 
-  primary: '#D6811F',
-  primaryLight: '#3A2712',
-  primaryMuted: 'rgba(214,129,31,0.18)',
+  primary: '#9D6FFF',
+  primaryLight: '#2A1F42',
+  primaryMuted: 'rgba(157,111,255,0.2)',
 
   expense: '#F2555A',
   income: '#3DDC84',
@@ -84,7 +84,7 @@ export const DarkColors = {
   calculator: '#1D1D22',
   calculatorDark: '#141417',
 
-  fab: '#D6811F',
+  fab: '#9D6FFF',
   tabActive: '#F2F2F4',
   tabInactive: '#6B6B72',
 

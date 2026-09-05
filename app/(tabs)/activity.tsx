@@ -15,7 +15,7 @@ import {
     View,
 } from "react-native";
 
-import { AmountText, Chip, InsightCard, ListRow, SectionLabel } from "@/components/ui";
+import { AmountText, Card, Chip, InsightCard, ListRow, SectionLabel } from "@/components/ui";
 
 import {
     loadRecordsFilterPrefs,
@@ -377,20 +377,23 @@ export default function ActivityScreen() {
             else if (item.isExcluded && !isTransfer) subtitleParts.push("Excluded");
 
             return (
-              <ListRow
-                emoji={isTransfer ? "🔄" : icon}
-                iconColor={catColor}
-                title={title}
-                subtitle={subtitleParts.join(" · ")}
-                trailing={
-                  <AmountText
-                    amount={item.actualAmount}
-                    type={isExpense ? "expense" : isIncome ? "income" : "neutral"}
-                  />
-                }
-                onPress={() => router.push(`/transaction/${item.id}`)}
-                onLongPress={() => handleDeleteTransaction(item)}
-              />
+              <Card noPadding style={styles.txCard}>
+                <ListRow
+                  style={styles.txRow}
+                  emoji={isTransfer ? "🔄" : icon}
+                  iconColor={catColor}
+                  title={title}
+                  subtitle={subtitleParts.join(" · ")}
+                  trailing={
+                    <AmountText
+                      amount={item.actualAmount}
+                      type={isExpense ? "expense" : isIncome ? "income" : "neutral"}
+                    />
+                  }
+                  onPress={() => router.push(`/transaction/${item.id}`)}
+                  onLongPress={() => handleDeleteTransaction(item)}
+                />
+              </Card>
             );
           }}
         />
@@ -522,7 +525,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: Spacing.lg,
+    marginTop: Spacing.xl,
     marginBottom: Spacing.sm,
   },
   dateHeader: {
@@ -532,6 +535,12 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   dateHeaderTotal: {
     fontSize: 12,
     fontWeight: "700",
+  },
+  txCard: {
+    marginBottom: Spacing.sm,
+  },
+  txRow: {
+    paddingHorizontal: Spacing.md,
   },
   modalOverlay: {
     flex: 1,

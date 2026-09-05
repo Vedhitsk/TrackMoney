@@ -150,34 +150,32 @@ export function TransactionFormLayout({
   const isSettlement = uiType === "settlement";
   const isExpense = uiType === "expense";
 
+  const amountIsZero = !amountStr || amountStr === "0";
+  const actionLabel = amountIsZero
+    ? "Enter an amount"
+    : canSave
+      ? "Save"
+      : isTransfer
+        ? "Select both accounts"
+        : isSettlement
+          ? "Select a recovery"
+          : "Select account & category";
+  const actionEnabled = canSave;
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.background }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <TouchableOpacity activeOpacity={1} onPress={onCancel} style={[styles.swipeHandleWrap, { paddingTop: Math.max(insets.top, 12) }]}>
+        <View style={[styles.swipeHandle, { backgroundColor: theme.border }]} />
+      </TouchableOpacity>
+
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[
-          styles.container,
-          {
-            paddingTop: Math.max(insets.top, 16) + 8,
-            paddingBottom: Math.max(insets.bottom, 12) + 12,
-          },
-        ]}
+        contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.topBar}>
-          <TouchableOpacity onPress={onCancel} style={styles.topBarBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <MaterialIcons name="close" size={22} color={theme.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.saveBtn, { backgroundColor: canSave ? theme.primary : theme.borderLight }]}
-            disabled={!canSave}
-            onPress={onSave}>
-            <Text style={[styles.saveBtnText, { color: canSave ? "#FFFFFF" : theme.textSecondary }]}>Save</Text>
-          </TouchableOpacity>
-        </View>
-
         <SegmentedControl style={styles.typeSegment} options={TYPE_OPTIONS} value={uiType} onChange={onChangeType} />
 
         <View style={styles.amountWrap}>
@@ -300,36 +298,38 @@ export function TransactionFormLayout({
           </View>
         )}
 
-        <View style={styles.calculatorWrap}>
-          <CalculatorPad value={amountStr} onChange={onChangeAmount} showDisplay={false} />
-        </View>
       </ScrollView>
+
+      <View style={[styles.bottomFixed, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+        <CalculatorPad value={amountStr} onChange={onChangeAmount} />
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: actionEnabled ? theme.primary : theme.segmentTrackBg }]}
+          disabled={!actionEnabled}
+          onPress={onSave}
+        >
+          <Text style={[styles.actionBtnText, { color: actionEnabled ? "#FFFFFF" : theme.textSecondary }]}>
+            {actionLabel}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  swipeHandleWrap: {
+    alignItems: "center",
+    paddingBottom: Spacing.sm,
+  },
+  swipeHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+  },
   container: {
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: Spacing.md,
-  },
-  topBarBtn: {
-    padding: 4,
-  },
-  saveBtn: {
-    borderRadius: Radius.pill,
-    paddingHorizontal: 20,
-    paddingVertical: 9,
-  },
-  saveBtnText: {
-    fontSize: 14,
-    fontWeight: "700",
+    paddingBottom: Spacing.lg,
   },
   typeSegment: {
     marginBottom: Spacing.md,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
   amountText: {
     ...Typography.hero,
-    fontSize: 36,
+    fontSize: 44,
   },
   section: {
     marginBottom: Spacing.sm,
@@ -442,9 +442,18 @@ const styles = StyleSheet.create({
     minWidth: 90,
     textAlign: "right",
   },
-  calculatorWrap: {
-    flex: 1,
-    justifyContent: "flex-end",
-    minHeight: 260,
+  bottomFixed: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  actionBtn: {
+    borderRadius: Radius.pill,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  actionBtnText: {
+    fontSize: 15,
+    fontWeight: "700",
   },
 });

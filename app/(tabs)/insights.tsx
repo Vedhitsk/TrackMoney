@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DonutChart } from "@/components/donut-chart";
 import {
@@ -47,7 +46,6 @@ export default function InsightsScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   const { categories, loadCategories, allTransactions, refreshAllTransactions } = useTransactionStore();
 
@@ -287,7 +285,7 @@ export default function InsightsScreen() {
   const catsForPicker = editBudgetId ? categories : categories.filter((c) => !existingCatIds.has(c.id));
 
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+    <View style={styles.container}>
       <Text style={styles.headerTitle}>Insights</Text>
 
       <SegmentedControl
@@ -548,7 +546,7 @@ export default function InsightsScreen() {
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.background, paddingTop: 56, paddingHorizontal: Spacing.lg },
+  container: { flex: 1, backgroundColor: theme.background, paddingTop: 56, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
   headerTitle: { ...Typography.title, color: theme.text, marginBottom: Spacing.md },
   paneSwitch: { marginBottom: Spacing.md },
   monthNav: {
@@ -601,7 +599,6 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     flexDirection: "row",
     gap: Spacing.sm,
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.xs,
     borderTopWidth: 1,
     borderTopColor: theme.borderLight,
   },

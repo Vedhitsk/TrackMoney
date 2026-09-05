@@ -112,7 +112,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="transaction/new" options={{ animation: "slide_from_bottom" }} />
+          <Stack.Screen
+            name="transaction/new"
+            options={{ presentation: "modal", animation: "slide_from_bottom", gestureDirection: "vertical" }}
+          />
           <Stack.Screen name="transaction/[id]" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="transaction/pending" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="settings" options={{ animation: "slide_from_left" }} />

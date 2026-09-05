@@ -63,11 +63,11 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             {index === 2 ? (
               <View style={styles.fabSlot}>
                 <TouchableOpacity
-                  style={[styles.fab, { backgroundColor: theme.fab, shadowColor: theme.shadow }]}
+                  style={[styles.fab, { backgroundColor: theme.fab, shadowColor: theme.primary }]}
                   onPress={onFabPress}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <MaterialIcons name="add" size={28} color="#FFFFFF" />
+                  <MaterialIcons name="add" size={28} color={theme.tabActive} />
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -114,9 +114,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -26,
-    elevation: 6,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    elevation: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
   },
 });
