@@ -185,7 +185,7 @@ export default function PendingTransactionsScreen() {
 
                   {!isComplete && (
                     <View style={styles.incompleteHint}>
-                      <MaterialIcons name="edit" size={13} color={isUnparsed ? theme.expense : theme.primary} />
+                      <MaterialIcons name="edit" size={13} color={theme.textSecondary} />
                       <Text style={[styles.incompleteHintText, isUnparsed && { color: theme.expense }]}>
                         {isUnparsed
                           ? "Tap to fill manually"

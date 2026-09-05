@@ -247,7 +247,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.border,
   },
-  recoveriesBtnText: { flex: 1, fontSize: 14, fontWeight: "600", color: theme.primary },
+  recoveriesBtnText: { flex: 1, fontSize: 14, fontWeight: "600" },
   recoveriesBadge: {
     backgroundColor: theme.expense,
     borderRadius: Radius.pill,
