@@ -1,6 +1,6 @@
 # TrackMoney — Full Project Context
 
-> **Last updated:** 2026-05-11 after UI/UX & Recoveries implementation sprint.
+> **Last updated:** 2026-09-05 after the full UI/UX redesign sprint (new 4-tab IA, design-token system, component library). See "UI/UX Redesign" section below for the full account of what changed and why.
 
 ## What the App Is
 Personal finance tracker for Android. Core USP is **automatic SMS-based transaction detection** — it reads bank SMS messages and creates pending transactions that the user can review and accept with one tap. Manual entry is also supported.
@@ -173,30 +173,46 @@ id, level(info|warn|error), message, details, created_at
 
 ## Screens & Navigation
 
-### Bottom Tabs
+> **Superseded 2026-09:** the IA below replaces the old 5-tab Records/Analysis/Budgets/Accounts/Categories layout. See "UI/UX Redesign" for the rationale.
+
+### Bottom Tabs (4 tabs + a floating center FAB, not a 5th route)
 | Tab | File | Purpose |
 |---|---|---|
-| Records | `app/(tabs)/index.tsx` | All accepted transactions, filterable by day/week/month/year |
-| Analysis | `app/(tabs)/analysis.tsx` | Charts, spending breakdown by category |
-| Budgets | `app/(tabs)/budgets.tsx` | Monthly budget limits per category |
-| Accounts | `app/(tabs)/accounts.tsx` | Account management + balance tracking |
-| Categories | `app/(tabs)/categories.tsx` | Custom categories with keywords + colors |
+| Home | `app/(tabs)/index.tsx` | Dashboard: net-cash-flow hero (tap to reveal — masked by default), line chart, Week/Month/Year toggle, in/out cards, spending-breakdown donut. Scrolls only when content overflows (e.g. the pending-review banner appears). |
+| Activity | `app/(tabs)/activity.tsx` | Transaction feed (was Records' logic) restyled per reference: search bar, All/Expenses/Income/Transfers chips, day/week/month/year filter (via a modal), per-date section totals (always neutral grey — it's a sum, not a signed amount), each transaction its own card. |
+| Insights | `app/(tabs)/insights.tsx` | Merges the old Analysis + Budgets tabs behind an Analysis/Budgets segmented control. Analysis pane: expense/income donut, 12-month bar chart, category-movement list (tappable → Category Details), priciest-day/small-spends stat tiles. Budgets pane: spent-of-total summary, over-budget alert, per-category budget cards, with Copy-previous-month + Add-budget pinned in a footer *inside the Budgets pane only* (not on Analysis). |
+| Manage | `app/(tabs)/manage.tsx` | New menu tab: links to Accounts, Categories, Pending Review (with a live count badge), Settings. |
+
+The FAB (always visible, centered between Activity and Insights) opens `/transaction/new` directly — it is an action, not a tab route. Custom tab bar: `components/tab-bar.tsx`.
 
 ### Stack Screens
 | Route | File | Purpose |
 |---|---|---|
-| `/transaction/new` | `new.tsx` | Manual transaction entry (Calculator pad, date/time picker, shared expense) |
-| `/transaction/[id]` | `[id].tsx` | Edit SMS-parsed transaction before accepting |
-| `/transaction/pending` | `pending.tsx` | Pending Dashboard — review/accept/discard SMS transactions |
-| `/settings` | `settings.tsx` | Export, Import, Simulate SMS, Logs link |
-| `/settings/logs` | `settings/logs.tsx` | System Logs viewer (last 200 entries, clearable) |
+| `/transaction/new` | `transaction/new.tsx` | Add transaction — single-page layout (see "Add Transaction" below), presented `modal` with vertical swipe-to-dismiss. |
+| `/transaction/[id]` | `transaction/[id].tsx` | Edit an existing transaction — same `TransactionFormLayout` component as `new.tsx`. |
+| `/transaction/pending` | `transaction/pending.tsx` | Pending Dashboard — review/accept/discard SMS transactions. |
+| `/accounts` | `accounts.tsx` | Account management + balance tracking (moved out of the tab bar into Manage → Accounts). |
+| `/categories` | `categories.tsx` | Category management (moved out of the tab bar into Manage → Categories). |
+| `/recoveries` | `recoveries.tsx` | Shared-expense recovery tracking (reachable from Accounts). |
+| `/settings` | `settings.tsx` | Export, Import, Simulate SMS, Logs link (reachable from Manage → Settings). |
+| `/settings/logs` | `settings/logs.tsx` | System Logs viewer (last 200 entries, clearable). |
 
-### Records Tab (index.tsx) Features
-- Filter by Day/Week/Month/Year with prev/next navigation
-- Shows income total, expense total, net balance for selected range
-- Pending transactions badge (tappable, goes to Pending Dashboard)
-- Grouped by date, sorted newest first
-- Each card shows: category icon, merchant, account, amount (green/red)
+### Add Transaction (`transaction/new.tsx` + `[id].tsx`, shared via `components/transaction-form-layout.tsx`)
+Rebuilt to match the reference design exactly:
+- No top X/Save bar. A small drag handle at the top acts as both a tap-to-dismiss button and a real `PanResponder`-driven swipe-down-to-dismiss (with velocity/distance threshold, springs back if released early). The route is also presented with `presentation:"modal", gestureDirection:"vertical"` for the native gesture.
+- Big amount readout below the Expense/Income/Transfer/Settle segmented pill (now the shared animated `SegmentedControl`, sliding indicator).
+- Account (or From/To for Transfer) and Category are each their own horizontally-scrolling chip section — not inside the Date/Time/Note card.
+- Date/Time/Note live together in one bordered list card.
+- Shared-expense checkbox (Expense only, collapsible "Your share" input) sits below the list card.
+- A plain numeric keypad (`components/calculator-pad.tsx`: 1-9/0/./backspace, long-press backspace to clear — **no arithmetic operators**, that was removed) plus a full-width bottom button ("Enter an amount" while empty → "Save" once valid) are fixed outside the scroll area so they can never be pushed off-screen or overlapped.
+- The whole form is wrapped in `KeyboardAvoidingView` + a `ScrollView` with `flexGrow:1` content — invisible in the normal case, but lets the Note field scroll above the keyboard when focused.
+
+### Activity Tab (activity.tsx) Features
+- Filter by Day/Week/Month/Year with prev/next navigation (same date-range logic the old Records tab had)
+- Search box (merchant/notes/amount) + All/Expenses/Income/Transfers filter chips
+- Per-date section header shows a total for that date, computed from the active filter (All = net, Expense/Income/Transfers = sum of that type) — always neutral grey, never green/red
+- Pending transactions banner (tappable, goes to Pending Dashboard)
+- Each transaction is its own card (visible gap between rows and between date groups), grouped by date, newest first
 - Filter preference persisted to AsyncStorage via `recordsFilterPrefs.ts`
 
 ### Pending Dashboard (pending.tsx) Features
@@ -220,18 +236,7 @@ id, level(info|warn|error), message, details, created_at
 - Accessible from Accounts tab via "View Pending Recoveries (N)" button with badge count
 - Fully settled expenses show a green "SETTLED" badge
 
-### Transaction Edit ([id].tsx) Features
-- Pre-filled from parsed data
-- All fields editable: amount, type, category, account, merchant, notes, date/time
-- Shared expense toggle (splits amount, user enters actual amount paid)
-- Settlement type support
-
-### New Transaction (new.tsx) Features
-- Calculator pad for amount input
-- Type: Income / Expense / Transfer / Settlement
-- Transfer: from account → to account
-- Shared expense: raw amount + actual amount fields
-- Date + Time pickers
+Both `new.tsx` and `[id].tsx` render the same `TransactionFormLayout` (see "Add Transaction" above) — `[id].tsx` pre-fills from the Zustand `draft` (loaded via `loadTransactionById`); all fields remain editable including type, shared-expense split, and settlement recovery allocation.
 
 ---
 
@@ -239,19 +244,31 @@ id, level(info|warn|error), message, details, created_at
 
 ```
 index.js                        → Entry point, HeadlessTask registration
-app/_layout.tsx                 → Root layout, DB init, permissions, backfill trigger
-app/(tabs)/_layout.tsx          → Bottom tab navigator + BackHandler (exits app on back press)
-app/(tabs)/index.tsx            → Records screen (useFocusEffect + DeviceEventEmitter for live pending count)
-app/(tabs)/analysis.tsx         → Spending analysis + charts (useFocusEffect)
-app/(tabs)/budgets.tsx          → Budget management (useFocusEffect)
-app/(tabs)/accounts.tsx         → Account management (useFocusEffect + Recoveries button with badge)
-app/(tabs)/categories.tsx       → Category management (KeyboardAvoidingView in modal)
-app/transaction/new.tsx         → Manual transaction entry
-app/transaction/[id].tsx        → Transaction edit (for pending SMS transactions)
+app/_layout.tsx                 → Root layout, DB init, permissions, backfill trigger, mounts <AppAlert/>
+app/(tabs)/_layout.tsx          → 4-tab navigator using the custom TabBar (see components/tab-bar.tsx)
+app/(tabs)/index.tsx            → Home dashboard (net-cash-flow hero w/ show-hide, chart, donut)
+app/(tabs)/activity.tsx         → Activity tab (was Records' logic, restyled — search/filters/cards)
+app/(tabs)/insights.tsx         → Insights tab: Analysis + Budgets merged behind a segmented control
+app/(tabs)/manage.tsx           → Manage tab: menu → Accounts/Categories/Pending Review/Settings
+app/accounts.tsx                → Account management (moved out of the tab bar; top-level stack route)
+app/categories.tsx              → Category management (moved out of the tab bar; top-level stack route)
+app/transaction/new.tsx         → Manual transaction entry (renders TransactionFormLayout)
+app/transaction/[id].tsx        → Transaction edit (renders TransactionFormLayout)
 app/transaction/pending.tsx     → Pending dashboard (DeviceEventEmitter + useFocusEffect + Map to Recovery)
 app/recoveries.tsx              → Shared Expenses Recoveries screen
+app/category-details.tsx        → Category drill-down (dual donut, transaction list)
 app/settings.tsx                → Settings + simulate SMS
 app/settings/logs.tsx           → System logs viewer
+
+components/transaction-form-layout.tsx → Shared Add/Edit Transaction layout (see "Add Transaction" above)
+components/tab-bar.tsx          → Custom 4-tab bar + floating FAB (press animation, colored glow shadow)
+components/calculator-pad.tsx   → Plain numeric keypad (no operators — see "Add Transaction")
+components/donut-chart.tsx      → Upgraded: thicker rounded-cap rings, gap between slices
+components/app-alert.tsx        → App-styled replacement for the native Alert dialog
+components/ui/*                 → Shared primitive library (Card, Chip, SegmentedControl — animated
+                                   sliding indicator, ProgressBar, Badge, CountBadge, ListRow, IconTile,
+                                   AmountText, SectionLabel, InsightCard, DonutLegend, CashFlowLineChart,
+                                   BarChart) — see "UI/UX Redesign" below for the full rationale
 
 db/client.ts                    → SQLite + Drizzle setup (trackmoney.db)
 db/schema.ts                    → Drizzle schema definitions (incl. settlements table)
@@ -273,9 +290,12 @@ lib/recordsFilterPrefs.ts       → AsyncStorage for filter mode persistence
 lib/serialization/trackmoney.ts → Export/import all data as JSON
 
 store/useTransactionStore.ts    → Zustand store (transactions, categories, accounts, pending)
+store/useAlertStore.ts          → Zustand store backing <AppAlert/> — showAppAlert() replaces Alert.alert everywhere
 
 types/index.ts                  → All TypeScript types (Transaction, Category, Account, etc.)
-constants/theme.ts              → AppColors, Fonts
+                                   + formatMoneyINR / formatMoneyINRWhole (no-decimals variant for tight spaces)
+constants/theme.ts              → Full design-token system: LightColors/DarkColors, Spacing, Radius,
+                                   Typography, IconPalette — see "UI/UX Redesign" below
 
 withBackgroundSms.js            → Expo Config Plugin:
                                     - Writes SmsBackgroundReceiver.java
@@ -451,6 +471,7 @@ Read via `lib/config.ts` → `getGroqApiKey()`, `getGeminiApiKey()`, `hasAnyAiKe
 - `listPendingTransactions()` uses JS filter instead of SQL WHERE clause (minor perf issue for large datasets)
 - The Recoveries screen is read-only — you can view progress but can only MAP credits from the Pending Dashboard (the correct intended flow)
 - `MaterialIcons` does not include a `handshake` icon — if it errors, use `"people"` or `"compare-arrows"` as fallback
+- **UI redesign not yet verified on-device** — done in a network-restricted sandbox (no npm registry access), so nothing was run through `expo start`; see "UI/UX Redesign" under "UI Architecture & Theming" for the full list of what needs a real-device pass.
 
 ---
 
@@ -496,15 +517,32 @@ Android package: `com.trackmoney.app`
 ## UI Architecture & Theming
 
 ### 1. Dynamic Theming (Dark Mode)
-- **Theme Definition:** constants/theme.ts exports LightColors and DarkColors unified under a ThemeColors type.
-- **Hook:** hooks/useAppTheme.ts merges user preference from Zustand (useThemeStore.ts) with system OS scheme (useColorScheme) to return the active dynamic palette.
-- **Rules:** Never hardcode hex colors or inline static styles. Use dynamic stylesheet generators:
-  `	ypescript
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+- **Theme Definition:** `constants/theme.ts` exports `LightColors`/`DarkColors` (unified under a `ThemeColors` type) plus theme-independent tokens: `Spacing`, `Radius`, `Typography`, `IconPalette`.
+- **Hook:** `hooks/useAppTheme.ts` merges user preference from Zustand (`useThemeStore.ts`) with system OS scheme (`useColorScheme`) to return the active dynamic palette.
+- **Two accepted patterns** (both still valid, pick per component):
+  1. Full-screen components: `const theme = useAppTheme(); const styles = getStyles(theme);` with `const getStyles = (theme: ThemeColors) => StyleSheet.create({...})`.
+  2. Shared `components/ui/*` primitives: a single **static** `StyleSheet.create({...})` for structural properties (padding, radius, layout) plus inline `[styles.x, { color: theme.y }]` overrides for anything color-dependent, read via `useAppTheme()` inside the component body. This pattern exists because these primitives are reused across dozens of call sites and a per-instance `getStyles(theme)` closure isn't worth the churn for a handful of color props.
+- **Navigation:** `<ThemeProvider>` in `app/_layout.tsx` consumes the dynamic theme, `<Stack>` is wrapped in a `<View style={{ backgroundColor: theme.background }}>` to prevent grey-screen flashes during stack transitions, and `<AppAlert/>` is mounted once at the root (see below).
+- **Headers Layout:** Home/Activity/Insights/Manage don't use a shared header component (matches the reference mockups' per-screen custom headers); stack screens (Settings, Accounts, Categories, Pending Review, Recoveries) use a simple back-arrow + centered title row.
 
-  const getStyles = (theme: ThemeColors) => StyleSheet.create({ ... })
-  `
-- **Navigation:** <ThemeProvider> in pp/_layout.tsx consumes the dynamic theme, and <Stack> is wrapped in a <View style={{ backgroundColor: theme.background }}> to prevent native grey screen transitions during stack animations.
-- **Headers Layout:** All tab screen headers (Records, Analysis, Budgets, Accounts, Categories) are centered. The main Records tab header features the Settings gear on the top-left (with slide_from_left navigation) and the Search icon on the top-right.
+### 2. UI/UX Redesign (2026-09-04 → 2026-09-05)
+The entire app was redesigned from a green/utilitarian look with zero shared components into a cohesive fintech-style design system, driven by 5 reference mockup images the user supplied (`ui designs/*.png`, both light and dark theme variants) plus several rounds of screenshot-driven feedback. This was **not** a cosmetic pass — it also restructured the navigation (5 tabs → 4 tabs + FAB, see "Screens & Navigation" above).
 
+**Design tokens** (`constants/theme.ts`):
+- Color: went through several iterations before landing on a **rich violet-purple primary** (`#7C3AED` light / `#9D6FFF` dark) — started as green (original app), tried a richer copper-amber, user kept reading it as "flat yellow," landed on violet as a request. This single token drives the FAB, Save/action buttons, active-chart accents, and total-balance hero cards — changing it in one place recolors the whole app.
+- `IconPalette` — a curated multi-color set (blue/purple/teal/pink/indigo/amber/red/slate) so Settings/Manage/Accounts row icons don't all look like the same monotone accent tile.
+- `Spacing`/`Radius`/`Typography` — plain numeric/style scales, no per-theme variation.
+- `ringTrack` — a translucent version of `text` (not a fixed grey) used for the "unfilled" portion of two-tone donut charts (category-details' dual donut), so it reads correctly against the card surface in both themes instead of blending into black/white.
+
+**Shared component library** (`components/ui/*`, built from nothing — the app previously had zero reusable UI components, every screen hand-rolled its own `StyleSheet.create`):
+`Card`, `SegmentedControl` (pill toggle with an **animated sliding indicator** — `Animated.Value` + spring, used for Week/Month/Year, Expense/Income/Transfer/Settle, Analysis/Budgets, Expense/Income), `Chip`, `ProgressBar`, `Badge`, `CountBadge` (compact circular counter, e.g. Manage's pending-review count), `ListRow`, `IconTile`, `AmountText`, `SectionLabel`, `InsightCard` (the dark "sparkle + message + Apply" nudge banner from the reference, reused for **real** notices like "N transactions need review" / "category over budget" rather than generated AI text — there is no AI-insights feature, this app's only AI usage is the existing one-shot SMS parser), `DonutLegend`, `CashFlowLineChart` (gradient-fill area chart w/ peak callout, built on `react-native-svg` — no charting library was added), `BarChart`.
+
+**Custom alert dialog** (`components/app-alert.tsx` + `store/useAlertStore.ts`): the native `Alert.alert` (Android system dialog look) was replaced app-wide with an app-styled modal. `showAppAlert(title, message, buttons)` is a drop-in replacement with the *exact same signature* as `Alert.alert`, so every call site only needed its import swapped, not rewritten.
+
+**Custom tab bar + FAB** (`components/tab-bar.tsx`): replaces Expo Router's default tab bar via the `tabBar` render prop. Renders the 4 tabs plus a floating circular FAB (centered between Activity and Insights) that opens `/transaction/new`. The FAB has a colored glow-shadow (`shadowColor: theme.primary`) and a mechanical-key press animation (translateY + scale via `Animated`, spring back on release); its icon color follows `theme.tabActive` (black in light mode / white in dark mode, matching the other tab icons) rather than a hardcoded color.
+
+**Known limitations / not yet verified:**
+- This work was done in a sandboxed environment with **no network access to the npm registry** — `npm install` / `npx tsc --noEmit` / `npx expo start` could not be run to verify the redesign compiles and behaves correctly. Everything was manually code-reviewed instead. **A real device/emulator pass is still owed**, especially for: the Add Transaction screen's `PanResponder`-based swipe-to-dismiss, the FAB press animation, and general dark/light parity.
+- The swipe-to-dismiss gesture on Add Transaction is implemented with core `PanResponder`/`Animated` (not `react-native-gesture-handler`/`react-native-reanimated`, even though both are dependencies) for simplicity — revisit if the feel isn't smooth enough on-device.
+- Category/merchant icons are still emoji (kept per an explicit scope decision), just restyled into colored rounded-square tiles — no icon/logo asset library was introduced.
+- Goals and an "Ask AI" chat screen appear in the reference mockups but were explicitly scoped out (not real features, no backing schema).

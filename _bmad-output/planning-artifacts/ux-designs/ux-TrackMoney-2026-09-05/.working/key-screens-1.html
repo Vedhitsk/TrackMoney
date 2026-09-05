@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrackMoney · Key Screens</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#E9EAEE;color:#15171C;
+ font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1320px;margin:0 auto;padding:40px 24px 90px}
+h1{margin:0 0 8px;font-size:27px;letter-spacing:-.4px}
+.lede{background:#fff;border:1px solid #DCDEE4;border-radius:16px;padding:22px 26px;margin-bottom:28px}
+.lede p{margin:0 0 10px;color:#4A4F5A;max-width:84ch}
+.lede code{background:#F2F3F6;padding:1px 5px;border-radius:4px;font-size:12px}
+.sec{background:#fff;border:1px solid #DCDEE4;border-radius:18px;padding:26px;margin-bottom:26px}
+.sec h2{margin:0 0 4px;font-size:20px;letter-spacing:-.3px}
+.sec .line{margin:0 0 22px;color:#4A4F5A;font-size:13px;max-width:88ch}
+.row{display:flex;gap:20px;flex-wrap:wrap}
+figure{margin:0;width:340px}
+figcaption{margin-top:10px;font-size:11.5px;color:#5A606C;line-height:1.5}
+figcaption b{color:#15171C;display:block;font-size:12px;margin-bottom:2px}
+
+/* ---------- device ---------- */
+.ph{width:340px;height:716px;border-radius:30px;overflow:hidden;position:relative;
+ border:1px solid rgba(0,0,0,.18);box-shadow:0 12px 32px rgba(15,18,25,.18);
+ display:flex;flex-direction:column;font-size:13px}
+.dk{background:#07070D;color:#F1F1F7}
+.lt{background:#F1F2F9;color:#14152A}
+
+/* chrome */
+.status{height:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 16px;font-size:10.5px;letter-spacing:.3px;position:relative;z-index:5}
+.glassT{position:absolute;inset:0 0 auto 0;height:34px;backdrop-filter:blur(20px);z-index:4}
+.dk .glassT{background:rgba(7,7,13,.72);border-bottom:1px solid #262633}
+.lt .glassT{background:rgba(241,242,249,.72);border-bottom:1px solid #EDEEF5}
+.dk .status{color:#8B8FA6}
+.lt .status{color:#686D83}
+
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:74px;display:flex;align-items:center;
+ justify-content:space-around;padding:0 6px 10px;backdrop-filter:blur(20px);z-index:6}
+.dk .tabbar{background:rgba(7,7,13,.72);border-top:1px solid #262633}
+.lt .tabbar{background:rgba(241,242,249,.72);border-top:1px solid #EDEEF5}
+.tabbar .t{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;font-size:15px}
+.tabbar .t b{font-size:8.5px;font-weight:600}
+.dk .t{color:#8B8FA6} .lt .t{color:#686D83}
+.dk .t.on{color:#9E8BFA} .lt .t.on{color:#4A38C4}
+
+/* ---------- the primary material ---------- */
+.pill{position:relative;display:inline-flex;align-items:center;justify-content:center;
+ border:0;color:#fff;font-family:inherit;cursor:default;isolation:isolate;
+ background:linear-gradient(120deg,#3C3596 0%,#5A47D6 52%,#7B62F7 100%);
+ box-shadow:0 6px 16px rgba(90,71,214,.16),0 2px 5px rgba(90,71,214,.10)}
+.pill::before{content:'';position:absolute;inset:1px;border-radius:inherit;z-index:-1;
+ background:inherit;filter:blur(11px);opacity:.22}
+.pill::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 55%)}
+.pill.sec{background:linear-gradient(120deg,#5B8CFF 0%,#4066FA 52%,#3448EE 100%);
+ box-shadow:0 6px 16px rgba(64,102,250,.16),0 2px 5px rgba(64,102,250,.10)}
+.pill.cta{width:100%;height:50px;border-radius:25px;font-size:14.5px;font-weight:700}
+.pill.cta::before{filter:blur(11px);opacity:.22}
+.pill.fab{width:52px;height:52px;border-radius:26px;margin-top:-26px;flex:0 0 52px}
+.pill.fab::before{filter:blur(12px);opacity:.28}
+.pill.fab svg{width:23px;height:23px}
+.pill.mini{height:44px;border-radius:22px;font-size:13.5px;font-weight:600;width:100%;gap:7px}
+.pill.mini::before{filter:blur(9px);opacity:.20}
+.pill.mini svg{width:16px;height:16px}
+.pill.segon{flex:1;border-radius:16px;padding:9px 4px;font-size:12px;font-weight:600}
+.pill.segon::before{filter:blur(8px);opacity:.18}
+.disabled{width:100%;height:50px;border-radius:25px;font-size:14.5px;font-weight:700;
+ display:grid;place-items:center;border:0;font-family:inherit}
+.dk .disabled{background:#24242F;color:#8B8FA6}
+.lt .disabled{background:#E6E8F2;color:#686D83}
+
+/* ---------- add-transaction bands ---------- */
+.axn{display:flex;flex-direction:column;height:100%}
+.grab{flex:0 0 auto;padding:12px 0 10px;display:flex;justify-content:center}
+.grab i{width:40px;height:4px;border-radius:2px;display:block}
+.dk .grab i{background:#343445} .lt .grab i{background:#E2E4EE}
+.head{flex:0 0 auto;padding:0 16px 12px}
+.seg{display:flex;gap:3px;padding:3px;border-radius:19px;margin-bottom:14px}
+.dk .seg{background:#24242F} .lt .seg{background:#E6E8F2}
+.seg .opt{flex:1;text-align:center;padding:9px 4px;border-radius:16px;font-size:12px;font-weight:600}
+.dk .seg .opt{color:#ADAFC2} .lt .seg .opt{color:#565A72}
+.amt{text-align:center;font-size:42px;font-weight:700;letter-spacing:-1px;padding:2px 0 6px}
+.dk .amt.zero{color:#8B8FA6} .lt .amt.zero{color:#686D83}
+
+.mid{flex:1;overflow:hidden;padding:0 16px;position:relative}
+.foot{flex:0 0 auto;padding:8px 16px 16px}
+
+.fields{display:flex;gap:10px;margin-bottom:12px}
+.fw{flex:1;min-width:0}
+.fw label{display:block;font-size:9px;font-weight:700;letter-spacing:.9px;margin-bottom:5px}
+.dk .fw label{color:#ADAFC2} .lt .fw label{color:#565A72}
+.fbox{height:50px;border-radius:12px;border:1px solid;display:flex;align-items:center;
+ gap:8px;padding:0 11px;font-size:13.5px;font-weight:600}
+.dk .fbox{background:#1C1C27;border-color:#343445} .lt .fbox{background:#fff;border-color:#E2E4EE}
+.fbox .v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbox .chev{opacity:.75;font-size:11px}
+.dk .fbox.empty .v,.dk .fbox .chev{color:#8B8FA6}
+.lt .fbox.empty .v,.lt .fbox .chev{color:#686D83}
+.dot{width:18px;height:18px;border-radius:6px;flex:0 0 18px;display:grid;place-items:center;
+ font-size:10px}
+
+.list{border-radius:14px;border:1px solid;overflow:hidden;margin-bottom:12px}
+.dk .list{background:#1C1C27;border-color:#343445} .lt .list{background:#fff;border-color:#E2E4EE}
+.lr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-size:13px}
+.lr+.lr{border-top:1px solid}
+.dk .lr+.lr{border-color:#262633} .lt .lr+.lr{border-color:#EDEEF5}
+.dk .lr .k{color:#ADAFC2} .lt .lr .k{color:#565A72}
+.lr .v{font-weight:600}
+.dk .lr .v.ph{color:#8B8FA6} .lt .lr .v.ph{color:#686D83}
+.lr .v.focus{border-bottom:2px solid #7B62F7;padding-bottom:1px}
+
+.shared{display:flex;align-items:center;gap:9px;padding:2px 2px 0;font-size:13px;font-weight:600}
+.cb{width:20px;height:20px;border-radius:6px;border:1.5px solid;display:grid;place-items:center;
+ flex:0 0 20px;font-size:12px}
+.dk .cb{border-color:#343445} .lt .cb{border-color:#D5D8E6}
+.cb.on{background:linear-gradient(120deg,#3C3596,#5A47D6 52%,#7B62F7);border-color:transparent;color:#fff}
+
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.key{border-radius:12px;display:grid;place-items:center;height:44px;font-size:19px;font-weight:600}
+.dk .key{background:#1C1C27} .lt .key{background:#fff}
+
+/* keyboard occluding the pad */
+.kbd{position:absolute;left:0;right:0;bottom:0;height:238px;z-index:8;
+ border-top:1px solid;padding:8px 4px;display:flex;flex-direction:column;gap:7px}
+.dk .kbd{background:#16161F;border-color:#343445} .lt .kbd{background:#D6D9E2;border-color:#C3C7D4}
+.krow{display:flex;gap:5px;justify-content:center}
+.kk{flex:1;max-width:31px;height:38px;border-radius:6px;display:grid;place-items:center;
+ font-size:14px;font-weight:500}
+.dk .kk{background:#2A2A37;color:#F1F1F7} .lt .kk{background:#fff;color:#14152A}
+.kk.wide{max-width:150px}
+.kbar{height:34px;display:flex;align-items:center;padding:0 12px;font-size:12px;gap:14px}
+.dk .kbar{color:#8B8FA6;border-bottom:1px solid #262633}
+.lt .kbar{color:#686D83;border-bottom:1px solid #C3C7D4}
+
+/* sheets */
+.scrim{position:absolute;inset:0;background:rgba(7,7,13,.45);z-index:7}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;border-radius:24px 24px 0 0;
+ padding:0 0 16px;max-height:70%;display:flex;flex-direction:column}
+.dk .sheet{background:#2A2A37} .lt .sheet{background:#fff;box-shadow:0 -8px 30px rgba(30,32,60,.18)}
+.sheet .grab{padding:10px 0 8px}
+.dk .sheet .grab i{background:#4A4A5E} .lt .sheet .grab i{background:#D5D8E6}
+.sh{padding:0 20px 10px;font-size:16px;font-weight:700}
+.search{margin:0 20px 10px;height:40px;border-radius:20px;display:flex;align-items:center;gap:8px;
+ padding:0 14px;font-size:13px}
+.dk .search{background:#1C1C27;color:#8B8FA6} .lt .search{background:#F1F2F9;color:#686D83}
+.rows{overflow:hidden;padding:0 12px;flex:1}
+.r{display:flex;align-items:center;gap:11px;padding:11px 8px;border-radius:12px;font-size:14px;
+ font-weight:500}
+.r .tile{width:30px;height:30px;border-radius:9px;flex:0 0 30px;display:grid;place-items:center;
+ font-size:14px}
+.r .tick{margin-left:auto;font-size:14px;color:#7B62F7;font-weight:700}
+.dk .r.on{background:#343445} .lt .r.on{background:#F1F2F9}
+.sfoot{padding:10px 20px 0;border-top:1px solid;margin-top:6px}
+.dk .sfoot{border-color:#3A3A4C} .lt .sfoot{border-color:#EDEEF5}
+
+/* home / insights content */
+.body{flex:1;overflow:hidden;padding:0 16px;position:relative}
+.h1{font-size:19px;font-weight:700;letter-spacing:-.3px;padding:10px 0 12px}
+.mlabel{font-size:9.5px;font-weight:700;letter-spacing:.9px;margin-bottom:5px}
+.dk .mlabel{color:#ADAFC2} .lt .mlabel{color:#565A72}
+.hero{font-size:31px;font-weight:700;letter-spacing:-.7px;margin-bottom:14px}
+.card{border-radius:14px;border:1px solid;padding:13px;margin-bottom:11px}
+.dk .card{background:#1C1C27;border-color:#343445} .lt .card{background:#fff;border-color:#E2E4EE}
+.two{display:flex;gap:11px;margin-bottom:11px}
+.two .card{flex:1;margin:0}
+.big{font-size:17px;font-weight:700;margin-top:3px}
+.donutrow{display:flex;gap:13px;align-items:center}
+.donut{width:82px;height:82px;border-radius:50%;flex:0 0 82px;display:grid;place-items:center;
+ background:conic-gradient(#7B62F7 0 0)}
+.donut span{width:55px;height:55px;border-radius:50%;display:grid;place-items:center;line-height:1.15}
+.dk .donut span{background:#1C1C27} .lt .donut span{background:#fff}
+.donut b{font-size:12px} .donut em{font-size:8.5px;font-style:normal}
+.lg{list-style:none;margin:0;padding:0;flex:1;display:flex;flex-direction:column;gap:6px;font-size:11.5px}
+.lg li{display:flex;align-items:center;gap:7px}
+.lg li i{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.lg li b{margin-left:auto;font-weight:600}
+.dk .lg li b{color:#ADAFC2} .lt .lg li b{color:#565A72}
+.mv{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.mv .tile{width:26px;height:26px;border-radius:8px;flex:0 0 26px;display:grid;place-items:center;font-size:13px}
+.mv .nm{flex:1;font-size:13px;font-weight:600}
+.mv .am{font-size:12.5px;font-weight:700}
+.bar{height:5px;border-radius:3px;overflow:hidden;margin-top:5px}
+.dk .bar{background:#24242F} .lt .bar{background:#E6E8F2}
+.bar i{display:block;height:100%;border-radius:3px}
+
+.ann{position:absolute;z-index:20;background:#15171C;color:#fff;font-size:10px;font-weight:600;
+ padding:4px 8px;border-radius:6px;letter-spacing:.2px;white-space:nowrap;
+ box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.ann::after{content:'';position:absolute;width:0;height:0}
+.badgood{background:#0E7A46}
+.badbad{background:#A32A22}
+</style></head>
+<body><div class="wrap">
+
+<h1>TrackMoney — key screens</h1>
+<div class="lede">
+  <p>The redesigned Add Transaction flow, plus the two chrome fixes. Every colour, radius and
+     gradient here comes from <code>DESIGN.md</code>; every behaviour from <code>EXPERIENCE.md</code>.
+     Where these mocks and the spines disagree, the spines win.</p>
+  <p>Add Transaction is drawn as <b>three fixed bands</b> — grab bar + type + amount on top, a
+     scrollable middle, an anchored footer holding the keypad and the action. That structure is the
+     fix for the note-focus bug, not a stylistic choice.</p>
+</div>
+
+<!-- ================= ADD TRANSACTION ================= -->
+<div class="sec">
+  <h2>Add Transaction — the flow</h2>
+  <p class="line">Dark theme. Six states, left to right in the order a real entry passes through them.</p>
+  <div class="row">
+
+    <!-- 1 · rest -->
+    <figure><div class="ph dk"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt zero">₹0</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox empty"><span class="v">Account</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox empty"><span class="v">Category</span><span class="chev">▼</span></div></div>
+        </div>
+        <div class="list">
+          <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v ph">Add a note</span></div>
+        </div>
+        <div class="shared"><span class="cb"></span>Shared expense</div>
+      </div>
+      <div class="foot">
+        <div class="pad">
+          <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+          <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+          <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+          <div class="key">.</div><div class="key">0</div><div class="key">⌫</div>
+        </div>
+        <button class="disabled">Enter an amount</button>
+      </div>
+    </div></div>
+    <figcaption><b>1 · Rest</b>Nothing is pre-selected. Account and Category show their own names as
+      placeholders — the shipped build auto-picks the first account, which this removes. The action
+      names what is missing.</figcaption></figure>
+
+    <!-- 2 · account sheet -->
+    <figure><div class="ph dk"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt">₹1,240</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox empty"><span class="v">Account</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox empty"><span class="v">Category</span><span class="chev">▼</span></div></div>
+        </div>
+        <div class="list">
+          <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v ph">Add a note</span></div>
+        </div>
+      </div>
+      <div class="foot"><div class="pad">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+        <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">.</div><div class="key">0</div><div class="key">⌫</div></div>
+        <button class="disabled">Select account &amp; category</button></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="grab"><i></i></div>
+        <div class="sh">Account</div>
+        <div class="rows">
+          <div class="r"><span class="tile" style="background:#3448EE33">💳</span>Card</div>
+          <div class="r"><span class="tile" style="background:#12A05E33">💵</span>Cash</div>
+          <div class="r"><span class="tile" style="background:#C43CA833">👛</span>Wallet</div>
+          <div class="r"><span class="tile" style="background:#0D9E9633">🏦</span>Savings</div>
+        </div>
+        <div class="sfoot"><button class="pill mini sec">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>New account</button></div>
+      </div>
+    </div></div>
+    <figcaption><b>2 · Account sheet</b>Hugs its content. Create button pinned below the list, outside
+      the scroll, in the secondary ramp. No search — four accounts don't need one.</figcaption></figure>
+
+    <!-- 3 · category sheet -->
+    <figure><div class="ph dk"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt">₹1,240</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox"><span class="dot" style="background:#3448EE33">💳</span>
+              <span class="v">Card</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox empty"><span class="v">Category</span><span class="chev">▼</span></div></div>
+        </div>
+      </div>
+      <div class="foot"><button class="disabled">Select account &amp; category</button></div>
+      <div class="scrim"></div>
+      <div class="sheet" style="max-height:78%">
+        <div class="grab"><i></i></div>
+        <div class="sh">Category</div>
+        <div class="search"><span>⌕</span>Search categories</div>
+        <div class="rows">
+          <div class="r"><span class="tile" style="background:#E85BD033">🍿</span>Entertainment</div>
+          <div class="r"><span class="tile" style="background:#FF704333">🍔</span>Food &amp; Dining</div>
+          <div class="r"><span class="tile" style="background:#38C4E833">🚗</span>Transport</div>
+          <div class="r"><span class="tile" style="background:#FFB02033">💡</span>Utilities</div>
+          <div class="r"><span class="tile" style="background:#2FD37A33">🛒</span>Groceries</div>
+          <div class="r"><span class="tile" style="background:#B9806033">🏠</span>Rent</div>
+        </div>
+        <div class="sfoot"><button class="pill mini sec">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>New category</button></div>
+      </div>
+    </div></div>
+    <figcaption><b>3 · Category sheet</b>Same construction plus a search field, because category
+      counts grow. Search never filters away the create button; with no match it pre-fills from the
+      query.</figcaption></figure>
+
+    <!-- 4 · note focused -->
+    <figure><div class="ph dk"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt">₹1,240</div>
+      </div>
+      <div class="mid">
+        <div class="list" style="margin-top:2px">
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v focus">Dinner with Sam</span></div>
+        </div>
+      </div>
+      <div class="foot"><div class="pad">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+        <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">.</div><div class="key">0</div><div class="key">⌫</div></div>
+        <button class="pill cta">Save</button></div>
+      <div class="kbd">
+        <div class="kbar"><span>Dinner</span><span>Dinners</span><span>Dining</span></div>
+        <div class="krow"><span class="kk">q</span><span class="kk">w</span><span class="kk">e</span>
+          <span class="kk">r</span><span class="kk">t</span><span class="kk">y</span>
+          <span class="kk">u</span><span class="kk">i</span><span class="kk">o</span>
+          <span class="kk">p</span></div>
+        <div class="krow"><span class="kk">a</span><span class="kk">s</span><span class="kk">d</span>
+          <span class="kk">f</span><span class="kk">g</span><span class="kk">h</span>
+          <span class="kk">j</span><span class="kk">k</span><span class="kk">l</span></div>
+        <div class="krow"><span class="kk">⇧</span><span class="kk">z</span><span class="kk">x</span>
+          <span class="kk">c</span><span class="kk">v</span><span class="kk">b</span>
+          <span class="kk">n</span><span class="kk">m</span><span class="kk">⌫</span></div>
+        <div class="krow"><span class="kk">?123</span><span class="kk wide">space</span>
+          <span class="kk">↵</span></div>
+      </div>
+    </div></div>
+    <figcaption><b>4 · Note focused</b>The keyboard rises <em>over</em> the keypad; the keypad has not
+      moved. The amount is still on screen. Only the middle band scrolled — just far enough to lift
+      the Note row clear, with one row of breathing space above the keyboard.</figcaption></figure>
+
+    <!-- 5 · saveable -->
+    <figure><div class="ph dk"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt">₹1,240</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox"><span class="dot" style="background:#3448EE33">💳</span>
+              <span class="v">Card</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox"><span class="dot" style="background:#FF704333">🍔</span>
+              <span class="v">Food &amp; Din…</span><span class="chev">▼</span></div></div>
+        </div>
+        <div class="list">
+          <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v">Dinner with Sam</span></div>
+        </div>
+        <div class="shared"><span class="cb on">✓</span>Shared expense</div>
+        <div class="lr" style="padding:10px 2px 0"><span class="k">Your share</span>
+          <span class="v">₹620</span></div>
+      </div>
+      <div class="foot"><div class="pad">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+        <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">.</div><div class="key">0</div><div class="key">⌫</div></div>
+        <button class="pill cta">Save</button></div>
+    </div></div>
+    <figcaption><b>5 · Saveable</b>Both fields set, shared expense on. The action has changed from
+      naming what's missing to the primary ramp — the only glowing thing on the screen.</figcaption></figure>
+
+    <!-- 6 · mid-drag -->
+    <figure><div class="ph dk" style="background:#000">
+      <div style="position:absolute;inset:0;background:#07070D;opacity:.35"></div>
+      <div class="axn" style="position:absolute;left:0;right:0;top:112px;bottom:-112px;
+        background:#07070D;border-radius:26px 26px 0 0;box-shadow:0 -14px 40px rgba(0,0,0,.6)">
+        <div class="grab" style="padding-top:14px"><i style="background:#5A5A72"></i></div>
+        <div class="head">
+          <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+            <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+          <div class="amt">₹450</div>
+        </div>
+        <div class="mid">
+          <div class="fields">
+            <div class="fw"><label>ACCOUNT</label>
+              <div class="fbox empty"><span class="v">Account</span><span class="chev">▼</span></div></div>
+            <div class="fw"><label>CATEGORY</label>
+              <div class="fbox empty"><span class="v">Category</span><span class="chev">▼</span></div></div>
+          </div>
+          <div class="list">
+            <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+            <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          </div>
+        </div>
+      </div>
+      <span class="ann" style="left:118px;top:64px">↓ dragging · 112px</span>
+    </div>
+    <figcaption><b>6 · Mid-drag</b>The grab bar is the only way out. It tracks the finger 1:1, the
+      sheet's top corners round in, and the screen behind dims. Past 120px or on a flick it leaves;
+      shorter, it springs back. <b style="display:inline">A tap does nothing</b> — too easy to fire
+      by accident on a screen holding a typed amount.</figcaption></figure>
+
+  </div>
+</div>
+
+<!-- ================= LIGHT ================= -->
+<div class="sec">
+  <h2>Add Transaction — light theme</h2>
+  <p class="line">Same two ends of the flow, to confirm the material and the placeholders hold on paper.</p>
+  <div class="row">
+
+    <figure><div class="ph lt"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt zero">₹0</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox empty"><span class="v">Account</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox empty"><span class="v">Category</span><span class="chev">▼</span></div></div>
+        </div>
+        <div class="list">
+          <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v ph">Add a note</span></div>
+        </div>
+        <div class="shared"><span class="cb"></span>Shared expense</div>
+      </div>
+      <div class="foot"><div class="pad">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+        <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">.</div><div class="key">0</div><div class="key">⌫</div></div>
+        <button class="disabled">Enter an amount</button></div>
+    </div></div>
+    <figcaption><b>Rest</b>Placeholders at 4.58:1 on the tinted background — readable as instructions,
+      not decoration.</figcaption></figure>
+
+    <figure><div class="ph lt"><div class="axn">
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="grab"><i></i></div>
+      <div class="head">
+        <div class="seg"><span class="pill segon">Expense</span><span class="opt">Income</span>
+          <span class="opt">Transfer</span><span class="opt">Settle</span></div>
+        <div class="amt">₹1,240</div>
+      </div>
+      <div class="mid">
+        <div class="fields">
+          <div class="fw"><label>ACCOUNT</label>
+            <div class="fbox"><span class="dot" style="background:#3448EE22">💳</span>
+              <span class="v">Card</span><span class="chev">▼</span></div></div>
+          <div class="fw"><label>CATEGORY</label>
+            <div class="fbox"><span class="dot" style="background:#E85D3C22">🍔</span>
+              <span class="v">Food &amp; Din…</span><span class="chev">▼</span></div></div>
+        </div>
+        <div class="list">
+          <div class="lr"><span class="k">Date</span><span class="v">05 Sept 2026</span></div>
+          <div class="lr"><span class="k">Time</span><span class="v">1:05 am</span></div>
+          <div class="lr"><span class="k">Note</span><span class="v">Dinner with Sam</span></div>
+        </div>
+        <div class="shared"><span class="cb on">✓</span>Shared expense</div>
+      </div>
+      <div class="foot"><div class="pad">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+        <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">.</div><div class="key">0</div><div class="key">⌫</div></div>
+        <button class="pill cta">Save</button></div>
+    </div></div>
+    <figcaption><b>Saveable</b>The bloom is quieter on light — same opacity, but it has less contrast
+      to bloom against, which is correct.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ================= CHROME ================= -->
+<div class="sec">
+  <h2>The chrome fixes</h2>
+  <p class="line">Both tab surfaces are now full-bleed: content runs under a blurred band at the top
+     and under the blurred tab bar at the bottom, with bottom padding equal to the tab bar's height
+     so the last card can always clear it.</p>
+  <div class="row">
+
+    <figure><div class="ph dk">
+      <div class="body" style="padding-top:34px">
+        <div class="h1">TrackMoney</div>
+        <div class="mlabel">NET CASH FLOW · SEPTEMBER 2026</div>
+        <div class="hero">₹12,080.00</div>
+        <div class="two">
+          <div class="card"><div class="mlabel">IN · MONTH</div>
+            <div class="big" style="color:#34D399">₹20,000</div></div>
+          <div class="card"><div class="mlabel">OUT · MONTH</div>
+            <div class="big" style="color:#FB7185">₹7,920</div></div>
+        </div>
+        <div class="card">
+          <div class="mlabel" style="margin-bottom:10px">SPENDING BREAKDOWN</div>
+          <div class="donutrow">
+            <div class="donut" style="background:conic-gradient(#E85BD0 0 63%,#FF7043 63% 97%,#38C4E8 97% 100%)">
+              <span><b>₹7,920</b><em>Spent</em></span></div>
+            <ul class="lg">
+              <li><i style="background:#E85BD0"></i>Entertainment<b>63%</b></li>
+              <li><i style="background:#FF7043"></i>Food &amp; Dining<b>34%</b></li>
+              <li><i style="background:#38C4E8"></i>Transport<b>3%</b></li>
+            </ul></div>
+        </div>
+        <div class="card"><div class="mv">
+          <span class="tile" style="background:#2FD37A33">🛒</span>
+          <span class="nm">Groceries</span><span class="am">₹2,140</span></div>
+          <div class="bar"><i style="width:62%;background:#2FD37A"></i></div></div>
+      </div>
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="tabbar">
+        <span class="t on">⌂<b>Home</b></span><span class="t">☰<b>Activity</b></span>
+        <button class="pill fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="3" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+        <span class="t">◺<b>Insights</b></span><span class="t">⠿<b>Manage</b></span>
+      </div>
+    </div>
+    <figcaption><b>Home — scrolls, and passes under both bands</b>The donut card no longer carries
+      <code>flex:1</code>, so it sizes to content and the page grows past one screen. The bottom card
+      is ghosted through the tab bar's glass rather than being clipped by a gap.</figcaption></figure>
+
+    <figure><div class="ph lt">
+      <div class="body" style="padding-top:34px">
+        <div class="h1">Insights</div>
+        <div class="seg" style="margin-bottom:12px"><span class="pill segon">Analysis</span>
+          <span class="opt">Budgets</span></div>
+        <div class="card">
+          <div class="donutrow">
+            <div class="donut" style="background:conic-gradient(#C43CA8 0 63%,#E85D3C 63% 97%,#0E7F9E 97% 100%)">
+              <span><b>₹7,920</b><em>Spent</em></span></div>
+            <ul class="lg">
+              <li><i style="background:#C43CA8"></i>Entertainment<b>63%</b></li>
+              <li><i style="background:#E85D3C"></i>Food &amp; Dining<b>34%</b></li>
+              <li><i style="background:#0E7F9E"></i>Transport<b>3%</b></li>
+            </ul></div>
+        </div>
+        <div class="card">
+          <div class="mlabel" style="margin-bottom:10px">CATEGORY MOVEMENT</div>
+          <div class="mv"><span class="tile" style="background:#C43CA822">🍿</span>
+            <span class="nm">Entertainment</span><span class="am">₹5,000</span></div>
+          <div class="bar" style="margin-bottom:12px"><i style="width:72%;background:#C43CA8"></i></div>
+          <div class="mv"><span class="tile" style="background:#E85D3C22">🍔</span>
+            <span class="nm">Food &amp; Dining</span><span class="am">₹2,700</span></div>
+          <div class="bar"><i style="width:44%;background:#E85D3C"></i></div>
+        </div>
+        <div class="two">
+          <div class="card"><div class="mlabel">PRICIEST DAY</div><div class="big">Friday</div></div>
+          <div class="card"><div class="mlabel">SMALL SPENDS</div><div class="big">₹318</div></div>
+        </div>
+      </div>
+      <div class="glassT"></div><div class="status"><span>16:15</span><span>▮▮ 42%</span></div>
+      <div class="tabbar">
+        <span class="t">⌂<b>Home</b></span><span class="t">☰<b>Activity</b></span>
+        <button class="pill fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="3" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+        <span class="t on">◺<b>Insights</b></span><span class="t">⠿<b>Manage</b></span>
+      </div>
+    </div>
+    <figcaption><b>Insights — the dead band is gone</b>Compare <code>imports/analytics_footer.jpg</code>:
+      there, the Food &amp; Dining card is cut off and a strip of empty background sits between it and
+      the tabs. The cause was <code>paddingBottom</code> on the container wrapping the scroll view;
+      that padding moves to the content container.</figcaption></figure>
+  </div>
+</div>
+
+</div></body></html>

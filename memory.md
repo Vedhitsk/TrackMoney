@@ -81,6 +81,42 @@
 
 ---
 
-## 6. Outstanding Tasks & Handoff Summary
-1. **Remote Push:** Run `git push origin master` in an authenticated terminal.
-2. **Release Build & Verification:** Build `--variant release` to verify all latest features.
+## 6. Key Work Completed — Full UI/UX Redesign Sprint (2026-09-04 → 2026-09-05)
+
+### A. Context & Process
+User supplied 5 reference mockup images (`ui designs/*.png`, an unnamed fintech-style app in both light and dark theme) and asked for the entire app to be redesigned to match, "as a senior UI/UX engineer." This ran through **multiple rounds**: an initial full redesign, then two rounds of screenshot-driven correction feedback (the user attached actual screenshots of the running app showing exactly what looked wrong). Treat this section as the source of truth over any earlier BMad UX artifacts under `planning_artifacts/` — those predate the redesign and were not used to drive it.
+
+### B. Navigation Restructure (5 tabs → 4 tabs + FAB)
+Old: Records / Analysis / Budgets / Accounts / Categories (5 tabs, each with its own local FAB).
+New: **Home / Activity / Insights / Manage**, with a single floating center **FAB** (opens `/transaction/new` directly — an action, not a route) via a custom `components/tab-bar.tsx` replacing Expo Router's default tab bar.
+- **Home** (`app/(tabs)/index.tsx`) — new dashboard: masked net-cash-flow hero (tap to reveal, auto-hides on tab blur / app background via `AppState`), `CashFlowLineChart`, Week/Month/Year toggle, in/out cards, spending-breakdown donut. `ScrollView` with `flexGrow:1` (scrolls only if content overflows, e.g. the pending-review banner).
+- **Activity** (`app/(tabs)/activity.tsx`) — old Records list logic, restyled: search + type-filter chips, per-date section totals (always neutral grey, computed per the active filter), each transaction its own card with visible gaps.
+- **Insights** (`app/(tabs)/insights.tsx`) — merges old Analysis + Budgets behind an Analysis/Budgets segmented control. Budgets pane has a fixed footer (Copy previous month / Add budget) that only renders in that pane — this was double-checked twice after user confusion about it "showing on Analytics," confirmed correctly scoped both times.
+- **Manage** (`app/(tabs)/manage.tsx`) — new menu tab: Accounts / Categories / Pending Review (live count badge) / Settings. `accounts.tsx` and `categories.tsx` moved out of the tab bar into top-level stack routes.
+- Goals and an "Ask AI" chat screen appear in the mockups but were **explicitly scoped out** by the user (not real features, no backing schema/data).
+
+### C. Design System (`constants/theme.ts`, `components/ui/*`)
+Built a full token system from scratch (previously just two flat `LightColors`/`DarkColors` color maps, no spacing/radius/typography scale, no shared components at all):
+- `Spacing`, `Radius`, `Typography`, `IconPalette` (curated 8-color set for menu-row icons).
+- **Primary accent went through 3 iterations**: original green → richer copper-amber (user still called it "flat yellow") → **final: rich violet-purple**, `#7C3AED` light / `#9D6FFF` dark. This one token drives the FAB, Save buttons, active-chart accents, total-balance cards.
+- `ringTrack` — translucent version of `text` (not a fixed grey) for two-tone donut "unfilled" segments, so it never blends into the background in either theme (category-details' dual donut had this bug twice before the fix landed).
+- New shared component library under `components/ui/`: `Card`, `SegmentedControl` (pill toggle with an **animated sliding indicator**, `Animated.Value` + spring — used everywhere a pill toggle appears), `Chip`, `ProgressBar`, `Badge`, `CountBadge`, `ListRow`, `IconTile`, `AmountText`, `SectionLabel`, `InsightCard` (reused for real notices, not generated AI text — no AI-insights feature exists), `DonutLegend`, `CashFlowLineChart`, `BarChart` (both hand-built on `react-native-svg`, no charting library added).
+- `components/app-alert.tsx` + `store/useAlertStore.ts` — replaced the native `Alert.alert` app-wide with an app-styled modal (`showAppAlert()` is a drop-in same-signature replacement, so every call site only needed an import swap).
+
+### D. Add Transaction Rework (`components/transaction-form-layout.tsx`, shared by `transaction/new.tsx` + `[id].tsx`)
+Went through several structural revisions to match the reference exactly:
+- No top X/Save bar. A drag handle at the top supports both tap-to-dismiss and a real `PanResponder`-driven swipe-down gesture (distance/velocity threshold, springs back otherwise). Route also uses `presentation:"modal"` + `gestureDirection:"vertical"`.
+- Big amount readout below the Expense/Income/Transfer/Settle pill. Account (or From/To) and Category are separate horizontal chip sections (**not** inside the Date/Time/Note card — this flip-flopped once based on user feedback, current state is the final one).
+- Numpad (`components/calculator-pad.tsx`) had its **arithmetic operators removed entirely** per explicit user request — it's now plain 1-9/0/./backspace only, matching the reference (the original app's calculator supported +-×÷= expressions; that's gone now). Backspace icon must be `"backspace"` (plain `MaterialIcons`) — `"backspace-outline"` doesn't exist in that icon set and silently renders as a tofu box.
+- Numpad + a full-width bottom action button ("Enter an amount" → "Save") are fixed outside the scrollable content area specifically so they can never overlap the shared-expense checkbox or get squeezed by keyboard-avoidance.
+- Wrapped in `KeyboardAvoidingView` + `ScrollView` (`flexGrow:1`) so focusing the Note field can scroll it above the keyboard without the page visibly scrolling in the normal case.
+
+### E. Verification Gap (important — read before assuming this works)
+**All of the above was implemented in a sandboxed environment with no network access to the npm registry** — `npm install` failed with `ECONNRESET` on every attempt, so `npx tsc --noEmit` and `npx expo start` could never be run. Everything was manually code-reviewed instead, across a very large diff. **A real device/emulator pass has not happened yet.** Priorities for that first pass: the Add Transaction swipe-to-dismiss gesture and FAB press animation (both hand-rolled with core `PanResponder`/`Animated`, not the already-installed `react-native-gesture-handler`/`reanimated`), and general light/dark parity across every screen.
+
+---
+
+## 7. Outstanding Tasks & Handoff Summary
+1. **Run the redesign on a real device/emulator** — nothing in section 6 has been executed, only reviewed. Start with Add Transaction (all 4 types, both themes) and the FAB.
+2. **Remote Push:** Run `git push origin master` in an authenticated terminal.
+3. **Release Build & Verification:** Build `--variant release` to verify all latest features.

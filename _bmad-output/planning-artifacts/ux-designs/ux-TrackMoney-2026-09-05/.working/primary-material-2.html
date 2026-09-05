@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrackMoney · Primary Material v2</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EDEEF0;color:#15171C;
+ font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 24px 90px}
+.lede{background:#fff;border:1px solid #DDDFE4;border-radius:16px;padding:22px 26px;margin-bottom:26px}
+.lede h1{margin:0 0 8px;font-size:26px;letter-spacing:-.4px}
+.lede p{margin:0 0 10px;color:#4A4F5A;max-width:82ch}
+.lede code{background:#F2F3F6;padding:1px 5px;border-radius:4px;font-size:12px}
+.fix{background:#F6F7F9;border-left:3px solid #15171C;border-radius:0 8px 8px 0;
+ padding:12px 16px;margin:14px 0 0;font-size:13px;color:#3A3F49}
+.fix b{color:#15171C}
+
+.card{background:#fff;border:1px solid #DDDFE4;border-radius:18px;padding:26px;margin-bottom:24px}
+.card h2{margin:0 0 4px;font-size:20px;letter-spacing:-.3px}
+.card .line{margin:0 0 20px;color:#4A4F5A;font-size:13px;max-width:84ch}
+.subhead{margin:24px 0 12px;font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:#8A909B}
+
+/* ---- side-by-side, matched to the reference's own scale ---- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cmp figure{margin:0}
+.stage{height:280px;border-radius:14px;border:1px solid #DDDFE4;background:#0C0C10;
+ display:grid;place-items:center;position:relative;overflow:hidden}
+.stage img{width:528px;display:block}
+figcaption{margin-top:9px;font-size:11.5px;color:#6C7280}
+figcaption code{font-size:10.5px;color:#8A909B}
+
+/* ---- THE MATERIAL ----------------------------------------------------
+   Geometry lifted from the reference at 1:2 scale:
+     height 100 · radius 26 (0.26h) · tile 38 (0.38h) · label 29px
+     left pad 42 · gap 22 · divider at 220 · chevron bay 79
+   -------------------------------------------------------------------- */
+.mat{
+  position:relative;
+  display:inline-flex;align-items:center;
+  height:100px;border-radius:26px;
+  padding-left:42px;
+  font:600 29px/1 inherit;font-family:inherit;
+  color:#fff;cursor:default;border:0;
+  background:linear-gradient(168deg,#8F63FF 0%,#7A46F7 46%,#6B31EE 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.42),
+    inset 0 0 0 1px rgba(255,255,255,.16),
+    inset 0 -2px 0 rgba(28,10,70,.30);
+  isolation:isolate;
+}
+/* layer 3 — the bloom: a blurred copy of the control sitting behind it. */
+.mat::before{
+  content:'';position:absolute;inset:2px;border-radius:inherit;z-index:-1;
+  background:linear-gradient(168deg,#8F63FF,#6B31EE);
+  filter:blur(26px);opacity:.92;
+}
+/* specular sheen across the top third */
+.mat::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.04) 34%,
+             rgba(255,255,255,0) 62%);
+}
+.mat .tile{
+  width:38px;height:38px;border-radius:12px;flex:0 0 38px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.24);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30);
+}
+.mat .tile svg{width:22px;height:22px}
+.mat .label{margin-left:22px;letter-spacing:-.3px}
+.mat .bay{width:79px;display:grid;place-items:center;align-self:stretch;margin-left:auto}
+.mat .bay svg{width:26px;height:26px}
+.mat .rule{width:1px;align-self:stretch;background:rgba(255,255,255,.22)}
+.mat.solo{padding-right:42px}
+
+/* glow strength variants — geometry identical, bloom differs */
+.g-close::before{filter:blur(16px);opacity:.85}
+.g-true::before{filter:blur(26px);opacity:.92}
+.g-wide::before{inset:-2px;filter:blur(40px);opacity:.95}
+
+/* ---- applied at real app scale (56px controls) ---- */
+.app{display:flex;gap:16px;flex-wrap:wrap}
+.pane{flex:1;min-width:430px;border:1px solid;border-radius:16px;padding:22px;position:relative}
+.pane .mode{position:absolute;top:11px;right:15px;font-size:9.5px;letter-spacing:1px;
+ text-transform:uppercase}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cell.wide{grid-column:1/-1}
+.cell label{display:block;font-size:9.5px;letter-spacing:.9px;text-transform:uppercase;
+ font-weight:700;margin-bottom:10px}
+
+.s{height:56px;border-radius:15px;font-size:15px;padding-left:18px}
+.s .tile{width:26px;height:26px;border-radius:9px;flex:0 0 26px}
+.s .tile svg{width:15px;height:15px}
+.s .label{margin-left:12px}
+.s .bay{width:46px}
+.s .bay svg{width:17px;height:17px}
+.s::before{filter:blur(16px);opacity:.85}
+.s.solo{padding-right:18px;justify-content:center}
+
+.fab{width:60px;height:60px;border-radius:19px;padding:0;justify-content:center}
+.fab svg{width:26px;height:26px}
+.fab::before{filter:blur(18px);opacity:.9}
+
+.cta{width:100%;height:54px;border-radius:16px;padding:0;justify-content:center;
+ font-size:15px;font-weight:700}
+.cta::before{filter:blur(15px);opacity:.8}
+
+.pressed{background:linear-gradient(168deg,#7A46F7 0%,#5C25D6 100%);
+ box-shadow:inset 0 3px 7px rgba(20,6,54,.42),inset 0 0 0 1px rgba(255,255,255,.10);
+ transform:translateY(2px) scale(.986)}
+.pressed::before{filter:blur(9px);opacity:.55}
+.pressed::after{background:none}
+
+.dis{background:none;box-shadow:none;color:inherit}
+.dis::before,.dis::after{display:none}
+
+.seg{display:flex;gap:4px;padding:4px;border-radius:19px}
+.seg .opt{flex:1;text-align:center;padding:11px 6px;border-radius:15px;font-size:12.5px;
+ font-weight:600}
+.seg .mat{height:auto;border-radius:15px;padding:11px 6px;font-size:12.5px;font-weight:600;
+ display:block;flex:1;text-align:center}
+.seg .mat::before{filter:blur(11px);opacity:.7}
+
+.tabs{display:flex;align-items:center;justify-content:space-around;padding:14px 8px;
+ border:1px solid;border-radius:16px}
+.tabs .t{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:15px;flex:1}
+.tabs .t b{font-size:9px;font-weight:600}
+.tabfab{width:52px;height:52px;border-radius:17px;margin-top:-26px;flex:0 0 52px;
+ justify-content:center;padding:0}
+.tabfab svg{width:23px;height:23px}
+.tabfab::before{filter:blur(17px);opacity:.9}
+
+.specs{border-collapse:collapse;font-size:12px;width:100%;max-width:640px}
+.specs td{padding:6px 10px;border-top:1px solid #EBEDF1;vertical-align:top}
+.specs td:first-child{color:#6C7280;width:190px}
+.specs code{font-size:11px;color:#15171C}
+.ratio{font-weight:700;font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;
+ font-size:10.5px;background:#E2F5EA;color:#116B41}
+</style></head>
+<body><div class="wrap">
+
+<div class="lede">
+  <h1>Primary material — rebuilt at your reference's proportions</h1>
+  <p>Same ground, same scale: your <code>primary_color.png</code> is displayed at 528px wide, which
+     puts its button at 299&times;100. Mine is built to exactly 100px tall so the two sit at 1:1.
+     Compare shape first, then glow.</p>
+  <div class="fix"><b>What was wrong in my last attempt, and is fixed here:</b>
+     the <code>+</code> and the chevron were <em>text characters</em>, which render thin, small and
+     slightly off-baseline — they are now stroked SVG paths with rounded caps, which is most of why
+     the earlier version looked cheap. The bloom was a CSS drop-shadow; it is now a blurred copy of
+     the control sitting behind it, which is how the glow in your reference is actually made. And the
+     geometry is measured off your image rather than guessed: radius is 0.26 of the height, the icon
+     tile is 0.38, the label is 0.29.</div>
+</div>
+
+<!-- ============ direct comparison ============ -->
+<div class="card">
+  <h2>Against your reference, 1:1</h2>
+  <p class="line">Three bloom strengths. The control itself is identical in all three — only the
+     halo behind it changes.</p>
+
+  <div class="cmp">
+    <figure>
+      <div class="stage"><img src="../imports/primary_color.png" alt="reference"></div>
+      <figcaption>yours · <code>imports/primary_color.png</code></figcaption>
+    </figure>
+    <figure>
+      <div class="stage">
+        <button class="mat g-true">
+          <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3.4" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+          <span class="label">New</span>
+          <span class="rule"></span>
+          <span class="bay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"
+            ><path d="M6 9.5l6 6 6-6"/></svg></span>
+        </button>
+      </div>
+      <figcaption>mine · <b>True</b> — blur 26px, opacity .92</figcaption>
+    </figure>
+  </div>
+
+  <div class="cmp" style="margin-top:20px">
+    <figure>
+      <div class="stage">
+        <button class="mat g-close">
+          <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3.4" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+          <span class="label">New</span>
+          <span class="rule"></span>
+          <span class="bay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"
+            ><path d="M6 9.5l6 6 6-6"/></svg></span>
+        </button>
+      </div>
+      <figcaption><b>Close</b> — blur 16px, opacity .85 · tighter, more grounded</figcaption>
+    </figure>
+    <figure>
+      <div class="stage">
+        <button class="mat g-wide">
+          <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3.4" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+          <span class="label">New</span>
+          <span class="rule"></span>
+          <span class="bay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"
+            ><path d="M6 9.5l6 6 6-6"/></svg></span>
+        </button>
+      </div>
+      <figcaption><b>Wide</b> — blur 40px, opacity .95 · more atmosphere, softer edge</figcaption>
+    </figure>
+  </div>
+</div>
+
+<!-- ============ applied ============ -->
+<div class="card">
+  <h2>The same material at real app scale</h2>
+  <p class="line">Controls here are 54–60px, the size they ship at. The bloom scales down with
+     them — a 26px halo on a 56px button would smear.</p>
+
+  <div class="app">
+    <!-- dark -->
+    <div class="pane" style="background:#0A0A0F;border-color:#2C2A38;color:#F3F2F7">
+      <span class="mode" style="color:#8C8A9E">dark</span>
+      <div class="grid">
+        <div class="cell"><label style="color:#8C8A9E">FAB</label>
+          <button class="mat fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3.2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+        </div>
+        <div class="cell"><label style="color:#8C8A9E">Split action</label>
+          <button class="mat s">
+            <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="3.4" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+            <span class="label">New</span><span class="rule"></span>
+            <span class="bay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M6 9.5l6 6 6-6"/></svg></span></button>
+        </div>
+        <div class="cell"><label style="color:#8C8A9E">Primary CTA</label>
+          <button class="mat cta solo">Save transaction</button></div>
+        <div class="cell"><label style="color:#8C8A9E">Pressed</label>
+          <button class="mat cta solo pressed">Save transaction</button></div>
+        <div class="cell"><label style="color:#8C8A9E">Disabled</label>
+          <button class="mat cta solo dis"
+            style="background:#221F2D;color:#8C8A9E;box-shadow:inset 0 0 0 1px #333042">
+            Enter an amount</button></div>
+        <div class="cell"><label style="color:#8C8A9E">Icon buttons</label>
+          <div style="display:flex;gap:10px">
+            <button class="mat fab" style="width:46px;height:46px;border-radius:15px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"
+                ><path d="M20 6L9 17l-5-5"/></svg></button>
+            <button class="mat fab" style="width:46px;height:46px;border-radius:15px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"
+                ><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          </div></div>
+        <div class="cell wide"><label style="color:#8C8A9E">Segmented — active segment carries it</label>
+          <div class="seg" style="background:#221F2D">
+            <button class="mat">Expense</button>
+            <span class="opt" style="color:#ADAABD">Income</span>
+            <span class="opt" style="color:#ADAABD">Transfer</span>
+            <span class="opt" style="color:#ADAABD">Settle</span>
+          </div></div>
+        <div class="cell wide"><label style="color:#8C8A9E">Tab bar, in place</label>
+          <div class="tabs" style="background:#16151D;border-color:#2C2A38">
+            <span class="t" style="color:#A78BFA">⌂<b>Home</b></span>
+            <span class="t" style="color:#8C8A9E">☰<b>Activity</b></span>
+            <button class="mat tabfab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="3.2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            <span class="t" style="color:#8C8A9E">◺<b>Insights</b></span>
+            <span class="t" style="color:#8C8A9E">⠿<b>Manage</b></span>
+          </div></div>
+      </div>
+    </div>
+
+    <!-- light -->
+    <div class="pane" style="background:#F4F3F7;border-color:#E4E2EC;color:#121118">
+      <span class="mode" style="color:#73718A">light</span>
+      <div class="grid">
+        <div class="cell"><label style="color:#73718A">FAB</label>
+          <button class="mat fab" style="--x:0"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="3.2" stroke-linecap="round"
+            ><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+        </div>
+        <div class="cell"><label style="color:#73718A">Split action</label>
+          <button class="mat s">
+            <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="3.4" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+            <span class="label">New</span><span class="rule"></span>
+            <span class="bay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M6 9.5l6 6 6-6"/></svg></span></button>
+        </div>
+        <div class="cell"><label style="color:#73718A">Primary CTA</label>
+          <button class="mat cta solo">Save transaction</button></div>
+        <div class="cell"><label style="color:#73718A">Pressed</label>
+          <button class="mat cta solo pressed">Save transaction</button></div>
+        <div class="cell"><label style="color:#73718A">Disabled</label>
+          <button class="mat cta solo dis"
+            style="background:#EAE8F1;color:#73718A;box-shadow:inset 0 0 0 1px #E4E2EC">
+            Enter an amount</button></div>
+        <div class="cell"><label style="color:#73718A">Icon buttons</label>
+          <div style="display:flex;gap:10px">
+            <button class="mat fab" style="width:46px;height:46px;border-radius:15px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"
+                ><path d="M20 6L9 17l-5-5"/></svg></button>
+            <button class="mat fab" style="width:46px;height:46px;border-radius:15px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"
+                ><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          </div></div>
+        <div class="cell wide"><label style="color:#73718A">Segmented — active segment carries it</label>
+          <div class="seg" style="background:#EAE8F1">
+            <button class="mat">Expense</button>
+            <span class="opt" style="color:#56545F">Income</span>
+            <span class="opt" style="color:#56545F">Transfer</span>
+            <span class="opt" style="color:#56545F">Settle</span>
+          </div></div>
+        <div class="cell wide"><label style="color:#73718A">Tab bar, in place</label>
+          <div class="tabs" style="background:#FFFFFF;border-color:#E4E2EC">
+            <span class="t" style="color:#6D28D9">⌂<b>Home</b></span>
+            <span class="t" style="color:#73718A">☰<b>Activity</b></span>
+            <button class="mat tabfab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="3.2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            <span class="t" style="color:#73718A">◺<b>Insights</b></span>
+            <span class="t" style="color:#73718A">⠿<b>Manage</b></span>
+          </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ spec ============ -->
+<div class="card">
+  <h2>The spec, if this one is right</h2>
+  <table class="specs">
+    <tr><td>Gradient</td><td><code>linear-gradient(168deg, #8F63FF 0%, #7A46F7 46%, #6B31EE 100%)</code></td></tr>
+    <tr><td>Rim-light</td><td><code>inset 0 1.5px 0 rgba(255,255,255,.42)</code><br>
+        <code>inset 0 0 0 1px rgba(255,255,255,.16)</code><br>
+        <code>inset 0 -2px 0 rgba(28,10,70,.30)</code></td></tr>
+    <tr><td>Bloom</td><td>A blurred copy of the control behind it —
+        <code>inset:2px; filter:blur(26px); opacity:.92</code> at hero scale,
+        <code>blur(16px)</code> at 56px control scale.</td></tr>
+    <tr><td>Sheen</td><td><code>linear-gradient(180deg, rgba(255,255,255,.20), transparent 62%)</code>
+        over the top third.</td></tr>
+    <tr><td>Glyph tile</td><td><code>rgba(255,255,255,.24)</code>, radius 0.32× tile,
+        <code>inset 0 1px 0 rgba(255,255,255,.30)</code></td></tr>
+    <tr><td>Geometry</td><td>radius <code>0.26 × height</code> · tile <code>0.38 × height</code> ·
+        label <code>0.29 × height</code></td></tr>
+    <tr><td>Pressed</td><td>ramp compresses to its lower two stops, sheen off,
+        bloom to <code>blur(9px) opacity .55</code>, <code>translateY(2px) scale(.986)</code></td></tr>
+    <tr><td>Glyph contrast</td><td>white on the ramp's deepest stop <code>#6B31EE</code>
+        <span class="ratio">4.29:1</span> — clears the 3:1 floor across the whole gradient</td></tr>
+    <tr><td>React Native</td><td>gradient needs <code>expo-linear-gradient</code>; the blurred-copy
+        bloom is not available — RN substitutes a layered <code>shadowColor</code> in the brand hue
+        (iOS) and an <code>elevation</code> + a soft absolutely-positioned gradient halo (Android).</td></tr>
+  </table>
+</div>
+
+</div></body></html>

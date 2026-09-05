@@ -57,7 +57,7 @@ export function CalculatorPad({ value, onChange }: Props) {
                 onLongPress={isBackspace ? () => handlePress("C") : undefined}
               >
                 {isBackspace ? (
-                  <MaterialIcons name="backspace-outline" size={22} color={theme.text} />
+                  <MaterialIcons name="backspace" size={20} color={theme.text} />
                 ) : (
                   <ThemedText style={styles.keyText}>{key}</ThemedText>
                 )}
@@ -72,22 +72,22 @@ export function CalculatorPad({ value, onChange }: Props) {
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
   container: {
-    gap: 8,
+    gap: 6,
   },
   row: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   key: {
     flex: 1,
-    aspectRatio: 1.9,
+    aspectRatio: 2.6,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: theme.calculator,
     borderRadius: 12,
   },
   keyText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
     color: theme.text,
   },

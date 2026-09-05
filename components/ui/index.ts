@@ -1,4 +1,6 @@
 export { Card } from './card';
+export { GradientButton, GradientFill } from './gradient-button';
+export { FieldCard } from './field-card';
 export { SegmentedControl } from './segmented-control';
 export { Chip } from './chip';
 export { ProgressBar } from './progress-bar';

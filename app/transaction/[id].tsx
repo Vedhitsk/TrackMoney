@@ -9,7 +9,8 @@ import { TransactionFormLayout, type UIType } from "@/components/transaction-for
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { showAppAlert } from "@/store/useAlertStore";
 import { updateTransaction } from "@/db/queries/transactions";
-import { addKeywordsToCategory } from "@/db/queries/categories";
+import { addKeywordsToCategory, createCategory } from "@/db/queries/categories";
+import { createAccount } from "@/db/queries/accounts";
 import type { TransactionType } from "@/types";
 
 import { listPendingRecoveries, createSettlements, type PendingRecovery } from "@/db/queries/settlements";
@@ -213,6 +214,26 @@ export default function EditTransactionScreen() {
     }
   };
 
+  const handleCreateAccount = async (name: string) => {
+    try {
+      const created = await createAccount({ name });
+      await loadAccounts();
+      setDraftField("accountId", created.id);
+    } catch (e) {
+      showAppAlert("Couldn't add account", e instanceof Error ? e.message : "Unknown error");
+    }
+  };
+
+  const handleCreateCategory = async (name: string) => {
+    try {
+      const created = await createCategory({ name });
+      await loadCategories();
+      setDraftField("categoryId", created.id);
+    } catch (e) {
+      showAppAlert("Couldn't add category", e instanceof Error ? e.message : "Unknown error");
+    }
+  };
+
   return (
     <>
       <TransactionFormLayout
@@ -221,12 +242,14 @@ export default function EditTransactionScreen() {
         accounts={accounts}
         accountId={draft.accountId}
         onSelectAccount={(id) => setDraftField("accountId", id)}
+        onCreateAccount={handleCreateAccount}
         toAccounts={accounts.filter((a) => a.id !== draft.accountId)}
         toAccountId={draft.toAccountId}
         onSelectToAccount={(id) => setDraftField("toAccountId", id)}
         categories={categories}
         categoryId={draft.categoryId}
         onSelectCategory={(id) => setDraftField("categoryId", id)}
+        onCreateCategory={handleCreateCategory}
         pendingRecoveries={pendingRecoveries}
         selectedRecoveries={selectedRecoveries}
         allocations={allocations}

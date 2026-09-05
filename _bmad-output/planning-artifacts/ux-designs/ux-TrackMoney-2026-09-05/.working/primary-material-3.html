@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrackMoney · Gradient Pill System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EDEEF0;color:#15171C;
+ font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:40px 24px 90px}
+.lede{background:#fff;border:1px solid #DDDFE4;border-radius:16px;padding:22px 26px;margin-bottom:26px}
+.lede h1{margin:0 0 8px;font-size:26px;letter-spacing:-.4px}
+.lede p{margin:0 0 10px;color:#4A4F5A;max-width:82ch}
+.lede code{background:#F2F3F6;padding:1px 5px;border-radius:4px;font-size:12px}
+.analysis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:16px}
+.an{background:#F6F7F9;border:1px solid #E4E6EB;border-radius:10px;padding:12px 14px;font-size:12.5px;color:#3A3F49}
+.an b{display:block;color:#15171C;margin-bottom:3px;font-size:12px}
+.card{background:#fff;border:1px solid #DDDFE4;border-radius:18px;padding:26px;margin-bottom:24px}
+.card h2{margin:0 0 4px;font-size:20px;letter-spacing:-.3px}
+.card .line{margin:0 0 20px;color:#4A4F5A;font-size:13px;max-width:86ch}
+.subhead{margin:24px 0 12px;font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:#8A909B}
+
+/* ================= THE PILL =================
+   Geometry measured off primary_color_gradiant.png:
+   222 x 78, radius = height/2 (full pill), label 22px/600.
+   Three layers only: diagonal ramp, ambient bloom, faint top sheen.
+   No rim-light. No border. No icon tile.
+   ============================================ */
+.pill{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:222px;height:78px;border-radius:39px;border:0;
+  font:600 22px/1 inherit;font-family:inherit;letter-spacing:-.2px;cursor:default;
+  color:#fff;isolation:isolate;
+}
+.pill::before{                       /* ambient bloom — blurred copy behind */
+  content:'';position:absolute;inset:1px;border-radius:inherit;z-index:-1;
+  background:inherit;filter:blur(13px);opacity:.26;
+}
+.pill::after{                        /* faint sheen, top third only */
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,0) 55%);
+}
+
+.p-primary  {background:linear-gradient(120deg,#5B8CFF 0%,#4066FA 52%,#3448EE 100%);
+             box-shadow:0 6px 16px rgba(64,102,250,.16),0 2px 5px rgba(64,102,250,.10)}
+.p-secondary{background:linear-gradient(120deg,#3C3596 0%,#5A47D6 52%,#7B62F7 100%);
+             box-shadow:0 6px 16px rgba(90,71,214,.16),0 2px 5px rgba(90,71,214,.10)}
+.p-dark     {background:linear-gradient(120deg,#4A4270 0%,#2A2545 52%,#191529 100%);
+             box-shadow:0 6px 16px rgba(42,37,69,.20),0 2px 5px rgba(42,37,69,.13)}
+.p-light    {background:linear-gradient(120deg,#FFFFFF 0%,#F7F5FE 52%,#EDEAFA 100%);
+             box-shadow:0 6px 16px rgba(120,110,190,.13),0 2px 5px rgba(120,110,190,.08);
+             color:#2E2A45}
+.p-light::after{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%)}
+
+/* glow levels, for confirming the new setting */
+.g-min::before{filter:blur(10px);opacity:.14}
+.g-sub::before{filter:blur(13px);opacity:.26}
+.g-old::before{filter:blur(17px);opacity:.55}
+.g-old.p-secondary{box-shadow:0 10px 30px rgba(90,71,214,.30),0 3px 10px rgba(90,71,214,.20)}
+.g-old::after{background:linear-gradient(180deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,0) 55%)}
+
+/* ---- comparison stages ---- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.cmp figure{margin:0}
+.stage{border-radius:14px;border:1px solid #DDDFE4;background:#F2F5FD;
+ display:grid;place-items:center;padding:34px;min-height:300px}
+.stage img{width:100%;max-width:520px;display:block;border-radius:10px}
+.quad{display:grid;grid-template-columns:auto auto;gap:32px 46px}
+figcaption{margin-top:9px;font-size:11.5px;color:#6C7280}
+figcaption code{font-size:10.5px;color:#8A909B}
+
+/* ---- role mapping ---- */
+.maps{display:flex;gap:16px;flex-wrap:wrap}
+.map{flex:1;min-width:400px;border:1px solid #DDDFE4;border-radius:16px;padding:20px;background:#FAFBFC}
+.map h3{margin:0 0 3px;font-size:15px}
+.map .sub{margin:0 0 16px;font-size:12px;color:#6C7280}
+.rolerow{display:flex;align-items:center;gap:14px;padding:10px 0;border-top:1px solid #EBEDF1}
+.rolerow:first-of-type{border-top:0}
+.rolerow .sw{width:76px;height:34px;border-radius:17px;flex:0 0 76px;position:relative}
+.rolerow .txt{font-size:12px;color:#3A3F49}
+.rolerow .txt b{display:block;color:#15171C;font-size:12.5px}
+
+/* ---- applied at app scale ---- */
+.app{display:flex;gap:16px;flex-wrap:wrap}
+.pane{flex:1;min-width:430px;border:1px solid;border-radius:16px;padding:22px;position:relative}
+.pane .mode{position:absolute;top:11px;right:15px;font-size:9.5px;letter-spacing:1px;
+ text-transform:uppercase}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cell.wide{grid-column:1/-1}
+.cell label{display:block;font-size:9.5px;letter-spacing:.9px;text-transform:uppercase;
+ font-weight:700;margin-bottom:10px}
+
+.pill.cta{width:100%;height:52px;border-radius:26px;font-size:15px;font-weight:700}
+.pill.cta::before{filter:blur(11px);opacity:.22}
+.pill.sm{width:auto;padding:0 20px;height:42px;border-radius:21px;font-size:13.5px;font-weight:600}
+.pill.sm::before{filter:blur(9px);opacity:.20}
+.pill.fab{width:60px;height:60px;border-radius:30px;padding:0}
+.pill.fab svg{width:26px;height:26px}
+.pill.fab::before{filter:blur(12px);opacity:.28}
+.pill.pressed{filter:saturate(1.06) brightness(.93);transform:translateY(1px) scale(.988)}
+.pill.pressed::before{filter:blur(7px);opacity:.14}
+.pill.dis{background:none!important;box-shadow:none!important}
+.pill.dis::before,.pill.dis::after{display:none}
+
+.seg{display:flex;gap:4px;padding:4px;border-radius:26px}
+.seg .opt{flex:1;text-align:center;padding:11px 6px;border-radius:22px;font-size:12.5px;font-weight:600}
+.seg .pill{flex:1;width:auto;height:auto;padding:11px 6px;border-radius:22px;font-size:12.5px;
+ font-weight:600}
+.seg .pill::before{filter:blur(8px);opacity:.18}
+
+.tabs{display:flex;align-items:center;justify-content:space-around;padding:14px 8px;
+ border:1px solid;border-radius:16px}
+.tabs .t{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:15px;flex:1}
+.tabs .t b{font-size:9px;font-weight:600}
+.pill.tabfab{width:52px;height:52px;border-radius:26px;margin-top:-26px;flex:0 0 52px;padding:0}
+.pill.tabfab svg{width:23px;height:23px}
+.pill.tabfab::before{filter:blur(11px);opacity:.30}
+
+.specs{border-collapse:collapse;font-size:12px;width:100%}
+.specs td{padding:7px 10px;border-top:1px solid #EBEDF1;vertical-align:top}
+.specs td:first-child{color:#6C7280;width:170px}
+.specs code{font-size:11px;color:#15171C;background:#F6F7F9;padding:1px 5px;border-radius:4px}
+.ratio{font-weight:700;font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;
+ font-size:10.5px;background:#E2F5EA;color:#116B41}
+.note{background:#F6F7F9;border-left:3px solid #15171C;border-radius:0 8px 8px 0;
+ padding:12px 16px;margin:16px 0 0;font-size:12.5px;color:#3A3F49}
+.note b{color:#15171C}
+</style></head>
+<body><div class="wrap">
+
+<div class="lede">
+  <h1>Gradient pill system — from <code>primary_color_gradiant.png</code></h1>
+  <p>This reference is a different language from the last one, so I have dropped the squircle-and-rim
+     design entirely. What this one actually is, layer by layer:</p>
+  <div class="analysis">
+    <div class="an"><b>Full pill</b>Radius equals half the height. Not a squircle — the ends are
+      true semicircles, which is what gives it the soft, friendly read.</div>
+    <div class="an"><b>Diagonal ramp</b>About 120°, running top-left to bottom-right. The range is
+      narrow — roughly one step of value — and never reaches black.</div>
+    <div class="an"><b>Ambient bloom</b>A same-hue halo that is visible <em>above</em> the button as
+      well as below it. It is light, not shadow — which is why these read as glowing rather than
+      floating.</div>
+    <div class="an"><b>No rim-light</b>Crucially, there is no bright inner edge and no border. The
+      surface is flat and soft. This is the single biggest difference from the previous reference.</div>
+    <div class="an"><b>Label only</b>Centred text, semibold, generous horizontal padding. No icon
+      tile, no divider, no split action.</div>
+    <div class="an"><b>Four roles</b>Primary (blue), Secondary (indigo→violet), Dark, and Light —
+      a complete button family rather than a single accent.</div>
+  </div>
+</div>
+
+<!-- ============ glow level ============ -->
+<div class="card">
+  <h2>Glow level — dialled back</h2>
+  <p class="line">You asked for less. Everything below is now set to <b>Subtle</b>: the bloom's
+     opacity dropped from .55 to .26 and its blur from 17px to 13px, the drop shadows roughly halved,
+     and the top sheen went from .13 to .06. <b>Minimal</b> is one further step down if this is still
+     too much. The gradient, shape and geometry are identical in all three — only the light changes.</p>
+  <div class="stage" style="min-height:210px;padding:40px">
+    <div style="display:flex;gap:52px;align-items:center;flex-wrap:wrap;justify-content:center">
+      <figure style="margin:0;text-align:center">
+        <button class="pill p-secondary g-min">Minimal</button>
+        <figcaption>blur 10px · opacity .14</figcaption></figure>
+      <figure style="margin:0;text-align:center">
+        <button class="pill p-secondary g-sub">Subtle</button>
+        <figcaption><b>blur 13px · opacity .26 — set</b></figcaption></figure>
+      <figure style="margin:0;text-align:center">
+        <button class="pill p-secondary g-old">Was</button>
+        <figcaption>blur 17px · opacity .55</figcaption></figure>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 1:1 comparison ============ -->
+<div class="card">
+  <h2>Against your reference, 1:1</h2>
+  <p class="line">Your image at native size puts each button at 222×78. Mine are built to exactly
+     that, on the same pale-blue ground, in the same 2×2 arrangement.</p>
+  <div class="cmp">
+    <figure>
+      <div class="stage"><img src="../imports/primary_color_gradiant.png" alt="reference"></div>
+      <figcaption>yours · <code>imports/primary_color_gradiant.png</code></figcaption>
+    </figure>
+    <figure>
+      <div class="stage">
+        <div class="quad">
+          <button class="pill p-primary">Primary</button>
+          <button class="pill p-dark">Dark</button>
+          <button class="pill p-secondary">Secondary</button>
+          <button class="pill p-light">Light</button>
+        </div>
+      </div>
+      <figcaption>mine · three layers: diagonal ramp, blurred same-hue bloom, faint top sheen</figcaption>
+    </figure>
+  </div>
+</div>
+
+<!-- ============ role mapping ============ -->
+<div class="card">
+  <h2>Mapping the four roles onto TrackMoney</h2>
+  <p class="line">The reference calls its blue “Primary”. TrackMoney's identity is already violet,
+     so there are two honest ways to land this. Both use all four pills; they differ only in which
+     one carries the brand.</p>
+  <div class="maps">
+
+    <div class="map">
+      <h3>A · Violet-led — keeps your identity</h3>
+      <p class="sub">The indigo→violet ramp becomes Primary. Blue demotes to Secondary. Nothing about
+         TrackMoney's brand recognition changes.</p>
+      <div class="rolerow"><span class="sw p-secondary"></span><span class="txt">
+        <b>Primary — indigo → violet</b>FAB · Save · active segment · sheet confirm</span></div>
+      <div class="rolerow"><span class="sw p-primary"></span><span class="txt">
+        <b>Secondary — blue</b>New account · New category · Add budget</span></div>
+      <div class="rolerow"><span class="sw p-dark"></span><span class="txt">
+        <b>Dark</b>Neutral actions on the light theme — Manage, Copy previous</span></div>
+      <div class="rolerow"><span class="sw p-light"></span><span class="txt">
+        <b>Light</b>The same neutral actions on the dark theme</span></div>
+    </div>
+
+    <div class="map">
+      <h3>B · Blue-led — the reference as drawn</h3>
+      <p class="sub">Blue becomes the brand. Cooler and more banking-conventional, but it retires the
+         violet the app is currently known by.</p>
+      <div class="rolerow"><span class="sw p-primary"></span><span class="txt">
+        <b>Primary — blue</b>FAB · Save · active segment · sheet confirm</span></div>
+      <div class="rolerow"><span class="sw p-secondary"></span><span class="txt">
+        <b>Secondary — indigo → violet</b>New account · New category · Add budget</span></div>
+      <div class="rolerow"><span class="sw p-dark"></span><span class="txt">
+        <b>Dark</b>Neutral actions on the light theme</span></div>
+      <div class="rolerow"><span class="sw p-light"></span><span class="txt">
+        <b>Light</b>The same neutral actions on the dark theme</span></div>
+    </div>
+  </div>
+  <div class="note"><b>My recommendation is A.</b> The gradient does the work of feeling new — you do
+     not also need a hue change to get there, and keeping violet means the icon, the splash and every
+     screenshot you already have stay correct. Blue then earns a real job as Secondary rather than
+     competing with the brand.</div>
+</div>
+
+<!-- ============ applied ============ -->
+<div class="card">
+  <h2>Mapping A, applied at real app scale</h2>
+  <p class="line">Controls at their shipping sizes — 52–60px. The bloom scales down with them; a
+     17px halo on a 52px button would smear.</p>
+
+  <div class="app">
+    <!-- dark theme -->
+    <div class="pane" style="background:#0A0A0F;border-color:#2C2A38;color:#F3F2F7">
+      <span class="mode" style="color:#8C8A9E">app · dark</span>
+      <div class="grid">
+        <div class="cell"><label style="color:#8C8A9E">FAB — primary</label>
+          <button class="pill fab p-secondary"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="3" stroke-linecap="round"
+            ><path d="M12 5.5v13M5.5 12h13"/></svg></button></div>
+        <div class="cell"><label style="color:#8C8A9E">Secondary actions</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="pill sm p-primary">New account</button>
+            <button class="pill sm p-light">Manage</button>
+          </div></div>
+        <div class="cell"><label style="color:#8C8A9E">Primary CTA</label>
+          <button class="pill cta p-secondary">Save transaction</button></div>
+        <div class="cell"><label style="color:#8C8A9E">Pressed</label>
+          <button class="pill cta p-secondary pressed">Save transaction</button></div>
+        <div class="cell wide"><label style="color:#8C8A9E">Disabled — no gradient, no bloom</label>
+          <button class="pill cta dis" style="background:#221F2D;color:#8C8A9E;
+            box-shadow:inset 0 0 0 1px #333042">Enter an amount</button></div>
+        <div class="cell wide"><label style="color:#8C8A9E">Segmented — active segment carries the ramp</label>
+          <div class="seg" style="background:#221F2D">
+            <button class="pill p-secondary">Expense</button>
+            <span class="opt" style="color:#ADAABD">Income</span>
+            <span class="opt" style="color:#ADAABD">Transfer</span>
+            <span class="opt" style="color:#ADAABD">Settle</span>
+          </div></div>
+        <div class="cell wide"><label style="color:#8C8A9E">Tab bar, in place</label>
+          <div class="tabs" style="background:#16151D;border-color:#2C2A38">
+            <span class="t" style="color:#A78BFA">⌂<b>Home</b></span>
+            <span class="t" style="color:#8C8A9E">☰<b>Activity</b></span>
+            <button class="pill tabfab p-secondary"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round"
+              ><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            <span class="t" style="color:#8C8A9E">◺<b>Insights</b></span>
+            <span class="t" style="color:#8C8A9E">⠿<b>Manage</b></span>
+          </div></div>
+      </div>
+    </div>
+
+    <!-- light theme -->
+    <div class="pane" style="background:#F4F5FA;border-color:#E2E4EE;color:#121118">
+      <span class="mode" style="color:#73718A">app · light</span>
+      <div class="grid">
+        <div class="cell"><label style="color:#73718A">FAB — primary</label>
+          <button class="pill fab p-secondary"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="3" stroke-linecap="round"
+            ><path d="M12 5.5v13M5.5 12h13"/></svg></button></div>
+        <div class="cell"><label style="color:#73718A">Secondary actions</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="pill sm p-primary">New account</button>
+            <button class="pill sm p-dark">Manage</button>
+          </div></div>
+        <div class="cell"><label style="color:#73718A">Primary CTA</label>
+          <button class="pill cta p-secondary">Save transaction</button></div>
+        <div class="cell"><label style="color:#73718A">Pressed</label>
+          <button class="pill cta p-secondary pressed">Save transaction</button></div>
+        <div class="cell wide"><label style="color:#73718A">Disabled — no gradient, no bloom</label>
+          <button class="pill cta dis" style="background:#E8E7F0;color:#73718A;
+            box-shadow:inset 0 0 0 1px #DEDDE9">Enter an amount</button></div>
+        <div class="cell wide"><label style="color:#73718A">Segmented — active segment carries the ramp</label>
+          <div class="seg" style="background:#E8E7F0">
+            <button class="pill p-secondary">Expense</button>
+            <span class="opt" style="color:#56545F">Income</span>
+            <span class="opt" style="color:#56545F">Transfer</span>
+            <span class="opt" style="color:#56545F">Settle</span>
+          </div></div>
+        <div class="cell wide"><label style="color:#73718A">Tab bar, in place</label>
+          <div class="tabs" style="background:#FFFFFF;border-color:#E2E4EE">
+            <span class="t" style="color:#5A47D6">⌂<b>Home</b></span>
+            <span class="t" style="color:#73718A">☰<b>Activity</b></span>
+            <button class="pill tabfab p-secondary"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round"
+              ><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            <span class="t" style="color:#73718A">◺<b>Insights</b></span>
+            <span class="t" style="color:#73718A">⠿<b>Manage</b></span>
+          </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ spec ============ -->
+<div class="card">
+  <h2>The spec</h2>
+  <table class="specs">
+    <tr><td>Primary ramp</td><td><code>linear-gradient(120deg, #3C3596 0%, #5A47D6 52%, #7B62F7 100%)</code><br>
+      white label, worst contrast on the lightest stop <span class="ratio">4.26:1</span></td></tr>
+    <tr><td>Secondary ramp</td><td><code>linear-gradient(120deg, #5B8CFF 0%, #4066FA 52%, #3448EE 100%)</code><br>
+      white label, worst contrast <span class="ratio">3.16:1</span></td></tr>
+    <tr><td>Dark ramp</td><td><code>linear-gradient(120deg, #4A4270 0%, #2A2545 52%, #191529 100%)</code><br>
+      white label, worst contrast <span class="ratio">9.11:1</span></td></tr>
+    <tr><td>Light ramp</td><td><code>linear-gradient(120deg, #FFFFFF 0%, #F7F5FE 52%, #EDEAFA 100%)</code><br>
+      <code>#2E2A45</code> label, worst contrast <span class="ratio">11.58:1</span></td></tr>
+    <tr><td>Radius</td><td><code>height ÷ 2</code> — always a true pill, at every size</td></tr>
+    <tr><td>Bloom</td><td>A blurred copy of the pill behind it, at <b>Subtle</b>:
+      <code>blur(13px) opacity .26</code> at 78px tall; <code>blur(11px) opacity .22</code> on a CTA;
+      <code>blur(12px) opacity .28</code> on the FAB; <code>blur(8px) opacity .18</code> on a
+      segment. Plus <code>0 6px 16px</code> at 16% and <code>0 2px 5px</code> at 10% in the ramp's
+      mid hue.</td></tr>
+    <tr><td>Sheen</td><td><code>linear-gradient(180deg, rgba(255,255,255,.06), transparent 55%)</code>
+      — deliberately barely there. On the Light pill it rises to .28, because a white pill needs the
+      sheen to read as curved at all.</td></tr>
+    <tr><td>Pressed</td><td><code>saturate(1.06) brightness(.93)</code>, bloom to
+      <code>blur(7px) opacity .14</code>, <code>translateY(1px) scale(.988)</code>. 120ms in,
+      180ms out.</td></tr>
+    <tr><td>Disabled</td><td>Gradient and bloom removed entirely — a flat track fill with a hairline.
+      A disabled control must never glow.</td></tr>
+    <tr><td>React Native</td><td><code>expo-linear-gradient</code> for the ramp (needs installing).
+      The blurred-copy bloom has no RN equivalent: iOS uses layered <code>shadowColor</code> in the
+      ramp's mid hue; Android has no coloured shadow before API 28, so it gets an absolutely-positioned
+      gradient halo behind the control instead.</td></tr>
+  </table>
+  <div class="note"><b>One thing to watch.</b> The bloom is the whole character of this system, and it
+     is the one part Android renders worst. If it has to be dropped on older devices the pills still
+     work — they just read flatter. I would rather that than a fake blur that costs frames on the
+     Add Transaction screen.</div>
+</div>
+
+</div></body></html>

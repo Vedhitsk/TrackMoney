@@ -3,11 +3,11 @@ import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AppState, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { DonutChart } from "@/components/donut-chart";
+import { GlassScrim, useTabBarHeight, useTopInset } from "@/components/glass-scrim";
 import {
   AmountText,
   CashFlowLineChart,
@@ -78,7 +78,8 @@ export default function HomeScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const topInset = useTopInset();
+  const tabBarHeight = useTabBarHeight();
 
   const {
     categories,
@@ -202,7 +203,15 @@ export default function HomeScreen() {
   const pendingCount = pendingTransactions.length;
 
   return (
-    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
+    <View style={styles.screen}>
+      <ScrollView
+        style={styles.scrollBg}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: topInset + 8, paddingBottom: tabBarHeight + Spacing.lg },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
       <Text style={styles.headerTitle}>TrackMoney</Text>
 
       <SectionLabel style={styles.heroLabel}>
@@ -278,20 +287,30 @@ export default function HomeScreen() {
               centerLabel={formatMoneyINRWhole(totalExpense)}
               centerSub="Spent"
             />
-            <ScrollView style={styles.legendWrap} showsVerticalScrollIndicator={false}>
+            <View style={styles.legendWrap}>
               <DonutLegend data={donutData} showAmount={false} />
-            </ScrollView>
+            </View>
           </View>
         </Card>
       )}
+      </ScrollView>
+
+      <GlassScrim edge="top" />
     </View>
   );
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     backgroundColor: theme.background,
+  },
+  scrollBg: {
+    flex: 1,
+    backgroundColor: theme.background,
+  },
+  container: {
+    flexGrow: 1,
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.lg,
   },
@@ -337,10 +356,12 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   insight: {
     marginTop: Spacing.lg,
   },
+  // No `flex: 1` here. It used to pin this card to the remaining viewport
+  // height inside a `flexGrow: 1` content container, which meant Home could
+  // never grow past one screen and the legend scrolled inside the card instead
+  // of the page scrolling. The card sizes to its content; the page scrolls.
   donutCard: {
     marginTop: Spacing.lg,
-    flex: 1,
-    minHeight: 210,
   },
   donutLabel: {
     marginBottom: Spacing.md,
@@ -348,7 +369,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   donutRow: {
     flexDirection: "row",
     gap: Spacing.lg,
-    flex: 1,
+    alignItems: "center",
   },
   legendWrap: {
     flex: 1,

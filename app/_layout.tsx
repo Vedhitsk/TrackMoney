@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import { Platform, View } from "react-native";
 import React from "react";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { backfillFromInbox } from "@/lib/sms/smsIngestion";
@@ -103,6 +104,9 @@ export default function RootLayout() {
   };
 
   return (
+    // Gesture Handler v2 requires this at the root, or the grab-bar drag on
+    // Add Transaction and the picker sheets silently do nothing on Android.
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ThemeProvider value={getNavigationTheme(theme, colorScheme === "dark")}>
       <View style={{ flex: 1, backgroundColor: theme.background }}>
         <Stack
@@ -132,5 +136,6 @@ export default function RootLayout() {
       />
       <AppAlert />
     </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

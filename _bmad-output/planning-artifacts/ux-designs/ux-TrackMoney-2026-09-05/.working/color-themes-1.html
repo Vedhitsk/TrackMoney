@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrackMoney · Primary Material &amp; Colour</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EDEEF0;color:#15171C;
+ font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1220px;margin:0 auto;padding:40px 24px 80px}
+.lede{background:#fff;border:1px solid #DDDFE4;border-radius:16px;padding:22px 26px;margin-bottom:30px}
+.lede h1{margin:0 0 6px;font-size:26px;letter-spacing:-.4px}
+.lede p{margin:0 0 10px;color:#4A4F5A;max-width:80ch}
+.rule{background:#F6F7F9;border-left:3px solid #15171C;border-radius:0 8px 8px 0;
+ padding:12px 16px;margin:14px 0 0;font-size:13px;color:#3A3F49}
+.rule+.rule{margin-top:8px}
+.dir{background:#fff;border:1px solid #DDDFE4;border-radius:18px;padding:26px;margin-bottom:28px}
+.dir header h2{margin:0 0 4px;font-size:22px;letter-spacing:-.3px}
+.register{margin:0 0 8px;color:#4A4F5A;max-width:86ch}
+.why{margin:0 0 4px;color:#4A4F5A;max-width:86ch;font-size:13px}
+.why b{color:#15171C}
+.subhead{margin:26px 0 12px;font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:#8A909B}
+.heroes{display:flex;gap:16px;flex-wrap:wrap}
+.hero{flex:1;min-width:430px;border:1px solid;border-radius:16px;padding:20px;position:relative}
+.heromode{position:absolute;top:10px;right:14px;font-size:9.5px;letter-spacing:1px;text-transform:uppercase}
+.herorow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.herorow:last-of-type{margin-bottom:12px}
+.mpill{display:inline-flex;align-items:center;gap:10px;border-radius:16px;padding:11px 8px 11px 11px;
+ font:600 15px/1 inherit;font-family:inherit;cursor:default}
+.mpill.sm{font-size:13px;padding:9px 14px 9px 9px}
+.mpill span{padding-right:4px}
+.mtile{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-style:normal;
+ font-size:16px;font-weight:700;flex:0 0 26px}
+.mpill.sm .mtile{width:22px;height:22px;border-radius:7px;font-size:14px;flex:0 0 22px}
+.mdiv{width:1px;align-self:stretch;margin:-11px 0;display:block}
+.mchev{font-style:normal;padding:0 12px 4px;font-size:16px}
+.mfab{width:56px;height:56px;border-radius:50%;font-size:26px;display:grid;place-items:center;
+ font-family:inherit;cursor:default;padding-bottom:4px}
+.mcta{flex:1;min-width:190px;border-radius:999px;padding:14px;font:700 14px inherit;
+ font-family:inherit;cursor:default}
+.mseg{display:flex;gap:3px;padding:3px;border-radius:999px}
+.mseg span{padding:8px 15px;border-radius:999px;font-size:12.5px;font-weight:600}
+.ramprow{display:flex;align-items:center;gap:7px;font-size:10px;flex-wrap:wrap}
+.ramprow i{width:22px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.3)}
+.ramprow code{font-size:9.5px}
+.sep{background:#F8F9FB;border:1px solid #E4E6EB;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.sephead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.seplabel{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#8A909B;font-weight:700}
+.sepnote{font-size:11px;color:#6C7280}
+.sepnote small{color:#9BA1AC;margin-left:3px}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:6px}
+.cat{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #E4E6EB;
+ border-radius:8px;padding:6px 8px;font-size:10.5px}
+.cat i{width:17px;height:17px;border-radius:5px;flex:0 0 17px}
+.cat b{font-weight:600}
+.cat code{color:#8A909B;font-size:9.5px}
+.cat u{margin-left:auto;text-decoration:none;color:#9BA1AC;font-size:9.5px;font-variant-numeric:tabular-nums}
+.phones{display:flex;gap:18px;flex-wrap:wrap}
+.phone{width:306px;border-radius:26px;overflow:hidden;border:1px solid rgba(0,0,0,.16);
+ box-shadow:0 10px 28px rgba(15,18,25,.16);display:flex;flex-direction:column}
+.statusglass{padding:8px 14px;display:flex;justify-content:space-between;font-size:10px;
+ letter-spacing:.4px;backdrop-filter:blur(10px)}
+.pbody{padding:12px 14px 16px;display:flex;flex-direction:column;gap:11px;flex:1}
+.ptitle{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.card{border:1px solid;border-radius:14px;padding:12px}
+.donutrow{display:flex;gap:14px;align-items:center}
+.donut{width:86px;height:86px;border-radius:50%;flex:0 0 86px;display:grid;place-items:center}
+.donut span{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;line-height:1.1}
+.donut b{font-size:12px}
+.donut em{font-size:9px;font-style:normal}
+.legend{list-style:none;margin:0;padding:0;flex:1;display:flex;flex-direction:column;gap:7px;font-size:11.5px}
+.legend li{display:flex;align-items:center;gap:7px}
+.legend li i{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.legend li b{margin-left:auto;font-weight:600}
+.lrow{display:flex;justify-content:space-between;align-items:center;padding:9px 2px;font-size:12.5px}
+.lrow b{font-weight:700}
+.lrow em{font-style:normal}
+.fieldrow{display:flex;gap:10px}
+.field{flex:1;min-width:0}
+.field label{font-size:9px;font-weight:700;letter-spacing:.9px;display:block;margin-bottom:5px}
+.fbox{border:1px solid;border-radius:12px;padding:11px 12px;display:flex;justify-content:space-between;
+ align-items:center;font-size:12.5px;font-weight:600}
+.fbox em{font-style:normal}
+.cta{border-radius:999px;padding:12px;font:700 13px inherit;font-family:inherit;margin-top:auto;cursor:default}
+.tabglass{display:flex;align-items:center;justify-content:space-around;padding:9px 6px 13px;
+ backdrop-filter:blur(14px)}
+.tabglass span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;flex:1}
+.tabglass b{font-size:8.5px;font-weight:600}
+.fab{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;
+ font-style:normal;margin-top:-22px;flex:0 0 44px}
+.tokens{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:18px}
+.tokcol{flex:1;min-width:300px}
+.tokcol h3{margin:0 0 10px;font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:#8A909B}
+.swgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:7px}
+.sw{display:flex;align-items:center;gap:7px;font-size:10.5px;background:#F8F9FB;
+ border:1px solid #E4E6EB;border-radius:8px;padding:5px 7px}
+.sw i{width:16px;height:16px;border-radius:4px;flex:0 0 16px}
+.sw b{font-weight:600}
+.sw code{margin-left:auto;color:#6C7280;font-size:9.5px}
+.checkwrap{display:flex;gap:22px;flex-wrap:wrap}
+.checks{flex:1;min-width:340px;border-collapse:collapse;font-size:11.5px}
+.checks caption{text-align:left;font-size:10px;letter-spacing:.8px;text-transform:uppercase;
+ color:#8A909B;padding-bottom:7px;font-weight:700}
+.checks td{padding:5px 8px;border-top:1px solid #EBEDF1;vertical-align:middle}
+.checks td.note{color:#8A909B;font-size:10.5px}
+.checks td:last-child{text-align:right;width:82px}
+.ratio{font-weight:700;font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;font-size:10.5px}
+.ratio.pass{background:#E2F5EA;color:#116B41}
+.ratio.fail{background:#FBE4E4;color:#9C2A24}
+.ratio.info{background:#EEF0F4;color:#5A606C}
+.currentwrap{background:#fff;border:1px solid #DDDFE4;border-radius:18px;padding:24px 26px;margin-bottom:28px}
+.currentwrap h2{margin:0 0 4px;font-size:18px}
+.currentwrap p{margin:0 0 16px;color:#4A4F5A;max-width:86ch;font-size:13px}
+</style></head>
+<body><div class="wrap">
+
+<div class="lede">
+  <h1>TrackMoney — primary material &amp; colour directions</h1>
+  <p>Four directions, each a complete system in light and dark. The primary accent is no longer a
+     flat fill — it is a <b>material</b>, built the way the button you attached is built.</p>
+  <div class="rule"><b>The material, in four layers:</b>
+     a vertical gradient ramp (light stop → brand → deep stop);
+     a 1px rim-light along the top inner edge, so the control reads as lit from above;
+     a coloured bloom beneath it rather than a neutral grey shadow;
+     and a translucent rounded tile carrying the glyph. Pressed state compresses the ramp,
+     tightens the bloom and drops 2px.</div>
+  <div class="rule"><b>Brand and category are separate systems.</b> The brand material is chrome only
+     — FAB, primary CTA, active tab, active segment. Categories are drawn from a 12-hue master
+     palette, and each direction automatically keeps the 10 furthest from its own brand hue in CIE
+     Lab. Two floors are enforced: ΔE ≥ 28 from brand, and ≥ 3:1 fill contrast on the card surface.</div>
+</div>
+
+<div class="currentwrap">
+  <h2>Where the shipped build stands</h2>
+  <p><b>SUPERSEDED</b> — this board explored four flat-fill hue directions. It was replaced by
+     <code>primary-material-3.html</code>, which follows the gradient-pill reference instead. Kept
+     for the audit of the shipped palette below, which still stands.</p>
+  <p>Three measured problems. Tertiary text (placeholders like “Add a note”) fails contrast in both
+     modes. Brand violet is also category colour #1 — ΔE 0 — so the FAB and your largest spending
+     slice are the same colour. And the primary controls have no material at all: flat fill,
+     neutral shadow.</p>
+  <p><b>Correction.</b> An earlier version of this page said dark cards sat “only 1.36:1” above the
+     background. That figure was wrong, and the metric was the wrong one to use: at near-black the
+     +0.05 flare term in the WCAG formula dominates, so <em>any</em> two dark greys score about
+     1.1:1 no matter how different they look. Surface separation is properly measured in perceptual
+     L*. On that measure the shipped dark theme steps background → surface by <b>ΔL* 4.83</b> and
+     surface → elevated by <b>ΔL* 3.56</b>, against a 6–9 target — genuinely shallow, but for a
+     reason the ratio column below cannot show.</p>
+  <div class="checkwrap"><table class="checks"><caption>shipped · light</caption><tr><td>Tertiary text on surface</td><td><span class="ratio fail">2.80:1</span></td></tr><tr><td>Secondary text on surface</td><td><span class="ratio pass">5.29:1</span></td></tr><tr><td>Surface vs background</td><td><span class="ratio info">1.10:1</span></td></tr><tr><td>Elevated vs surface</td><td><span class="ratio info">1.00:1</span></td></tr><tr><td>Brand vs largest category</td><td><span class="ratio fail">ΔE 0</span></td></tr><tr><td>Primary material</td><td><span class="ratio fail">none</span></td></tr></table><table class="checks"><caption>shipped · dark</caption><tr><td>Tertiary text on surface</td><td><span class="ratio fail">3.38:1</span></td></tr><tr><td>Secondary text on surface</td><td><span class="ratio pass">6.24:1</span></td></tr><tr><td>Surface vs background</td><td><span class="ratio info">1.10:1</span></td></tr><tr><td>Elevated vs surface</td><td><span class="ratio info">1.08:1</span></td></tr><tr><td>Brand vs largest category</td><td><span class="ratio fail">ΔE 0</span></td></tr><tr><td>Primary material</td><td><span class="ratio fail">none</span></td></tr></table></div>
+</div>
+
+
+<section class="dir" id="violet">
+  <header><h2>Violet Signal</h2>
+    <p class="register">Energetic, contemporary, screen-native. Your shipped identity — but the accent stops being a flat fill and becomes a material: gradient ramp, rim-light, coloured bloom.</p>
+    <p class="why"><b>Why it holds up:</b> Closest to the button you attached. Nothing about your brand moves; what changes is that violet becomes chrome-only and gains dimension, while categories get a vivid 10-hue set that stays clear of the violet lane.</p></header>
+  <h4 class="subhead">1 · the primary material — every chrome control, both modes</h4>
+  <div class="heroes">
+<div class="hero" style="background:#F4F3F7;border-color:#E4E2EC">
+  <span class="heromode" style="color:#73718A">light</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#7C3AED 0%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(124,58,237,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#EAE8F1;color:#73718A;border:1px solid #E4E2EC">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#EAE8F1">
+      <span class="on" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">Expense</span>
+      <span style="color:#56545F">Income</span>
+      <span style="color:#56545F">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#73718A">ramp</span>
+    <i style="background:#9B6BFF"></i><code style="color:#56545F">#9B6BFF</code>
+    <i style="background:#7C3AED"></i><code style="color:#56545F">#7C3AED</code>
+    <i style="background:#6321C9"></i><code style="color:#56545F">#6321C9</code>
+    <span style="color:#73718A">bloom rgba(124,58,237,0.46)</span>
+  </div>
+</div>
+<div class="hero" style="background:#0A0A0F;border-color:#333042">
+  <span class="heromode" style="color:#8C8A9E">dark</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#8B5CF6 0%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(139,92,246,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#221F2D;color:#8C8A9E;border:1px solid #333042">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#221F2D">
+      <span class="on" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">Expense</span>
+      <span style="color:#ADAABD">Income</span>
+      <span style="color:#ADAABD">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#8C8A9E">ramp</span>
+    <i style="background:#A883FF"></i><code style="color:#ADAABD">#A883FF</code>
+    <i style="background:#8B5CF6"></i><code style="color:#ADAABD">#8B5CF6</code>
+    <i style="background:#6D28D9"></i><code style="color:#ADAABD">#6D28D9</code>
+    <span style="color:#8C8A9E">bloom rgba(139,92,246,0.46)</span>
+  </div>
+</div></div>
+  <h4 class="subhead">2 · categories — chosen by distance from the brand hue</h4>
+  
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">light · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 50</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">3.23:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#E85D3C"></i><b>Coral</b><code>#E85D3C</code><u>ΔE 126</u></div><div class="cat"><i style="background:#C87F06"></i><b>Amber</b><code>#C87F06</code><u>ΔE 151</u></div><div class="cat"><i style="background:#7E9418"></i><b>Lime</b><code>#7E9418</code><u>ΔE 163</u></div><div class="cat"><i style="background:#12A05E"></i><b>Emerald</b><code>#12A05E</code><u>ΔE 156</u></div><div class="cat"><i style="background:#0D9E96"></i><b>Teal</b><code>#0D9E96</code><u>ΔE 125</u></div><div class="cat"><i style="background:#1685D6"></i><b>Sky</b><code>#1685D6</code><u>ΔE 71</u></div><div class="cat"><i style="background:#C43CA8"></i><b>Fuchsia</b><code>#C43CA8</code><u>ΔE 50</u></div><div class="cat"><i style="background:#E03A67"></i><b>Rose</b><code>#E03A67</code><u>ΔE 93</u></div><div class="cat"><i style="background:#9C6A4E"></i><b>Mocha</b><code>#9C6A4E</code><u>ΔE 114</u></div><div class="cat"><i style="background:#6E7787"></i><b>Slate</b><code>#6E7787</code><u>ΔE 95</u></div></div>
+</div>
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">dark · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 41</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">5.45:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#FF7043"></i><b>Coral</b><code>#FF7043</code><u>ΔE 122</u></div><div class="cat"><i style="background:#FFB020"></i><b>Amber</b><code>#FFB020</code><u>ΔE 153</u></div><div class="cat"><i style="background:#C6D93B"></i><b>Lime</b><code>#C6D93B</code><u>ΔE 165</u></div><div class="cat"><i style="background:#2FD37A"></i><b>Emerald</b><code>#2FD37A</code><u>ΔE 155</u></div><div class="cat"><i style="background:#14C8C0"></i><b>Teal</b><code>#14C8C0</code><u>ΔE 116</u></div><div class="cat"><i style="background:#3DAFFF"></i><b>Sky</b><code>#3DAFFF</code><u>ΔE 65</u></div><div class="cat"><i style="background:#E85BD0"></i><b>Fuchsia</b><code>#E85BD0</code><u>ΔE 41</u></div><div class="cat"><i style="background:#FF5C8A"></i><b>Rose</b><code>#FF5C8A</code><u>ΔE 81</u></div><div class="cat"><i style="background:#B98060"></i><b>Mocha</b><code>#B98060</code><u>ΔE 103</u></div><div class="cat"><i style="background:#8A93A5"></i><b>Slate</b><code>#8A93A5</code><u>ΔE 80</u></div></div>
+</div>
+  <h4 class="subhead">3 · in place</h4>
+  <div class="phones">
+<div class="phone" style="background:#F4F3F7;color:#121118">
+  <div class="statusglass" style="background:rgba(255,255,255,.74);border-bottom:1px solid #EFEEF4">
+    <span style="color:#73718A">16:15</span>
+    <span style="color:#73718A">light</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#FFFFFF;border-color:#E4E2EC">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#E85D3C 0 63%, #7E9418 63% 97%, #0D9E96 97% 100%)">
+          <span style="background:#FFFFFF"><b>₹7,920</b>
+            <em style="color:#56545F">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#E85D3C"></i>Entertainment<b style="color:#56545F">63%</b></li>
+          <li><i style="background:#7E9418"></i>Food &amp; Dining<b style="color:#56545F">34%</b></li>
+          <li><i style="background:#0D9E96"></i>Transport<b style="color:#56545F">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#FFFFFF;border-color:#E4E2EC">
+      <div class="lrow"><span style="color:#56545F">Swiggy · Food</span>
+        <b style="color:#CE3B49">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EFEEF4">
+        <span style="color:#56545F">Salary · Sept</span>
+        <b style="color:#0A6B3E">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EFEEF4">
+        <span style="color:#56545F">Note</span>
+        <em style="color:#73718A">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#56545F">ACCOUNT</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E4E2EC">
+          <span>💳 Card</span><em style="color:#73718A">⌄</em></div></div>
+      <div class="field"><label style="color:#56545F">CATEGORY</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E4E2EC">
+          <span style="color:#73718A">Category</span>
+          <em style="color:#73718A">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(255,255,255,.74);border-top:1px solid #EFEEF4">
+    <span style="color:#6D28D9">⌂<b>Home</b></span>
+    <span style="color:#73718A">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#9B6BFF 0%,#7C3AED 54%,#6321C9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(124,58,237,0.46),0 2px 6px rgba(124,58,237,0.3)">+</i>
+    <span style="color:#73718A">↗<b>Insights</b></span>
+    <span style="color:#73718A">∷<b>Manage</b></span>
+  </div>
+</div>
+<div class="phone" style="background:#0A0A0F;color:#F3F2F7">
+  <div class="statusglass" style="background:rgba(20,20,24,.74);border-bottom:1px solid #211F2B">
+    <span style="color:#8C8A9E">16:15</span>
+    <span style="color:#8C8A9E">dark</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#16151D;border-color:#333042">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#FF7043 0 63%, #C6D93B 63% 97%, #14C8C0 97% 100%)">
+          <span style="background:#16151D"><b>₹7,920</b>
+            <em style="color:#ADAABD">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#FF7043"></i>Entertainment<b style="color:#ADAABD">63%</b></li>
+          <li><i style="background:#C6D93B"></i>Food &amp; Dining<b style="color:#ADAABD">34%</b></li>
+          <li><i style="background:#14C8C0"></i>Transport<b style="color:#ADAABD">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#16151D;border-color:#333042">
+      <div class="lrow"><span style="color:#ADAABD">Swiggy · Food</span>
+        <b style="color:#FB7185">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #211F2B">
+        <span style="color:#ADAABD">Salary · Sept</span>
+        <b style="color:#34D399">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #211F2B">
+        <span style="color:#ADAABD">Note</span>
+        <em style="color:#8C8A9E">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#ADAABD">ACCOUNT</label>
+        <div class="fbox" style="background:#16151D;border-color:#333042">
+          <span>💳 Card</span><em style="color:#8C8A9E">⌄</em></div></div>
+      <div class="field"><label style="color:#ADAABD">CATEGORY</label>
+        <div class="fbox" style="background:#16151D;border-color:#333042">
+          <span style="color:#8C8A9E">Category</span>
+          <em style="color:#8C8A9E">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(20,20,24,.74);border-top:1px solid #211F2B">
+    <span style="color:#A78BFA">⌂<b>Home</b></span>
+    <span style="color:#8C8A9E">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#A883FF 0%,#8B5CF6 54%,#6D28D9 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(139,92,246,0.46),0 2px 6px rgba(139,92,246,0.3)">+</i>
+    <span style="color:#8C8A9E">↗<b>Insights</b></span>
+    <span style="color:#8C8A9E">∷<b>Manage</b></span>
+  </div>
+</div></div>
+  <h4 class="subhead">4 · neutrals &amp; measured contrast</h4>
+  <div class="tokens"><div class="tokcol"><h3>Light neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#F4F3F7;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#F4F3F7</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#E4E2EC;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#E4E2EC</code></div><div class="sw"><i style="background:#121118;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#121118</code></div><div class="sw"><i style="background:#56545F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#56545F</code></div><div class="sw"><i style="background:#73718A;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#73718A</code></div><div class="sw"><i style="background:#0A6B3E;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#0A6B3E</code></div><div class="sw"><i style="background:#CE3B49;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#CE3B49</code></div></div></div><div class="tokcol"><h3>Dark neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#0A0A0F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#0A0A0F</code></div><div class="sw"><i style="background:#16151D;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#16151D</code></div><div class="sw"><i style="background:#221F2D;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#221F2D</code></div><div class="sw"><i style="background:#333042;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#333042</code></div><div class="sw"><i style="background:#F3F2F7;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#F3F2F7</code></div><div class="sw"><i style="background:#ADAABD;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#ADAABD</code></div><div class="sw"><i style="background:#8C8A9E;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#8C8A9E</code></div><div class="sw"><i style="background:#34D399;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#34D399</code></div><div class="sw"><i style="background:#FB7185;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#FB7185</code></div></div></div></div>
+  <div class="checkwrap"><table class="checks"><caption>light · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">16.99:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">7.42:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">4.71:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">6.59:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">4.83:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">6.43:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">5.70:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">8.10:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.10:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.00:1</span></td></tr></table><table class="checks"><caption>dark · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">17.73:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">7.99:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">5.39:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">9.42:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">6.73:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">7.26:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">4.23:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">7.10:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.09:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.12:1</span></td></tr></table></div>
+</section>
+<section class="dir" id="amber">
+  <header><h2>Amber Ledger</h2>
+    <p class="register">Warm, paper-like, private. The register your own reference mockups were drawn in — now with the same gradient-and-bloom material on every primary control.</p>
+    <p class="why"><b>Why it holds up:</b> Warm chrome pushes the entire category set into the cool half of the wheel, so the separation is the widest on the board. The ramp is deepened from the mockups&#x27; gold so white glyphs clear the 3:1 floor.</p></header>
+  <h4 class="subhead">1 · the primary material — every chrome control, both modes</h4>
+  <div class="heroes">
+<div class="hero" style="background:#F7F5F0;border-color:#E6E2D9">
+  <span class="heromode" style="color:#757064">light</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#C97A12 0%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(201,122,18,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#EDEAE1;color:#757064;border:1px solid #E6E2D9">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#EDEAE1">
+      <span class="on" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">Expense</span>
+      <span style="color:#5F5B50">Income</span>
+      <span style="color:#5F5B50">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#757064">ramp</span>
+    <i style="background:#E8A03A"></i><code style="color:#5F5B50">#E8A03A</code>
+    <i style="background:#C97A12"></i><code style="color:#5F5B50">#C97A12</code>
+    <i style="background:#A25C08"></i><code style="color:#5F5B50">#A25C08</code>
+    <span style="color:#757064">bloom rgba(201,122,18,0.46)</span>
+  </div>
+</div>
+<div class="hero" style="background:#0C0B09;border-color:#332E26">
+  <span class="heromode" style="color:#928D80">dark</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">
+      <i class="mtile" style="background:rgba(0,0,0,0.12)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(0,0,0,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#E0952A 0%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(224,149,42,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(0,0,0,0.12)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#242019;color:#928D80;border:1px solid #332E26">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#242019">
+      <span class="on" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">Expense</span>
+      <span style="color:#B5AD9E">Income</span>
+      <span style="color:#B5AD9E">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#928D80">ramp</span>
+    <i style="background:#F5B85E"></i><code style="color:#B5AD9E">#F5B85E</code>
+    <i style="background:#E0952A"></i><code style="color:#B5AD9E">#E0952A</code>
+    <i style="background:#B87214"></i><code style="color:#B5AD9E">#B87214</code>
+    <span style="color:#928D80">bloom rgba(224,149,42,0.46)</span>
+  </div>
+</div></div>
+  <h4 class="subhead">2 · categories — chosen by distance from the brand hue</h4>
+  
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">light · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 40</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">3.31:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#7E9418"></i><b>Lime</b><code>#7E9418</code><u>ΔE 48</u></div><div class="cat"><i style="background:#12A05E"></i><b>Emerald</b><code>#12A05E</code><u>ΔE 83</u></div><div class="cat"><i style="background:#0D9E96"></i><b>Teal</b><code>#0D9E96</code><u>ΔE 90</u></div><div class="cat"><i style="background:#1685D6"></i><b>Sky</b><code>#1685D6</code><u>ΔE 114</u></div><div class="cat"><i style="background:#4457C9"></i><b>Indigo</b><code>#4457C9</code><u>ΔE 125</u></div><div class="cat"><i style="background:#7C3AED"></i><b>Violet</b><code>#7C3AED</code><u>ΔE 147</u></div><div class="cat"><i style="background:#C43CA8"></i><b>Fuchsia</b><code>#C43CA8</code><u>ΔE 100</u></div><div class="cat"><i style="background:#E03A67"></i><b>Rose</b><code>#E03A67</code><u>ΔE 64</u></div><div class="cat"><i style="background:#9C6A4E"></i><b>Mocha</b><code>#9C6A4E</code><u>ΔE 40</u></div><div class="cat"><i style="background:#6E7787"></i><b>Slate</b><code>#6E7787</code><u>ΔE 76</u></div></div>
+</div>
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">dark · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 38</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">5.33:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#C6D93B"></i><b>Lime</b><code>#C6D93B</code><u>ΔE 49</u></div><div class="cat"><i style="background:#2FD37A"></i><b>Emerald</b><code>#2FD37A</code><u>ΔE 86</u></div><div class="cat"><i style="background:#14C8C0"></i><b>Teal</b><code>#14C8C0</code><u>ΔE 94</u></div><div class="cat"><i style="background:#3DAFFF"></i><b>Sky</b><code>#3DAFFF</code><u>ΔE 115</u></div><div class="cat"><i style="background:#7C8DF5"></i><b>Indigo</b><code>#7C8DF5</code><u>ΔE 118</u></div><div class="cat"><i style="background:#A78BFA"></i><b>Violet</b><code>#A78BFA</code><u>ΔE 116</u></div><div class="cat"><i style="background:#E85BD0"></i><b>Fuchsia</b><code>#E85BD0</code><u>ΔE 108</u></div><div class="cat"><i style="background:#FF5C8A"></i><b>Rose</b><code>#FF5C8A</code><u>ΔE 71</u></div><div class="cat"><i style="background:#B98060"></i><b>Mocha</b><code>#B98060</code><u>ΔE 38</u></div><div class="cat"><i style="background:#8A93A5"></i><b>Slate</b><code>#8A93A5</code><u>ΔE 77</u></div></div>
+</div>
+  <h4 class="subhead">3 · in place</h4>
+  <div class="phones">
+<div class="phone" style="background:#F7F5F0;color:#16150F">
+  <div class="statusglass" style="background:rgba(255,255,255,.74);border-bottom:1px solid #F0EDE5">
+    <span style="color:#757064">16:15</span>
+    <span style="color:#757064">light</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#FFFFFF;border-color:#E6E2D9">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#7E9418 0 63%, #0D9E96 63% 97%, #4457C9 97% 100%)">
+          <span style="background:#FFFFFF"><b>₹7,920</b>
+            <em style="color:#5F5B50">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#7E9418"></i>Entertainment<b style="color:#5F5B50">63%</b></li>
+          <li><i style="background:#0D9E96"></i>Food &amp; Dining<b style="color:#5F5B50">34%</b></li>
+          <li><i style="background:#4457C9"></i>Transport<b style="color:#5F5B50">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#FFFFFF;border-color:#E6E2D9">
+      <div class="lrow"><span style="color:#5F5B50">Swiggy · Food</span>
+        <b style="color:#C0392F">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #F0EDE5">
+        <span style="color:#5F5B50">Salary · Sept</span>
+        <b style="color:#1B7F4B">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #F0EDE5">
+        <span style="color:#5F5B50">Note</span>
+        <em style="color:#757064">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#5F5B50">ACCOUNT</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E6E2D9">
+          <span>💳 Card</span><em style="color:#757064">⌄</em></div></div>
+      <div class="field"><label style="color:#5F5B50">CATEGORY</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E6E2D9">
+          <span style="color:#757064">Category</span>
+          <em style="color:#757064">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(255,255,255,.74);border-top:1px solid #F0EDE5">
+    <span style="color:#8A4D0F">⌂<b>Home</b></span>
+    <span style="color:#757064">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#E8A03A 0%,#C97A12 54%,#A25C08 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(201,122,18,0.46),0 2px 6px rgba(201,122,18,0.3)">+</i>
+    <span style="color:#757064">↗<b>Insights</b></span>
+    <span style="color:#757064">∷<b>Manage</b></span>
+  </div>
+</div>
+<div class="phone" style="background:#0C0B09;color:#F5F2EA">
+  <div class="statusglass" style="background:rgba(20,20,24,.74);border-bottom:1px solid #26221C">
+    <span style="color:#928D80">16:15</span>
+    <span style="color:#928D80">dark</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#1A1815;border-color:#332E26">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#C6D93B 0 63%, #14C8C0 63% 97%, #7C8DF5 97% 100%)">
+          <span style="background:#1A1815"><b>₹7,920</b>
+            <em style="color:#B5AD9E">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#C6D93B"></i>Entertainment<b style="color:#B5AD9E">63%</b></li>
+          <li><i style="background:#14C8C0"></i>Food &amp; Dining<b style="color:#B5AD9E">34%</b></li>
+          <li><i style="background:#7C8DF5"></i>Transport<b style="color:#B5AD9E">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#1A1815;border-color:#332E26">
+      <div class="lrow"><span style="color:#B5AD9E">Swiggy · Food</span>
+        <b style="color:#F2555A">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #26221C">
+        <span style="color:#B5AD9E">Salary · Sept</span>
+        <b style="color:#3DDC84">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #26221C">
+        <span style="color:#B5AD9E">Note</span>
+        <em style="color:#928D80">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#B5AD9E">ACCOUNT</label>
+        <div class="fbox" style="background:#1A1815;border-color:#332E26">
+          <span>💳 Card</span><em style="color:#928D80">⌄</em></div></div>
+      <div class="field"><label style="color:#B5AD9E">CATEGORY</label>
+        <div class="fbox" style="background:#1A1815;border-color:#332E26">
+          <span style="color:#928D80">Category</span>
+          <em style="color:#928D80">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(20,20,24,.74);border-top:1px solid #26221C">
+    <span style="color:#F0A94A">⌂<b>Home</b></span>
+    <span style="color:#928D80">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#F5B85E 0%,#E0952A 54%,#B87214 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(224,149,42,0.46),0 2px 6px rgba(224,149,42,0.3)">+</i>
+    <span style="color:#928D80">↗<b>Insights</b></span>
+    <span style="color:#928D80">∷<b>Manage</b></span>
+  </div>
+</div></div>
+  <h4 class="subhead">4 · neutrals &amp; measured contrast</h4>
+  <div class="tokens"><div class="tokcol"><h3>Light neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#F7F5F0;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#F7F5F0</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#E6E2D9;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#E6E2D9</code></div><div class="sw"><i style="background:#16150F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#16150F</code></div><div class="sw"><i style="background:#5F5B50;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#5F5B50</code></div><div class="sw"><i style="background:#757064;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#757064</code></div><div class="sw"><i style="background:#1B7F4B;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#1B7F4B</code></div><div class="sw"><i style="background:#C0392F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#C0392F</code></div></div></div><div class="tokcol"><h3>Dark neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#0C0B09;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#0C0B09</code></div><div class="sw"><i style="background:#1A1815;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#1A1815</code></div><div class="sw"><i style="background:#242019;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#242019</code></div><div class="sw"><i style="background:#332E26;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#332E26</code></div><div class="sw"><i style="background:#F5F2EA;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#F5F2EA</code></div><div class="sw"><i style="background:#B5AD9E;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#B5AD9E</code></div><div class="sw"><i style="background:#928D80;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#928D80</code></div><div class="sw"><i style="background:#3DDC84;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#3DDC84</code></div><div class="sw"><i style="background:#F2555A;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#F2555A</code></div></div></div></div>
+  <div class="checkwrap"><table class="checks"><caption>light · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">16.79:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">6.78:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">4.93:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">5.02:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">5.43:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">6.12:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">3.35:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">5.16:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.09:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.00:1</span></td></tr></table><table class="checks"><caption>dark · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">17.59:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">7.96:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">5.35:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">9.93:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">5.25:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">9.82:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">7.58:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">4.86:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.11:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.09:1</span></td></tr></table></div>
+</section>
+<section class="dir" id="nocturne">
+  <header><h2>Nocturne Indigo</h2>
+    <p class="register">Cool, technical, calm at 1am. Signal-blue chrome with a deep bloom — the register of a tool you trust rather than one that excites you.</p>
+    <p class="why"><b>Why it holds up:</b> Blue reads as neutral-authoritative beside red and green. Sky and Indigo drop out of the category set automatically, keeping the blue lane clear so no category can ever be mistaken for a button.</p></header>
+  <h4 class="subhead">1 · the primary material — every chrome control, both modes</h4>
+  <div class="heroes">
+<div class="hero" style="background:#F3F5F9;border-color:#DFE4EE">
+  <span class="heromode" style="color:#697185">light</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#2F5FE0 0%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(47,95,224,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#E7EBF3;color:#697185;border:1px solid #DFE4EE">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#E7EBF3">
+      <span class="on" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">Expense</span>
+      <span style="color:#545C73">Income</span>
+      <span style="color:#545C73">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#697185">ramp</span>
+    <i style="background:#5A85F5"></i><code style="color:#545C73">#5A85F5</code>
+    <i style="background:#2F5FE0"></i><code style="color:#545C73">#2F5FE0</code>
+    <i style="background:#1E42B0"></i><code style="color:#545C73">#1E42B0</code>
+    <span style="color:#697185">bloom rgba(47,95,224,0.46)</span>
+  </div>
+</div>
+<div class="hero" style="background:#080A11;border-color:#2B3040">
+  <span class="heromode" style="color:#848C9F">dark</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#3B6FEF 0%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(59,111,239,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#1E222E;color:#848C9F;border:1px solid #2B3040">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#1E222E">
+      <span class="on" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">Expense</span>
+      <span style="color:#A6AEC2">Income</span>
+      <span style="color:#A6AEC2">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#848C9F">ramp</span>
+    <i style="background:#7BA5FF"></i><code style="color:#A6AEC2">#7BA5FF</code>
+    <i style="background:#3B6FEF"></i><code style="color:#A6AEC2">#3B6FEF</code>
+    <i style="background:#2450C4"></i><code style="color:#A6AEC2">#2450C4</code>
+    <span style="color:#848C9F">bloom rgba(59,111,239,0.46)</span>
+  </div>
+</div></div>
+  <h4 class="subhead">2 · categories — chosen by distance from the brand hue</h4>
+  
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">light · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 37</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">3.23:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#E85D3C"></i><b>Coral</b><code>#E85D3C</code><u>ΔE 119</u></div><div class="cat"><i style="background:#C87F06"></i><b>Amber</b><code>#C87F06</code><u>ΔE 136</u></div><div class="cat"><i style="background:#7E9418"></i><b>Lime</b><code>#7E9418</code><u>ΔE 138</u></div><div class="cat"><i style="background:#12A05E"></i><b>Emerald</b><code>#12A05E</code><u>ΔE 125</u></div><div class="cat"><i style="background:#0D9E96"></i><b>Teal</b><code>#0D9E96</code><u>ΔE 93</u></div><div class="cat"><i style="background:#1685D6"></i><b>Sky</b><code>#1685D6</code><u>ΔE 37</u></div><div class="cat"><i style="background:#C43CA8"></i><b>Fuchsia</b><code>#C43CA8</code><u>ΔE 54</u></div><div class="cat"><i style="background:#E03A67"></i><b>Rose</b><code>#E03A67</code><u>ΔE 91</u></div><div class="cat"><i style="background:#9C6A4E"></i><b>Mocha</b><code>#9C6A4E</code><u>ΔE 95</u></div><div class="cat"><i style="background:#6E7787"></i><b>Slate</b><code>#6E7787</code><u>ΔE 68</u></div></div>
+</div>
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">dark · 10 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 43</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">5.44:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#FF7043"></i><b>Coral</b><code>#FF7043</code><u>ΔE 124</u></div><div class="cat"><i style="background:#FFB020"></i><b>Amber</b><code>#FFB020</code><u>ΔE 148</u></div><div class="cat"><i style="background:#C6D93B"></i><b>Lime</b><code>#C6D93B</code><u>ΔE 153</u></div><div class="cat"><i style="background:#2FD37A"></i><b>Emerald</b><code>#2FD37A</code><u>ΔE 137</u></div><div class="cat"><i style="background:#14C8C0"></i><b>Teal</b><code>#14C8C0</code><u>ΔE 95</u></div><div class="cat"><i style="background:#3DAFFF"></i><b>Sky</b><code>#3DAFFF</code><u>ΔE 43</u></div><div class="cat"><i style="background:#E85BD0"></i><b>Fuchsia</b><code>#E85BD0</code><u>ΔE 55</u></div><div class="cat"><i style="background:#FF5C8A"></i><b>Rose</b><code>#FF5C8A</code><u>ΔE 88</u></div><div class="cat"><i style="background:#B98060"></i><b>Mocha</b><code>#B98060</code><u>ΔE 96</u></div><div class="cat"><i style="background:#8A93A5"></i><b>Slate</b><code>#8A93A5</code><u>ΔE 65</u></div></div>
+</div>
+  <h4 class="subhead">3 · in place</h4>
+  <div class="phones">
+<div class="phone" style="background:#F3F5F9;color:#0F1420">
+  <div class="statusglass" style="background:rgba(255,255,255,.74);border-bottom:1px solid #EBEEF5">
+    <span style="color:#697185">16:15</span>
+    <span style="color:#697185">light</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#FFFFFF;border-color:#DFE4EE">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#E85D3C 0 63%, #7E9418 63% 97%, #0D9E96 97% 100%)">
+          <span style="background:#FFFFFF"><b>₹7,920</b>
+            <em style="color:#545C73">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#E85D3C"></i>Entertainment<b style="color:#545C73">63%</b></li>
+          <li><i style="background:#7E9418"></i>Food &amp; Dining<b style="color:#545C73">34%</b></li>
+          <li><i style="background:#0D9E96"></i>Transport<b style="color:#545C73">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#FFFFFF;border-color:#DFE4EE">
+      <div class="lrow"><span style="color:#545C73">Swiggy · Food</span>
+        <b style="color:#CE3540">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EBEEF5">
+        <span style="color:#545C73">Salary · Sept</span>
+        <b style="color:#0E7C5A">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EBEEF5">
+        <span style="color:#545C73">Note</span>
+        <em style="color:#697185">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#545C73">ACCOUNT</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#DFE4EE">
+          <span>💳 Card</span><em style="color:#697185">⌄</em></div></div>
+      <div class="field"><label style="color:#545C73">CATEGORY</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#DFE4EE">
+          <span style="color:#697185">Category</span>
+          <em style="color:#697185">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(255,255,255,.74);border-top:1px solid #EBEEF5">
+    <span style="color:#2F5FE0">⌂<b>Home</b></span>
+    <span style="color:#697185">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#5A85F5 0%,#2F5FE0 54%,#1E42B0 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(47,95,224,0.46),0 2px 6px rgba(47,95,224,0.3)">+</i>
+    <span style="color:#697185">↗<b>Insights</b></span>
+    <span style="color:#697185">∷<b>Manage</b></span>
+  </div>
+</div>
+<div class="phone" style="background:#080A11;color:#EEF1F8">
+  <div class="statusglass" style="background:rgba(20,20,24,.74);border-bottom:1px solid #1B1F29">
+    <span style="color:#848C9F">16:15</span>
+    <span style="color:#848C9F">dark</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#13161F;border-color:#2B3040">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#FF7043 0 63%, #C6D93B 63% 97%, #14C8C0 97% 100%)">
+          <span style="background:#13161F"><b>₹7,920</b>
+            <em style="color:#A6AEC2">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#FF7043"></i>Entertainment<b style="color:#A6AEC2">63%</b></li>
+          <li><i style="background:#C6D93B"></i>Food &amp; Dining<b style="color:#A6AEC2">34%</b></li>
+          <li><i style="background:#14C8C0"></i>Transport<b style="color:#A6AEC2">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#13161F;border-color:#2B3040">
+      <div class="lrow"><span style="color:#A6AEC2">Swiggy · Food</span>
+        <b style="color:#FF6B7A">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #1B1F29">
+        <span style="color:#A6AEC2">Salary · Sept</span>
+        <b style="color:#2FD79B">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #1B1F29">
+        <span style="color:#A6AEC2">Note</span>
+        <em style="color:#848C9F">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#A6AEC2">ACCOUNT</label>
+        <div class="fbox" style="background:#13161F;border-color:#2B3040">
+          <span>💳 Card</span><em style="color:#848C9F">⌄</em></div></div>
+      <div class="field"><label style="color:#A6AEC2">CATEGORY</label>
+        <div class="fbox" style="background:#13161F;border-color:#2B3040">
+          <span style="color:#848C9F">Category</span>
+          <em style="color:#848C9F">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(20,20,24,.74);border-top:1px solid #1B1F29">
+    <span style="color:#6E9BFF">⌂<b>Home</b></span>
+    <span style="color:#848C9F">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#7BA5FF 0%,#3B6FEF 54%,#2450C4 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(59,111,239,0.46),0 2px 6px rgba(59,111,239,0.3)">+</i>
+    <span style="color:#848C9F">↗<b>Insights</b></span>
+    <span style="color:#848C9F">∷<b>Manage</b></span>
+  </div>
+</div></div>
+  <h4 class="subhead">4 · neutrals &amp; measured contrast</h4>
+  <div class="tokens"><div class="tokcol"><h3>Light neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#F3F5F9;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#F3F5F9</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#DFE4EE;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#DFE4EE</code></div><div class="sw"><i style="background:#0F1420;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#0F1420</code></div><div class="sw"><i style="background:#545C73;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#545C73</code></div><div class="sw"><i style="background:#697185;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#697185</code></div><div class="sw"><i style="background:#0E7C5A;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#0E7C5A</code></div><div class="sw"><i style="background:#CE3540;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#CE3540</code></div></div></div><div class="tokcol"><h3>Dark neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#080A11;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#080A11</code></div><div class="sw"><i style="background:#13161F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#13161F</code></div><div class="sw"><i style="background:#1E222E;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#1E222E</code></div><div class="sw"><i style="background:#2B3040;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#2B3040</code></div><div class="sw"><i style="background:#EEF1F8;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#EEF1F8</code></div><div class="sw"><i style="background:#A6AEC2;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#A6AEC2</code></div><div class="sw"><i style="background:#848C9F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#848C9F</code></div><div class="sw"><i style="background:#2FD79B;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#2FD79B</code></div><div class="sw"><i style="background:#FF6B7A;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#FF6B7A</code></div></div></div></div>
+  <div class="checkwrap"><table class="checks"><caption>light · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">16.86:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">6.66:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">4.88:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">5.19:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">4.99:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">5.02:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">5.48:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">8.53:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.09:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.00:1</span></td></tr></table><table class="checks"><caption>dark · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">17.49:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">8.14:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">5.36:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">9.73:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">6.57:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">7.34:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">4.46:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">6.95:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.09:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.14:1</span></td></tr></table></div>
+</section>
+<section class="dir" id="quiet">
+  <header><h2>Quiet Ink</h2>
+    <p class="register">Restrained, editorial, serious about money. The material is still there — gloss, rim-light, depth — but achromatic: polished graphite on paper, polished bone on ink.</p>
+    <p class="why"><b>Why it holds up:</b> The only direction where brand and category cannot collide by construction, because the chrome has no hue. Categories keep all 12 master colours, violet included — the widest palette available.</p></header>
+  <h4 class="subhead">1 · the primary material — every chrome control, both modes</h4>
+  <div class="heroes">
+<div class="hero" style="background:#F2F1ED;border-color:#E3E1DA">
+  <span class="heromode" style="color:#73726B">light</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(255,255,255,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#1C1C1A 0%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(28,28,26,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(255,255,255,0.22)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#E9E7E0;color:#73726B;border:1px solid #E3E1DA">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#E9E7E0">
+      <span class="on" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">Expense</span>
+      <span style="color:#57564F">Income</span>
+      <span style="color:#57564F">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#73726B">ramp</span>
+    <i style="background:#3A3A37"></i><code style="color:#57564F">#3A3A37</code>
+    <i style="background:#1C1C1A"></i><code style="color:#57564F">#1C1C1A</code>
+    <i style="background:#000000"></i><code style="color:#57564F">#000000</code>
+    <span style="color:#73726B">bloom rgba(28,28,26,0.46)</span>
+  </div>
+</div>
+<div class="hero" style="background:#0D0D0C;border-color:#343431">
+  <span class="heromode" style="color:#8F8E86">dark</span>
+  <div class="herorow">
+    <button class="mpill" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">
+      <i class="mtile" style="background:rgba(0,0,0,0.12)">+</i><span>New</span>
+      <em class="mdiv" style="background:rgba(0,0,0,0.18)"></em><em class="mchev">⌄</em>
+    </button>
+    <button class="mfab" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">+</button>
+    <button class="mpill sm" style="background:linear-gradient(180deg,#F0EFE9 0%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 2px rgba(0,0,0,.30),0 2px 8px rgba(240,239,233,0.3);transform:translateY(2px) scale(.985)">
+      <i class="mtile" style="background:rgba(0,0,0,0.12)">+</i><span>Pressed</span>
+    </button>
+    <button class="mpill sm dis"
+      style="background:#252523;color:#8F8E86;border:1px solid #343431">
+      <i class="mtile" style="background:rgba(128,128,128,0.16)">+</i><span>Disabled</span>
+    </button>
+  </div>
+  <div class="herorow">
+    <button class="mcta" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">Save transaction</button>
+    <div class="mseg" style="background:#252523">
+      <span class="on" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">Expense</span>
+      <span style="color:#AFAEA6">Income</span>
+      <span style="color:#AFAEA6">Transfer</span>
+    </div>
+  </div>
+  <div class="ramprow">
+    <span style="color:#8F8E86">ramp</span>
+    <i style="background:#FFFFFF"></i><code style="color:#AFAEA6">#FFFFFF</code>
+    <i style="background:#F0EFE9"></i><code style="color:#AFAEA6">#F0EFE9</code>
+    <i style="background:#D2D1C9"></i><code style="color:#AFAEA6">#D2D1C9</code>
+    <span style="color:#8F8E86">bloom rgba(240,239,233,0.46)</span>
+  </div>
+</div></div>
+  <h4 class="subhead">2 · categories — chosen by distance from the brand hue</h4>
+  
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">light · 12 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 41</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">3.23:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#E85D3C"></i><b>Coral</b><code>#E85D3C</code><u>ΔE 83</u></div><div class="cat"><i style="background:#C87F06"></i><b>Amber</b><code>#C87F06</code><u>ΔE 83</u></div><div class="cat"><i style="background:#7E9418"></i><b>Lime</b><code>#7E9418</code><u>ΔE 76</u></div><div class="cat"><i style="background:#12A05E"></i><b>Emerald</b><code>#12A05E</code><u>ΔE 73</u></div><div class="cat"><i style="background:#0D9E96"></i><b>Teal</b><code>#0D9E96</code><u>ΔE 60</u></div><div class="cat"><i style="background:#1685D6"></i><b>Sky</b><code>#1685D6</code><u>ΔE 67</u></div><div class="cat"><i style="background:#4457C9"></i><b>Indigo</b><code>#4457C9</code><u>ΔE 77</u></div><div class="cat"><i style="background:#7C3AED"></i><b>Violet</b><code>#7C3AED</code><u>ΔE 109</u></div><div class="cat"><i style="background:#C43CA8"></i><b>Fuchsia</b><code>#C43CA8</code><u>ΔE 82</u></div><div class="cat"><i style="background:#E03A67"></i><b>Rose</b><code>#E03A67</code><u>ΔE 79</u></div><div class="cat"><i style="background:#9C6A4E"></i><b>Mocha</b><code>#9C6A4E</code><u>ΔE 48</u></div><div class="cat"><i style="background:#6E7787"></i><b>Slate</b><code>#6E7787</code><u>ΔE 41</u></div></div>
+</div>
+<div class="sep">
+  <div class="sephead">
+    <span class="seplabel">dark · 12 categories</span>
+    <span class="sepnote">nearest to brand
+      <span class="ratio pass">ΔE 36</span><small>(≥28 required)</small>
+      &nbsp; weakest fill on surface
+      <span class="ratio pass">5.24:1</span><small>(≥3 required)</small></span>
+  </div>
+  <div class="catgrid"><div class="cat"><i style="background:#FF7043"></i><b>Coral</b><code>#FF7043</code><u>ΔE 77</u></div><div class="cat"><i style="background:#FFB020"></i><b>Amber</b><code>#FFB020</code><u>ΔE 77</u></div><div class="cat"><i style="background:#C6D93B"></i><b>Lime</b><code>#C6D93B</code><u>ΔE 73</u></div><div class="cat"><i style="background:#2FD37A"></i><b>Emerald</b><code>#2FD37A</code><u>ΔE 69</u></div><div class="cat"><i style="background:#14C8C0"></i><b>Teal</b><code>#14C8C0</code><u>ΔE 47</u></div><div class="cat"><i style="background:#3DAFFF"></i><b>Sky</b><code>#3DAFFF</code><u>ΔE 58</u></div><div class="cat"><i style="background:#7C8DF5"></i><b>Indigo</b><code>#7C8DF5</code><u>ΔE 70</u></div><div class="cat"><i style="background:#A78BFA"></i><b>Violet</b><code>#A78BFA</code><u>ΔE 72</u></div><div class="cat"><i style="background:#E85BD0"></i><b>Fuchsia</b><code>#E85BD0</code><u>ΔE 84</u></div><div class="cat"><i style="background:#FF5C8A"></i><b>Rose</b><code>#FF5C8A</code><u>ΔE 74</u></div><div class="cat"><i style="background:#B98060"></i><b>Mocha</b><code>#B98060</code><u>ΔE 47</u></div><div class="cat"><i style="background:#8A93A5"></i><b>Slate</b><code>#8A93A5</code><u>ΔE 36</u></div></div>
+</div>
+  <h4 class="subhead">3 · in place</h4>
+  <div class="phones">
+<div class="phone" style="background:#F2F1ED;color:#111110">
+  <div class="statusglass" style="background:rgba(255,255,255,.74);border-bottom:1px solid #EEECE6">
+    <span style="color:#73726B">16:15</span>
+    <span style="color:#73726B">light</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#FFFFFF;border-color:#E3E1DA">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#E85D3C 0 63%, #7E9418 63% 97%, #0D9E96 97% 100%)">
+          <span style="background:#FFFFFF"><b>₹7,920</b>
+            <em style="color:#57564F">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#E85D3C"></i>Entertainment<b style="color:#57564F">63%</b></li>
+          <li><i style="background:#7E9418"></i>Food &amp; Dining<b style="color:#57564F">34%</b></li>
+          <li><i style="background:#0D9E96"></i>Transport<b style="color:#57564F">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#FFFFFF;border-color:#E3E1DA">
+      <div class="lrow"><span style="color:#57564F">Swiggy · Food</span>
+        <b style="color:#C1362F">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EEECE6">
+        <span style="color:#57564F">Salary · Sept</span>
+        <b style="color:#14804A">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #EEECE6">
+        <span style="color:#57564F">Note</span>
+        <em style="color:#73726B">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#57564F">ACCOUNT</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E3E1DA">
+          <span>💳 Card</span><em style="color:#73726B">⌄</em></div></div>
+      <div class="field"><label style="color:#57564F">CATEGORY</label>
+        <div class="fbox" style="background:#FFFFFF;border-color:#E3E1DA">
+          <span style="color:#73726B">Category</span>
+          <em style="color:#73726B">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(255,255,255,.74);border-top:1px solid #EEECE6">
+    <span style="color:#111110">⌂<b>Home</b></span>
+    <span style="color:#73726B">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#3A3A37 0%,#1C1C1A 54%,#000000 100%);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(28,28,26,0.46),0 2px 6px rgba(28,28,26,0.3)">+</i>
+    <span style="color:#73726B">↗<b>Insights</b></span>
+    <span style="color:#73726B">∷<b>Manage</b></span>
+  </div>
+</div>
+<div class="phone" style="background:#0D0D0C;color:#F4F3EF">
+  <div class="statusglass" style="background:rgba(20,20,24,.74);border-bottom:1px solid #232321">
+    <span style="color:#8F8E86">16:15</span>
+    <span style="color:#8F8E86">dark</span>
+  </div>
+  <div class="pbody">
+    <div class="ptitle">Insights</div>
+    <div class="card" style="background:#1A1A18;border-color:#343431">
+      <div class="donutrow">
+        <div class="donut" style="background:conic-gradient(#FF7043 0 63%, #C6D93B 63% 97%, #14C8C0 97% 100%)">
+          <span style="background:#1A1A18"><b>₹7,920</b>
+            <em style="color:#AFAEA6">Spent</em></span></div>
+        <ul class="legend">
+          <li><i style="background:#FF7043"></i>Entertainment<b style="color:#AFAEA6">63%</b></li>
+          <li><i style="background:#C6D93B"></i>Food &amp; Dining<b style="color:#AFAEA6">34%</b></li>
+          <li><i style="background:#14C8C0"></i>Transport<b style="color:#AFAEA6">3%</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="background:#1A1A18;border-color:#343431">
+      <div class="lrow"><span style="color:#AFAEA6">Swiggy · Food</span>
+        <b style="color:#F0625F">−₹1,240.00</b></div>
+      <div class="lrow" style="border-top:1px solid #232321">
+        <span style="color:#AFAEA6">Salary · Sept</span>
+        <b style="color:#35C77E">+₹20,000.00</b></div>
+      <div class="lrow" style="border-top:1px solid #232321">
+        <span style="color:#AFAEA6">Note</span>
+        <em style="color:#8F8E86">Add a note</em></div>
+    </div>
+    <div class="fieldrow">
+      <div class="field"><label style="color:#AFAEA6">ACCOUNT</label>
+        <div class="fbox" style="background:#1A1A18;border-color:#343431">
+          <span>💳 Card</span><em style="color:#8F8E86">⌄</em></div></div>
+      <div class="field"><label style="color:#AFAEA6">CATEGORY</label>
+        <div class="fbox" style="background:#1A1A18;border-color:#343431">
+          <span style="color:#8F8E86">Category</span>
+          <em style="color:#8F8E86">⌄</em></div></div>
+    </div>
+    <button class="cta" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">Save</button>
+  </div>
+  <div class="tabglass" style="background:rgba(20,20,24,.74);border-top:1px solid #232321">
+    <span style="color:#F4F3EF">⌂<b>Home</b></span>
+    <span style="color:#8F8E86">≡<b>Activity</b></span>
+    <i class="fab" style="background:linear-gradient(180deg,#FFFFFF 0%,#F0EFE9 54%,#D2D1C9 100%);color:#131210;border:1px solid rgba(0,0,0,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,.16),0 8px 22px rgba(240,239,233,0.46),0 2px 6px rgba(240,239,233,0.3)">+</i>
+    <span style="color:#8F8E86">↗<b>Insights</b></span>
+    <span style="color:#8F8E86">∷<b>Manage</b></span>
+  </div>
+</div></div>
+  <h4 class="subhead">4 · neutrals &amp; measured contrast</h4>
+  <div class="tokens"><div class="tokcol"><h3>Light neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#F2F1ED;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#F2F1ED</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#FFFFFF</code></div><div class="sw"><i style="background:#E3E1DA;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#E3E1DA</code></div><div class="sw"><i style="background:#111110;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#111110</code></div><div class="sw"><i style="background:#57564F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#57564F</code></div><div class="sw"><i style="background:#73726B;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#73726B</code></div><div class="sw"><i style="background:#14804A;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#14804A</code></div><div class="sw"><i style="background:#C1362F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#C1362F</code></div></div></div><div class="tokcol"><h3>Dark neutrals &amp; semantics</h3><div class="swgrid"><div class="sw"><i style="background:#0D0D0C;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>background</b><code>#0D0D0C</code></div><div class="sw"><i style="background:#1A1A18;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>surface</b><code>#1A1A18</code></div><div class="sw"><i style="background:#252523;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>elevated</b><code>#252523</code></div><div class="sw"><i style="background:#343431;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>border</b><code>#343431</code></div><div class="sw"><i style="background:#F4F3EF;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text</b><code>#F4F3EF</code></div><div class="sw"><i style="background:#AFAEA6;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 2°</b><code>#AFAEA6</code></div><div class="sw"><i style="background:#8F8E86;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>text 3°</b><code>#8F8E86</code></div><div class="sw"><i style="background:#35C77E;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>income</b><code>#35C77E</code></div><div class="sw"><i style="background:#F0625F;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)"></i><b>expense</b><code>#F0625F</code></div></div></div></div>
+  <div class="checkwrap"><table class="checks"><caption>light · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">16.72:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">7.37:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">4.83:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">4.98:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">5.47:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">16.72:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">17.07:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">21.00:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.13:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.00:1</span></td></tr></table><table class="checks"><caption>dark · contrast</caption><tr><td>Body text on background</td><td class=note>primary reading surface</td><td><span class="ratio pass">17.51:1</span></td></tr><tr><td>Secondary text on surface</td><td class=note>row subtitles</td><td><span class="ratio pass">7.82:1</span></td></tr><tr><td>Tertiary text on surface</td><td class=note>placeholders</td><td><span class="ratio pass">5.30:1</span></td></tr><tr><td>Income on surface</td><td class=note>credit amounts</td><td><span class="ratio pass">7.99:1</span></td></tr><tr><td>Expense on surface</td><td class=note>debit amounts</td><td><span class="ratio pass">5.49:1</span></td></tr><tr><td>Brand text on background</td><td class=note>links, active labels</td><td><span class="ratio pass">17.51:1</span></td></tr><tr><td>Glyph on brand mid</td><td class=note>FAB + CTA glyph, 3:1 floor</td><td><span class="ratio pass">16.25:1</span></td></tr><tr><td>Glyph on brand deep</td><td class=note>gradient's darkest stop</td><td><span class="ratio pass">12.22:1</span></td></tr><tr><td>Surface vs background</td><td class=note>card separation</td><td><span class="ratio info">1.12:1</span></td></tr><tr><td>Elevated vs surface</td><td class=note>sheet over card</td><td><span class="ratio info">1.14:1</span></td></tr></table></div>
+</section>
+
+</div></body></html>

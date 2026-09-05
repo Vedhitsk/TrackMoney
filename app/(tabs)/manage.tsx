@@ -1,11 +1,12 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { IconPalette, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 
 import { Card, CountBadge, ListRow } from "@/components/ui";
+import { GlassScrim, useTabBarHeight, useTopInset } from "@/components/glass-scrim";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -13,6 +14,8 @@ export default function ManageScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const router = useRouter();
+  const topInset = useTopInset();
+  const tabBarHeight = useTabBarHeight();
 
   const { categories, loadCategories, accounts, loadAccounts, pendingTransactions, refreshPendingTransactions } =
     useTransactionStore(
@@ -83,6 +86,13 @@ export default function ManageScreen() {
 
   return (
     <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: topInset + 8, paddingBottom: tabBarHeight + Spacing.lg },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
       <Text style={styles.headerTitle}>Manage</Text>
 
       <Card noPadding style={styles.card}>
@@ -105,12 +115,16 @@ export default function ManageScreen() {
           </View>
         ))}
       </Card>
+      </ScrollView>
+
+      <GlassScrim edge="top" />
     </View>
   );
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.background, paddingTop: 56, paddingHorizontal: Spacing.lg },
+  container: { flex: 1, backgroundColor: theme.background },
+  scroll: { paddingHorizontal: Spacing.lg },
   headerTitle: { ...Typography.title, color: theme.text, marginBottom: Spacing.lg },
   card: { overflow: "hidden" },
   row: { paddingHorizontal: Spacing.md },

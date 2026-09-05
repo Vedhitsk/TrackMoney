@@ -1,109 +1,183 @@
 import { Platform } from 'react-native';
 
-// Chart/legend palette shared by donut & bar charts (rich violet-led,
-// matches the fintech reference mockups' single "hero" accent, the rest are
-// muted functional/category hues).
-const DARK_CHART_PALETTE = ['#9D6FFF', '#F2555A', '#3AD1B0', '#3DDC84', '#F0A94A', '#98989F'];
-const LIGHT_CHART_PALETTE = ['#7C3AED', '#D64550', '#2BB6A3', '#1FA463', '#D6811F', '#9A9AA1'];
+/**
+ * Design tokens — see _bmad-output/planning-artifacts/ux-designs/
+ * ux-TrackMoney-2026-09-05/DESIGN.md, which this file implements.
+ *
+ * Two rules govern colour here, and both are load-bearing:
+ *
+ *  1. Brand and category are separate systems. The brand ramps are chrome only
+ *     (FAB, buttons, active segment, active tab). Category colour appears only
+ *     in charts, legends, icon tiles and progress bars. Every category hue is
+ *     at least ΔE 45 from both brand ramps in CIE Lab — the closest is Fuchsia
+ *     at ΔE 45 from primary. Reusing a brand hue as a category colour is the
+ *     bug this palette exists to fix.
+ *
+ *  2. Surface separation is measured in perceptual L*, not WCAG contrast ratio.
+ *     At near-black the +0.05 flare term in the ratio formula dominates, so any
+ *     two dark greys score ~1.1:1 regardless of how different they look. The
+ *     dark ladder below steps ΔL* 8.69 then 6.84, against a 6–9 target.
+ */
 
-export const LightColors = {
-  background: '#F5F4F0',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-  text: '#14141A',
-  textSecondary: '#6B6B72',
-  textTertiary: '#9A9AA1',
+// ---------------------------------------------------------------------------
+// Category palette. Ten hues, tuned per mode, none within ΔE 45 of a brand ramp.
+// ---------------------------------------------------------------------------
 
-  // Single brand accent (rich violet-purple) — used for the FAB, hero chart
-  // line/fill, and the largest donut slice. NOT used for active tabs/segments
-  // — those use an inverted high-contrast pill instead (see segmentActiveBg).
-  primary: '#7C3AED',
-  primaryLight: '#EDE4FB',
-  primaryMuted: 'rgba(124,58,237,0.14)',
-
-  expense: '#D64550',
-  income: '#1FA463',
-
-  border: '#E7E4DD',
-  borderLight: '#EFEDE7',
-
-  progressGreen: '#1FA463',
-  progressRed: '#D64550',
-
-  calculator: '#FFFFFF',
-  calculatorDark: '#F1EFE9',
-
-  fab: '#7C3AED',
-  tabActive: '#14141A',
-  tabInactive: '#9A9AA1',
-
-  // Inverted high-contrast pill used for the active state of segmented
-  // controls / pill toggles (Week·Month·Year, Expense·Income·Transfer, etc.)
-  segmentTrackBg: '#EDEBE4',
-  segmentActiveBg: '#14141A',
-  segmentActiveText: '#FFFFFF',
-  segmentInactiveText: '#6B6B72',
-
-  chipBg: '#EDEBE4',
-  chipActiveBg: '#14141A',
-  chipActiveText: '#FFFFFF',
-  chipText: '#3A3A40',
-
-  chartPalette: LIGHT_CHART_PALETTE,
-
-  // Contrasting "unfilled" track color for partial-ring / two-tone donut
-  // charts — a translucent version of `text`, so it's always visible against
-  // `surface`/`surfaceElevated` regardless of theme.
-  ringTrack: '#14141A1F',
-
-  white: '#FFFFFF',
-  shadow: 'rgba(20,20,20,0.08)',
+export type CategoryPalette = {
+  fuchsia: string;
+  coral: string;
+  cyan: string;
+  emerald: string;
+  amber: string;
+  teal: string;
+  rose: string;
+  lime: string;
+  mocha: string;
+  slate: string;
 };
 
-export const DarkColors = {
-  background: '#0B0B0D',
-  surface: '#17171B',
-  surfaceElevated: '#1E1E23',
-  text: '#F2F2F4',
-  textSecondary: '#98989F',
-  textTertiary: '#6B6B72',
+// Not `as const` — the two palettes must stay mutually assignable so
+// `DarkColors: typeof LightColors` typechecks.
+const LIGHT_CATEGORIES: CategoryPalette = {
+  fuchsia: '#C43CA8',
+  coral: '#E85D3C',
+  cyan: '#0E7F9E',
+  emerald: '#12A05E',
+  amber: '#C87F06',
+  teal: '#0D9E96',
+  rose: '#E03A67',
+  lime: '#7E9418',
+  mocha: '#9C6A4E',
+  slate: '#6E7787',
+};
 
-  primary: '#9D6FFF',
-  primaryLight: '#2A1F42',
-  primaryMuted: 'rgba(157,111,255,0.2)',
+const DARK_CATEGORIES: CategoryPalette = {
+  fuchsia: '#E85BD0',
+  coral: '#FF7043',
+  cyan: '#38C4E8',
+  emerald: '#2FD37A',
+  amber: '#FFB020',
+  teal: '#14C8C0',
+  rose: '#FF5C8A',
+  lime: '#C6D93B',
+  mocha: '#B98060',
+  slate: '#8A93A5',
+};
 
-  expense: '#F2555A',
-  income: '#3DDC84',
+/** Chart/legend order. The last entry is always the "everything else" bucket. */
+const toPalette = (c: CategoryPalette): string[] => [
+  c.fuchsia, c.coral, c.cyan, c.emerald, c.amber,
+  c.teal, c.rose, c.lime, c.mocha, c.slate,
+];
 
-  border: '#26262B',
-  borderLight: '#1F1F24',
+// ---------------------------------------------------------------------------
+// Themes
+// ---------------------------------------------------------------------------
 
-  progressGreen: '#3DDC84',
-  progressRed: '#F2555A',
+export const LightColors = {
+  background: '#F1F2F9',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  text: '#14152A',
+  textSecondary: '#565A72',
+  // Placeholders are instructions, not hints. 5.12:1 on surface, 4.58:1 on
+  // background — it has to clear both, which is why it is this dark.
+  textTertiary: '#686D83',
 
-  calculator: '#1D1D22',
-  calculatorDark: '#141417',
+  // Brand accent as a flat colour, for text, icons and hairlines. The gradient
+  // ramps below carry every filled control.
+  primary: '#4A38C4',
+  primaryLight: '#E7E4FA',
+  primaryMuted: 'rgba(90,71,214,0.13)',
 
-  fab: '#9D6FFF',
-  tabActive: '#F2F2F4',
-  tabInactive: '#6B6B72',
+  expense: '#CE3B49',
+  income: '#0A6B3E',
 
-  segmentTrackBg: '#1B1B20',
-  segmentActiveBg: '#F2F2F4',
-  segmentActiveText: '#0B0B0D',
-  segmentInactiveText: '#98989F',
+  border: '#E2E4EE',
+  borderLight: '#EDEEF5',
 
-  chipBg: '#1B1B20',
-  chipActiveBg: '#F2F2F4',
-  chipActiveText: '#0B0B0D',
-  chipText: '#C9C9CE',
+  progressGreen: '#0A6B3E',
+  progressRed: '#CE3B49',
 
-  chartPalette: DARK_CHART_PALETTE,
+  calculator: '#FFFFFF',
+  calculatorDark: '#E6E8F2',
 
-  ringTrack: '#F2F2F42B',
+  fab: '#5A47D6',
+  tabActive: '#4A38C4',
+  tabInactive: '#686D83',
+
+  segmentTrackBg: '#E6E8F2',
+  segmentActiveBg: '#5A47D6',
+  segmentActiveText: '#FFFFFF',
+  segmentInactiveText: '#565A72',
+
+  chipBg: '#E6E8F2',
+  chipActiveBg: '#5A47D6',
+  chipActiveText: '#FFFFFF',
+  chipText: '#3D4157',
+
+  chartPalette: toPalette(LIGHT_CATEGORIES),
+  categories: LIGHT_CATEGORIES,
+
+  ringTrack: '#14152A1F',
+
+  /** Tint for the blurred status-bar and tab-bar scrims. */
+  scrim: 'rgba(241,242,249,0.72)',
+  /** Backdrop behind a presented sheet. */
+  sheetScrim: 'rgba(20,21,42,0.40)',
 
   white: '#FFFFFF',
-  shadow: 'rgba(0,0,0,0.5)',
+  shadow: 'rgba(30,32,60,0.10)',
+};
+
+export const DarkColors: typeof LightColors = {
+  background: '#07070D',
+  surface: '#1C1C27',
+  surfaceElevated: '#2A2A37',
+  text: '#F1F1F7',
+  textSecondary: '#ADAFC2',
+  textTertiary: '#8B8FA6',
+
+  primary: '#9E8BFA',
+  primaryLight: '#2A2450',
+  primaryMuted: 'rgba(158,139,250,0.18)',
+
+  expense: '#FB7185',
+  income: '#34D399',
+
+  border: '#343445',
+  borderLight: '#262633',
+
+  progressGreen: '#34D399',
+  progressRed: '#FB7185',
+
+  calculator: '#1C1C27',
+  calculatorDark: '#16161F',
+
+  fab: '#5A47D6',
+  tabActive: '#9E8BFA',
+  tabInactive: '#8B8FA6',
+
+  segmentTrackBg: '#24242F',
+  segmentActiveBg: '#5A47D6',
+  segmentActiveText: '#FFFFFF',
+  segmentInactiveText: '#ADAFC2',
+
+  chipBg: '#24242F',
+  chipActiveBg: '#5A47D6',
+  chipActiveText: '#FFFFFF',
+  chipText: '#C7C9D8',
+
+  chartPalette: toPalette(DARK_CATEGORIES),
+  categories: DARK_CATEGORIES,
+
+  ringTrack: '#F1F1F72B',
+
+  scrim: 'rgba(7,7,13,0.72)',
+  sheetScrim: 'rgba(3,3,8,0.55)',
+
+  white: '#FFFFFF',
+  shadow: 'rgba(0,0,0,0.55)',
 };
 
 export type ThemeColors = typeof LightColors;
@@ -128,6 +202,86 @@ export const Colors = {
     tabIconSelected: DarkColors.tabActive,
   },
 };
+
+// ---------------------------------------------------------------------------
+// The primary material
+//
+// A gradient pill: a short diagonal ramp, a same-hue bloom, and a faint sheen.
+// Identical in both themes — the material is the brand, so it does not change
+// when the surface under it does.
+// ---------------------------------------------------------------------------
+
+export type GradientRamp = {
+  /** Three stops, light → mid → deep. Feed straight to LinearGradient. */
+  colors: readonly [string, string, string];
+  /** Colour of the label and glyphs sitting on the ramp. */
+  on: string;
+  /** Mid stop, used for the bloom and for any flat fallback. */
+  mid: string;
+};
+
+export const Gradients = {
+  /** Chrome that commits: FAB, Save, active segment, sheet confirm. */
+  primary: {
+    colors: ['#3C3596', '#5A47D6', '#7B62F7'],
+    on: '#FFFFFF',
+    mid: '#5A47D6',
+  },
+  /** Chrome that creates: New account, New category, Add budget. */
+  secondary: {
+    colors: ['#5B8CFF', '#4066FA', '#3448EE'],
+    on: '#FFFFFF',
+    mid: '#4066FA',
+  },
+  /** Neutral actions on the light theme. */
+  neutralDark: {
+    colors: ['#4A4270', '#2A2545', '#191529'],
+    on: '#FFFFFF',
+    mid: '#2A2545',
+  },
+  /** The same neutral actions on the dark theme. */
+  neutralLight: {
+    colors: ['#FFFFFF', '#F7F5FE', '#EDEAFA'],
+    on: '#2E2A45',
+    mid: '#F7F5FE',
+  },
+} as const satisfies Record<string, GradientRamp>;
+
+export type GradientName = keyof typeof Gradients;
+
+/**
+ * Bloom strength per control size. The web mocks use a blurred copy of the
+ * control; React Native has no equivalent, so this maps to a coloured
+ * shadow on iOS and to elevation plus a gradient halo on Android.
+ *
+ * Values are deliberately restrained — the first pass glowed too much.
+ */
+export type BloomSpec = {
+  radius: number;
+  opacity: number;
+  offsetY: number;
+  elevation: number;
+};
+
+// No `as const` — the sizes must stay mutually assignable so a
+// `Record<Size, BloomSpec>` lookup table typechecks.
+export const Bloom = {
+  fab: { radius: 12, opacity: 0.28, offsetY: 6, elevation: 10 },
+  cta: { radius: 11, opacity: 0.22, offsetY: 5, elevation: 6 },
+  mini: { radius: 9, opacity: 0.2, offsetY: 4, elevation: 4 },
+  segment: { radius: 8, opacity: 0.18, offsetY: 3, elevation: 3 },
+  pressed: { radius: 7, opacity: 0.14, offsetY: 2, elevation: 2 },
+} satisfies Record<string, BloomSpec>;
+
+// ---------------------------------------------------------------------------
+// Chrome geometry
+// ---------------------------------------------------------------------------
+
+/** Tab bar height excluding the bottom safe-area inset. */
+export const TAB_BAR_HEIGHT = 64;
+
+/** Blur radius for the status-bar and tab-bar scrims. */
+export const SCRIM_BLUR = 20;
 
 export const Fonts = Platform.select({
   ios: {
@@ -171,24 +325,26 @@ export const Radius = {
   pill: 999,
 } as const;
 
-/** Curated multi-color set for menu-row icon tiles (Settings, Manage, etc.) —
- * modern, muted jewel tones, distinguishable from each other and from the
- * single amber brand accent. Same hues in both themes. */
+/**
+ * Icon tiles on menu rows (Manage, Settings) draw from the category palette,
+ * not from the brand — same separation rule as charts. Keys are kept for the
+ * existing call sites; the values are now category hues.
+ */
 export const IconPalette = {
-  blue: '#4C7EF3',
-  purple: '#8B5CF6',
-  teal: '#14B8A6',
-  pink: '#EC4899',
-  indigo: '#6366F1',
-  amber: '#D6811F',
-  red: '#EF4444',
-  slate: '#64748B',
+  blue: LIGHT_CATEGORIES.cyan,
+  purple: LIGHT_CATEGORIES.fuchsia,
+  teal: LIGHT_CATEGORIES.teal,
+  pink: LIGHT_CATEGORIES.rose,
+  indigo: LIGHT_CATEGORIES.mocha,
+  amber: LIGHT_CATEGORIES.amber,
+  red: LIGHT_CATEGORIES.coral,
+  slate: LIGHT_CATEGORIES.slate,
 } as const;
 
 export const Typography = {
-  hero: { fontSize: 34, fontWeight: '700' as const },
-  heroSm: { fontSize: 26, fontWeight: '700' as const },
-  title: { fontSize: 20, fontWeight: '700' as const },
+  hero: { fontSize: 34, fontWeight: '700' as const, letterSpacing: -0.6 },
+  heroSm: { fontSize: 26, fontWeight: '700' as const, letterSpacing: -0.4 },
+  title: { fontSize: 20, fontWeight: '700' as const, letterSpacing: -0.3 },
   subtitle: { fontSize: 16, fontWeight: '600' as const },
   body: { fontSize: 15, fontWeight: '400' as const },
   bodySemibold: { fontSize: 15, fontWeight: '600' as const },

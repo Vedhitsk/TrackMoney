@@ -16,6 +16,7 @@ import {
 } from "react-native";
 
 import { AmountText, Card, Chip, InsightCard, ListRow, SectionLabel } from "@/components/ui";
+import { GlassScrim, useTabBarHeight, useTopInset } from "@/components/glass-scrim";
 
 import {
     loadRecordsFilterPrefs,
@@ -137,6 +138,8 @@ const TYPE_FILTERS: { key: TypeFilter; label: string }[] = [
 export default function ActivityScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
+  const topInset = useTopInset();
+  const tabBarHeight = useTabBarHeight();
 
   const router = useRouter();
   const {
@@ -288,7 +291,7 @@ export default function ActivityScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: topInset + 8 }]}>
         <Text style={styles.headerTitle}>Activity</Text>
         <Text style={styles.headerCount}>{filtered.length} of {inRange.length}</Text>
       </View>
@@ -353,7 +356,7 @@ export default function ActivityScreen() {
           sections={sections}
           keyExtractor={(item) => String(item.id)}
           stickySectionHeadersEnabled={false}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + Spacing.lg }]}
           renderSectionHeader={({ section }) => (
             <View style={styles.dateHeaderRow}>
               <SectionLabel style={styles.dateHeader}>{section.title}</SectionLabel>
@@ -430,15 +433,17 @@ export default function ActivityScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <GlassScrim edge="top" />
     </View>
   );
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
+  // No hardcoded paddingTop — the header takes insets.top at render time.
   container: {
     flex: 1,
     backgroundColor: theme.background,
-    paddingTop: 56,
   },
   header: {
     flexDirection: "row",
@@ -519,7 +524,9 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    paddingBottom: 100,
+    // paddingBottom is applied at render time from useTabBarHeight() — the
+    // tab bar is absolute, so a hardcoded value hides the last row on devices
+    // with a taller gesture inset.
   },
   dateHeaderRow: {
     flexDirection: "row",

@@ -17,6 +17,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 
 import { DonutChart } from "@/components/donut-chart";
+import { GlassScrim, useTabBarHeight, useTopInset } from "@/components/glass-scrim";
 import {
   BarChart,
   Card,
@@ -46,6 +47,8 @@ export default function InsightsScreen() {
   const theme = useAppTheme();
   const styles = getStyles(theme);
   const router = useRouter();
+  const topInset = useTopInset();
+  const tabBarHeight = useTabBarHeight();
 
   const { categories, loadCategories, allTransactions, refreshAllTransactions } = useTransactionStore();
 
@@ -286,30 +289,35 @@ export default function InsightsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>Insights</Text>
+      <View style={[styles.header, { paddingTop: topInset + 8 }]}>
+        <Text style={styles.headerTitle}>Insights</Text>
 
-      <SegmentedControl
-        style={styles.paneSwitch}
-        value={pane}
-        onChange={setPane}
-        options={[
-          { value: "analysis", label: "Analysis" },
-          { value: "budgets", label: "Budgets" },
-        ]}
-      />
+        <SegmentedControl
+          style={styles.paneSwitch}
+          value={pane}
+          onChange={setPane}
+          options={[
+            { value: "analysis", label: "Analysis" },
+            { value: "budgets", label: "Budgets" },
+          ]}
+        />
 
-      <View style={styles.monthNav}>
-        <TouchableOpacity onPress={prevMonth} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <MaterialIcons name="chevron-left" size={26} color={theme.textSecondary} />
-        </TouchableOpacity>
-        <Text style={styles.monthLabel}>{monthLabel}</Text>
-        <TouchableOpacity onPress={nextMonth} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <MaterialIcons name="chevron-right" size={26} color={theme.textSecondary} />
-        </TouchableOpacity>
+        <View style={styles.monthNav}>
+          <TouchableOpacity onPress={prevMonth} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <MaterialIcons name="chevron-left" size={26} color={theme.textSecondary} />
+          </TouchableOpacity>
+          <Text style={styles.monthLabel}>{monthLabel}</Text>
+          <TouchableOpacity onPress={nextMonth} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <MaterialIcons name="chevron-right" size={26} color={theme.textSecondary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {pane === "analysis" ? (
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarHeight + Spacing.lg }]}
+          showsVerticalScrollIndicator={false}
+        >
           <SegmentedControl
             value={viewType}
             onChange={setViewType}
@@ -399,7 +407,11 @@ export default function InsightsScreen() {
         </ScrollView>
       ) : (
         <View style={styles.budgetPane}>
-          <ScrollView style={styles.budgetScroll} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.budgetScroll}
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
             <Card style={styles.summaryCard}>
               <View style={styles.summaryRow}>
                 <View>
@@ -490,7 +502,7 @@ export default function InsightsScreen() {
             )}
           </ScrollView>
 
-          <View style={styles.budgetFooter}>
+          <View style={[styles.budgetFooter, { paddingBottom: tabBarHeight }]}>
             <TouchableOpacity style={styles.footerSecondaryBtn} onPress={handleCopyFromPrevious}>
               <MaterialIcons name="content-copy" size={15} color={theme.textSecondary} />
               <Text style={styles.footerSecondaryBtnText}>Copy previous</Text>
@@ -541,12 +553,23 @@ export default function InsightsScreen() {
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </Modal>
+
+      <GlassScrim edge="top" />
     </View>
   );
 }
 
 const getStyles = (theme: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.background, paddingTop: 56, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
+  // The container carries no padding of its own. It used to have
+  // `paddingTop: 56, paddingHorizontal, paddingBottom: Spacing.lg` — and that
+  // bottom padding was the dead band in the screenshot: the ScrollView's own
+  // edge stopped 16px short of the tab bar, so the last card was clipped
+  // early against empty background. The hardcoded 56 was the same bug at the
+  // top, ignoring insets.top and only looking right on one device.
+  // Padding now lives on the fixed header and on the scroll content
+  // containers. See EXPERIENCE.md § Chrome & Scroll Contract, rules C1/C4.
+  container: { flex: 1, backgroundColor: theme.background },
+  header: { paddingHorizontal: Spacing.lg },
   headerTitle: { ...Typography.title, color: theme.text, marginBottom: Spacing.md },
   paneSwitch: { marginBottom: Spacing.md },
   monthNav: {
@@ -557,7 +580,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     marginBottom: Spacing.md,
   },
   monthLabel: { fontSize: 14, fontWeight: "600", color: theme.textSecondary, minWidth: 140, textAlign: "center" },
-  scroll: { gap: Spacing.md, paddingBottom: 100 },
+  scroll: { gap: Spacing.md, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
   chartCard: { marginTop: Spacing.sm },
   donutRow: { flexDirection: "row", alignItems: "center", gap: Spacing.lg },
   legendWrap: { flex: 1 },
@@ -599,6 +622,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     flexDirection: "row",
     gap: Spacing.sm,
     paddingTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderTopWidth: 1,
     borderTopColor: theme.borderLight,
   },

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { Radius } from '@/constants/theme';
+import { Bloom, Gradients, Radius } from '@/constants/theme';
+import { GradientFill } from './gradient-button';
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -51,11 +52,19 @@ export function SegmentedControl<T extends string>({ options, value, onChange, s
             styles.indicator,
             {
               width: segmentWidth,
-              backgroundColor: theme.segmentActiveBg,
+              // The bloom, one step lighter than a CTA — a segment is chrome
+              // inside chrome and should not compete with the Save button.
+              shadowColor: Gradients.primary.mid,
+              shadowOpacity: Bloom.segment.opacity,
+              shadowRadius: Bloom.segment.radius,
+              shadowOffset: { width: 0, height: Bloom.segment.offsetY },
+              elevation: Bloom.segment.elevation,
               transform: [{ translateX }],
             },
           ]}
-        />
+        >
+          <GradientFill radius={Radius.pill} style={StyleSheet.absoluteFill} />
+        </Animated.View>
       )}
       {options.map((opt) => {
         const active = opt.value === value;

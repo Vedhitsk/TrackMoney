@@ -9,6 +9,8 @@ import { insertTransaction } from "@/db/queries/transactions";
 import type { TransactionType } from "@/types";
 
 import { listPendingRecoveries, createSettlements, type PendingRecovery } from "@/db/queries/settlements";
+import { createAccount } from "@/db/queries/accounts";
+import { createCategory } from "@/db/queries/categories";
 
 export default function NewTransactionScreen() {
   const router = useRouter();
@@ -46,11 +48,10 @@ export default function NewTransactionScreen() {
     }
   }, [uiType]);
 
-  useEffect(() => {
-    if (accounts.length > 0 && accountId === null) {
-      setAccountId(accounts[0].id);
-    }
-  }, [accounts]);
+  // Deliberately no auto-selection. Account and Category both start empty and
+  // show their own names as placeholders, so the user picks rather than
+  // discovering later that the first account was chosen for them.
+  // EXPERIENCE.md § State Patterns, "Unset account".
 
   const amount = useMemo(() => {
     const v = Number(amountStr.replace(/[×÷+\-]/g, ""));
@@ -91,6 +92,29 @@ export default function NewTransactionScreen() {
   };
 
   const selectedCategory = categories.find((c) => c.id === categoryId) ?? null;
+
+  // Creating from inside a picker sheet selects the new row immediately — the
+  // user asked for it by name, so making them find it in the list afterwards
+  // would be busywork.
+  const handleCreateAccount = async (name: string) => {
+    try {
+      const created = await createAccount({ name });
+      await loadAccounts();
+      setAccountId(created.id);
+    } catch (e) {
+      showAppAlert("Couldn't add account", e instanceof Error ? e.message : "Unknown error");
+    }
+  };
+
+  const handleCreateCategory = async (name: string) => {
+    try {
+      const created = await createCategory({ name });
+      await loadCategories();
+      setCategoryId(created.id);
+    } catch (e) {
+      showAppAlert("Couldn't add category", e instanceof Error ? e.message : "Unknown error");
+    }
+  };
 
   const canSave = (() => {
     if (amount <= 0) return false;
@@ -170,12 +194,14 @@ export default function NewTransactionScreen() {
         accounts={accounts}
         accountId={accountId}
         onSelectAccount={setAccountId}
+        onCreateAccount={handleCreateAccount}
         toAccounts={accounts.filter((a) => a.id !== accountId)}
         toAccountId={toAccountId}
         onSelectToAccount={setToAccountId}
         categories={categories}
         categoryId={categoryId}
         onSelectCategory={setCategoryId}
+        onCreateCategory={handleCreateCategory}
         pendingRecoveries={pendingRecoveries}
         selectedRecoveries={selectedRecoveries}
         allocations={allocations}

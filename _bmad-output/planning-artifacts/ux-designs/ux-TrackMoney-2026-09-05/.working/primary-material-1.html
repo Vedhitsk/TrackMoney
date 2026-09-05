@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrackMoney · Primary Material</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EDEEF0;color:#15171C;
+ font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 24px 80px}
+.lede{background:#fff;border:1px solid #DDDFE4;border-radius:16px;padding:22px 26px;margin-bottom:30px}
+.lede h1{margin:0 0 8px;font-size:26px;letter-spacing:-.4px}
+.lede p{margin:0 0 10px;color:#4A4F5A;max-width:80ch}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:16px}
+.layer{background:#F6F7F9;border:1px solid #E4E6EB;border-radius:10px;padding:12px 14px;font-size:12.5px;color:#3A3F49}
+.layer b{display:block;color:#15171C;margin-bottom:3px;font-size:12px}
+.var{background:#fff;border:1px solid #DDDFE4;border-radius:18px;padding:26px;margin-bottom:26px}
+.var h2{margin:0 0 4px;font-size:21px;letter-spacing:-.3px}
+.var .line{margin:0 0 20px;color:#4A4F5A;max-width:84ch;font-size:13px}
+.subhead{margin:24px 0 12px;font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:#8A909B}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cmp figure{margin:0}
+.imgwrap,.stage{height:300px;border-radius:14px;overflow:hidden;display:grid;place-items:center;
+ border:1px solid #DDDFE4;position:relative}
+.imgwrap{background:#0C0C10}
+.imgwrap img{max-width:100%;max-height:100%;display:block}
+.stage{position:relative}
+.ambient{position:absolute;width:520px;height:260px;pointer-events:none}
+.bigpill{position:relative;display:inline-flex;align-items:center;gap:16px;border-radius:30px;
+ padding:20px 8px 20px 20px;font:600 30px/1 inherit;font-family:inherit;cursor:default}
+.bigpill span{padding-right:10px}
+.bigtile{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
+ font-style:normal;font-size:32px;font-weight:600;flex:0 0 52px}
+.bigdiv{width:1px;align-self:stretch;margin:-20px 0;display:block}
+.bigchev{font-style:normal;padding:0 22px 10px;font-size:30px}
+figcaption{margin-top:9px;font-size:11.5px;color:#6C7280}
+figcaption code{font-size:10.5px;color:#8A909B}
+.ctls{display:flex;gap:16px;flex-wrap:wrap}
+.ctl{flex:1;min-width:440px;border:1px solid;border-radius:16px;padding:20px;position:relative}
+.ctlmode{position:absolute;top:10px;right:14px;font-size:9.5px;letter-spacing:1px;text-transform:uppercase}
+.ctlgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cell.wide{grid-column:1 / -1}
+.cell label{display:block;font-size:9.5px;letter-spacing:.9px;text-transform:uppercase;
+ font-weight:700;margin-bottom:9px}
+.fab{width:60px;height:60px;border-radius:22px;font-size:28px;display:grid;place-items:center;
+ font-family:inherit;cursor:default;padding-bottom:3px}
+.cta{width:100%;border-radius:18px;padding:15px;font:700 14px inherit;font-family:inherit;cursor:default}
+.seg{display:flex;gap:4px;padding:4px;border-radius:20px}
+.seg span{flex:1;text-align:center;padding:10px 8px;border-radius:16px;font-size:12.5px;font-weight:600}
+.iconrow{display:flex;gap:10px}
+.ibtn{width:44px;height:44px;border-radius:15px;font-size:18px;display:grid;place-items:center;
+ font-family:inherit;cursor:default}
+.pill{display:inline-flex;align-items:center;gap:10px;border-radius:18px;padding:11px 4px 11px 11px;
+ font:600 15px/1 inherit;font-family:inherit;cursor:default}
+.pill span{padding-right:6px}
+.ptile{width:28px;height:28px;border-radius:10px;display:grid;place-items:center;font-style:normal;
+ font-size:17px;font-weight:600;flex:0 0 28px}
+.pdiv{width:1px;align-self:stretch;margin:-11px 0;display:block}
+.pchev{font-style:normal;padding:0 14px 5px;font-size:17px}
+.inplace{border:1px solid;border-radius:16px;padding:0;overflow:hidden}
+.tabs{display:flex;align-items:center;justify-content:space-around;padding:12px 8px}
+.tabs span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;flex:1}
+.tabs b{font-size:9px;font-weight:600}
+.tabfab{width:50px;height:50px;border-radius:18px;display:grid;place-items:center;font-size:24px;
+ font-style:normal;margin-top:-24px;flex:0 0 50px}
+.checks{border-collapse:collapse;font-size:11.5px;min-width:340px}
+.checks caption{text-align:left;font-size:10px;letter-spacing:.8px;text-transform:uppercase;
+ color:#8A909B;padding-bottom:7px;font-weight:700}
+.checks td{padding:5px 8px;border-top:1px solid #EBEDF1}
+.checks td:last-child{text-align:right}
+.checks code{color:#6C7280;font-size:10.5px}
+.ratio{font-weight:700;font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;font-size:10.5px}
+.ratio.pass{background:#E2F5EA;color:#116B41}
+.ratio.fail{background:#FBE4E4;color:#9C2A24}
+</style></head>
+<body><div class="wrap">
+
+<div class="lede">
+  <h1>The primary material</h1>
+  <p>Your reference button is not a colour — it is a material, and it is built from four things.
+     Three readings of it are below, differing only in how hard each layer is pushed. Your own
+     image is loaded beside each one on the same near-black ground, so the comparison is direct
+     rather than remembered.</p>
+  <div class="layers">
+    <div class="layer"><b>1 · Gradient ramp</b>A short vertical shift, roughly one step of value,
+      angled 176° so it is not perfectly plumb. Never so deep that the bottom edge reads black.</div>
+    <div class="layer"><b>2 · Rim-light</b>A 1px inset highlight along the top edge and a 1px
+      inset shadow along the bottom, so the control reads as lit from above rather than painted on.</div>
+    <div class="layer"><b>3 · Coloured bloom</b>Three stacked shadows in the brand hue, not grey:
+      a tight contact shadow, a mid glow, and a wide diffuse halo. This is what makes it glow
+      rather than float.</div>
+    <div class="layer"><b>4 · Translucent tile</b>The glyph sits in a rounded square of white at
+      low opacity with its own rim-light — a control within a control.</div>
+  </div>
+  <p style="margin-top:16px"><b>Two things I changed from my earlier attempt:</b> the corner radius is a
+     soft rounded-rect, not a full pill — your reference is roughly 0.28 of its own height, which is
+     what gives it that squircle weight. And the bloom is far wider and softer than a normal shadow,
+     which is the layer that was missing.</p>
+</div>
+
+
+<section class="var" id="soft">
+  <h2>Soft</h2>
+  <p class="line">Narrowest ramp, widest bloom. The control looks lit rather than shaded — closest to a glass lozenge.</p>
+  <h4 class="subhead">against your reference</h4>
+  
+<div class="cmp">
+  <figure>
+    <div class="imgwrap"><img src="../imports/primary_color.png" alt="reference button"></div>
+    <figcaption>your reference · <code>imports/primary_color.png</code></figcaption>
+  </figure>
+  <figure>
+    <div class="stage" style="background:#0C0C10">
+      <span class="ambient" style="background:radial-gradient(closest-side,rgba(122,77,245,0.22),transparent)"></span>
+      <button class="bigpill" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">
+        <i class="bigtile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="bigdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="bigchev">⌄</em>
+      </button>
+    </div>
+    <figcaption>Soft · ramp <code>#8C63FF → #7A4DF5 → #6B3BE8</code></figcaption>
+  </figure>
+</div>
+  <h4 class="subhead">every primary control, both modes</h4>
+  <div class="ctls">
+<div class="ctl" style="background:#0C0C10;border-color:#2C2A38;color:#F3F2F7">
+  <span class="ctlmode" style="color:#8C8A9E">dark</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#8C8A9E">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7A4DF5 0%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.21);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(122,77,245,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Disabled</label>
+      <button class="cta dis" style="background:#221F2D;color:#8C8A9E;border:1px solid #2C2A38">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#221F2D">
+        <span class="on" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">Expense</span>
+        <span style="color:#ADAABD">Income</span>
+        <span style="color:#ADAABD">Transfer</span>
+        <span style="color:#ADAABD">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#221F2D;color:#ADAABD;border:1px solid #2C2A38">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#16151D;border-color:#2C2A38">
+        <div class="tabs">
+          <span style="color:#F3F2F7">⌂<b>Home</b></span>
+          <span style="color:#8C8A9E">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.3),0 10px 30px rgba(122,77,245,0.42),0 20px 60px rgba(122,77,245,0.16);color:#FFFFFF">+</i>
+          <span style="color:#8C8A9E">↗<b>Insights</b></span>
+          <span style="color:#8C8A9E">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div>
+<div class="ctl" style="background:#F4F3F7;border-color:#E4E2EC;color:#121118">
+  <span class="ctlmode" style="color:#73718A">light</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#73718A">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#73718A">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7A4DF5 0%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.21);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(122,77,245,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Disabled</label>
+      <button class="cta dis" style="background:#EAE8F1;color:#73718A;border:1px solid #E4E2EC">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#73718A">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#EAE8F1">
+        <span class="on" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">Expense</span>
+        <span style="color:#56545F">Income</span>
+        <span style="color:#56545F">Transfer</span>
+        <span style="color:#56545F">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#EAE8F1;color:#56545F;border:1px solid #E4E2EC">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#73718A">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#FFFFFF;border-color:#E4E2EC">
+        <div class="tabs">
+          <span style="color:#121118">⌂<b>Home</b></span>
+          <span style="color:#73718A">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#8C63FF 0%,#7A4DF5 52%,#6B3BE8 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 0 rgba(255,255,255,0.42),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(122,77,245,0.165),0 7px 21px rgba(122,77,245,0.189),0 12px 36px rgba(122,77,245,0.08);color:#FFFFFF">+</i>
+          <span style="color:#73718A">↗<b>Insights</b></span>
+          <span style="color:#73718A">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div></div>
+  <h4 class="subhead">measured</h4>
+  <table class="checks"><caption>white glyph · 3:1 floor</caption><tr><td>White glyph on ramp top</td><td><code>#8C63FF</code></td><td><span class="ratio pass">3.93:1</span></td></tr><tr><td>White glyph on ramp mid</td><td><code>#7A4DF5</code></td><td><span class="ratio pass">4.99:1</span></td></tr><tr><td>White glyph on ramp deep</td><td><code>#6B3BE8</code></td><td><span class="ratio pass">6.15:1</span></td></tr><tr><td><b>Weakest point of the gradient</b></td><td></td><td><span class="ratio pass">3.93:1</span></td></tr></table>
+</section>
+<section class="var" id="signal">
+  <h2>Signal</h2>
+  <p class="line">The closest match to your reference. Ramp shifts about one step of value; bloom is tight enough to read as a shadow and wide enough to read as light.</p>
+  <h4 class="subhead">against your reference</h4>
+  
+<div class="cmp">
+  <figure>
+    <div class="imgwrap"><img src="../imports/primary_color.png" alt="reference button"></div>
+    <figcaption>your reference · <code>imports/primary_color.png</code></figcaption>
+  </figure>
+  <figure>
+    <div class="stage" style="background:#0C0C10">
+      <span class="ambient" style="background:radial-gradient(closest-side,rgba(124,77,255,0.22),transparent)"></span>
+      <button class="bigpill" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">
+        <i class="bigtile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="bigdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="bigchev">⌄</em>
+      </button>
+    </div>
+    <figcaption>Signal · ramp <code>#9068FF → #7C4DFF → #6633E6</code></figcaption>
+  </figure>
+</div>
+  <h4 class="subhead">every primary control, both modes</h4>
+  <div class="ctls">
+<div class="ctl" style="background:#0C0C10;border-color:#2C2A38;color:#F3F2F7">
+  <span class="ctlmode" style="color:#8C8A9E">dark</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#8C8A9E">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7C4DFF 0%,#6633E6 100%);border:1px solid rgba(255,255,255,0.238);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(124,77,255,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Disabled</label>
+      <button class="cta dis" style="background:#221F2D;color:#8C8A9E;border:1px solid #2C2A38">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#221F2D">
+        <span class="on" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">Expense</span>
+        <span style="color:#ADAABD">Income</span>
+        <span style="color:#ADAABD">Transfer</span>
+        <span style="color:#ADAABD">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#221F2D;color:#ADAABD;border:1px solid #2C2A38">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#16151D;border-color:#2C2A38">
+        <div class="tabs">
+          <span style="color:#F3F2F7">⌂<b>Home</b></span>
+          <span style="color:#8C8A9E">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.34);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.38),0 8px 24px rgba(124,77,255,0.5),0 17px 52px rgba(124,77,255,0.2);color:#FFFFFF">+</i>
+          <span style="color:#8C8A9E">↗<b>Insights</b></span>
+          <span style="color:#8C8A9E">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div>
+<div class="ctl" style="background:#F4F3F7;border-color:#E4E2EC;color:#121118">
+  <span class="ctlmode" style="color:#73718A">light</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#73718A">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#73718A">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7C4DFF 0%,#6633E6 100%);border:1px solid rgba(255,255,255,0.238);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(124,77,255,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Disabled</label>
+      <button class="cta dis" style="background:#EAE8F1;color:#73718A;border:1px solid #E4E2EC">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#73718A">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#EAE8F1">
+        <span class="on" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">Expense</span>
+        <span style="color:#56545F">Income</span>
+        <span style="color:#56545F">Transfer</span>
+        <span style="color:#56545F">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#EAE8F1;color:#56545F;border:1px solid #E4E2EC">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#73718A">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#FFFFFF;border-color:#E4E2EC">
+        <div class="tabs">
+          <span style="color:#121118">⌂<b>Home</b></span>
+          <span style="color:#73718A">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#9068FF 0%,#7C4DFF 52%,#6633E6 100%);border:1px solid rgba(255,255,255,0.20400000000000001);box-shadow:inset 0 1px 0 rgba(255,255,255,0.46),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,77,255,0.20900000000000002),0 5px 16px rgba(124,77,255,0.225),0 10px 31px rgba(124,77,255,0.1);color:#FFFFFF">+</i>
+          <span style="color:#73718A">↗<b>Insights</b></span>
+          <span style="color:#73718A">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div></div>
+  <h4 class="subhead">measured</h4>
+  <table class="checks"><caption>white glyph · 3:1 floor</caption><tr><td>White glyph on ramp top</td><td><code>#9068FF</code></td><td><span class="ratio pass">3.74:1</span></td></tr><tr><td>White glyph on ramp mid</td><td><code>#7C4DFF</code></td><td><span class="ratio pass">4.81:1</span></td></tr><tr><td>White glyph on ramp deep</td><td><code>#6633E6</code></td><td><span class="ratio pass">6.60:1</span></td></tr><tr><td><b>Weakest point of the gradient</b></td><td></td><td><span class="ratio pass">3.74:1</span></td></tr></table>
+</section>
+<section class="var" id="bold">
+  <h2>Bold</h2>
+  <p class="line">Deepest ramp, tightest bloom. Reads as a physical, pressable slab — more weight, less glow.</p>
+  <h4 class="subhead">against your reference</h4>
+  
+<div class="cmp">
+  <figure>
+    <div class="imgwrap"><img src="../imports/primary_color.png" alt="reference button"></div>
+    <figcaption>your reference · <code>imports/primary_color.png</code></figcaption>
+  </figure>
+  <figure>
+    <div class="stage" style="background:#0C0C10">
+      <span class="ambient" style="background:radial-gradient(closest-side,rgba(124,58,237,0.22),transparent)"></span>
+      <button class="bigpill" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">
+        <i class="bigtile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="bigdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="bigchev">⌄</em>
+      </button>
+    </div>
+    <figcaption>Bold · ramp <code>#A07BFF → #7C3AED → #5A20B4</code></figcaption>
+  </figure>
+</div>
+  <h4 class="subhead">every primary control, both modes</h4>
+  <div class="ctls">
+<div class="ctl" style="background:#0C0C10;border-color:#2C2A38;color:#F3F2F7">
+  <span class="ctlmode" style="color:#8C8A9E">dark</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#8C8A9E">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7C3AED 0%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.27999999999999997);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(124,58,237,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Disabled</label>
+      <button class="cta dis" style="background:#221F2D;color:#8C8A9E;border:1px solid #2C2A38">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#221F2D">
+        <span class="on" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">Expense</span>
+        <span style="color:#ADAABD">Income</span>
+        <span style="color:#ADAABD">Transfer</span>
+        <span style="color:#ADAABD">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#221F2D;color:#ADAABD;border:1px solid #2C2A38">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#8C8A9E">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#8C8A9E">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#16151D;border-color:#2C2A38">
+        <div class="tabs">
+          <span style="color:#F3F2F7">⌂<b>Home</b></span>
+          <span style="color:#8C8A9E">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.42),0 6px 18px rgba(124,58,237,0.46),0 13px 40px rgba(124,58,237,0.22);color:#FFFFFF">+</i>
+          <span style="color:#8C8A9E">↗<b>Insights</b></span>
+          <span style="color:#8C8A9E">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div>
+<div class="ctl" style="background:#F4F3F7;border-color:#E4E2EC;color:#121118">
+  <span class="ctlmode" style="color:#73718A">light</span>
+
+  <div class="ctlgrid">
+    <div class="cell"><label style="color:#73718A">FAB</label>
+      <button class="fab" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">+</button></div>
+
+    <div class="cell"><label style="color:#73718A">Primary CTA</label>
+      <button class="cta" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Pressed</label>
+      <button class="cta" style="background:linear-gradient(176deg,#7C3AED 0%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.27999999999999997);box-shadow:inset 0 2px 5px rgba(0,0,0,0.34),0 1px 4px rgba(124,58,237,0.3);color:#FFFFFF;transform:translateY(2px) scale(.985)">Save transaction</button></div>
+
+    <div class="cell"><label style="color:#73718A">Disabled</label>
+      <button class="cta dis" style="background:#EAE8F1;color:#73718A;border:1px solid #E4E2EC">
+        Enter an amount</button></div>
+
+    <div class="cell wide"><label style="color:#73718A">Segmented — active segment carries the material</label>
+      <div class="seg" style="background:#EAE8F1">
+        <span class="on" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">Expense</span>
+        <span style="color:#56545F">Income</span>
+        <span style="color:#56545F">Transfer</span>
+        <span style="color:#56545F">Settle</span>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Icon button</label>
+      <div class="iconrow">
+        <button class="ibtn" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">↑</button>
+        <button class="ibtn" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">✓</button>
+        <button class="ibtn ghost"
+          style="background:#EAE8F1;color:#56545F;border:1px solid #E4E2EC">✕</button>
+      </div></div>
+
+    <div class="cell"><label style="color:#73718A">Split action</label>
+      <button class="pill" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">
+        <i class="ptile" style="background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.22)">+</i><span>New</span>
+        <em class="pdiv" style="background:rgba(255,255,255,0.2)"></em>
+        <em class="pchev">⌄</em></button></div>
+
+    <div class="cell wide"><label style="color:#73718A">In place — tab bar and sheet CTA</label>
+      <div class="inplace" style="background:#FFFFFF;border-color:#E4E2EC">
+        <div class="tabs">
+          <span style="color:#121118">⌂<b>Home</b></span>
+          <span style="color:#73718A">≡<b>Activity</b></span>
+          <i class="tabfab" style="background:linear-gradient(176deg,#A07BFF 0%,#7C3AED 52%,#5A20B4 100%);border:1px solid rgba(255,255,255,0.24);box-shadow:inset 0 1px 0 rgba(255,255,255,0.52),inset 0 -1px 0 rgba(0,0,0,0.2),0 2px 6px rgba(124,58,237,0.231),0 4px 12px rgba(124,58,237,0.20700000000000002),0 8px 24px rgba(124,58,237,0.11);color:#FFFFFF">+</i>
+          <span style="color:#73718A">↗<b>Insights</b></span>
+          <span style="color:#73718A">∷<b>Manage</b></span>
+        </div>
+      </div></div>
+  </div>
+</div></div>
+  <h4 class="subhead">measured</h4>
+  <table class="checks"><caption>white glyph · 3:1 floor</caption><tr><td>White glyph on ramp top</td><td><code>#A07BFF</code></td><td><span class="ratio pass">3.10:1</span></td></tr><tr><td>White glyph on ramp mid</td><td><code>#7C3AED</code></td><td><span class="ratio pass">5.70:1</span></td></tr><tr><td>White glyph on ramp deep</td><td><code>#5A20B4</code></td><td><span class="ratio pass">9.13:1</span></td></tr><tr><td><b>Weakest point of the gradient</b></td><td></td><td><span class="ratio pass">3.10:1</span></td></tr></table>
+</section>
+
+</div></body></html>
