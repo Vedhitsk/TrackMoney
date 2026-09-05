@@ -9,7 +9,7 @@ import { ThemedText } from "@/components/themed-text";
 type Props = {
   value: string;
   onChange: (value: string) => void;
-  /** Set false to hide the internal amount readout (e.g. when the caller renders its own large display). Backspace stays reachable either way. */
+  /** Set false to hide the internal amount readout (e.g. when the caller renders its own large display). Clear/backspace move into their own key row either way. */
   showDisplay?: boolean;
 };
 
@@ -70,7 +70,7 @@ export function CalculatorPad({ value, onChange, showDisplay = true }: Props) {
   return (
     <View style={styles.container}>
       {/* Display */}
-      {showDisplay ? (
+      {showDisplay && (
         <View style={styles.display}>
           <ThemedText style={styles.displayText} numberOfLines={1} adjustsFontSizeToFit>
             {value}
@@ -79,10 +79,16 @@ export function CalculatorPad({ value, onChange, showDisplay = true }: Props) {
             <MaterialIcons name="backspace" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.backspaceRow}>
-          <TouchableOpacity onPress={() => handlePress("⌫")} style={styles.backspace}>
-            <MaterialIcons name="backspace" size={22} color={theme.textSecondary} />
+      )}
+
+      {/* Clear / backspace — a real row of keys, same width/height rhythm as the digit grid below, so they read as part of the calculator rather than a floating control. */}
+      {!showDisplay && (
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.key, styles.utilityKey, { flex: 2 }]} onPress={() => handlePress("C")}>
+            <ThemedText style={styles.utilityKeyText}>C</ThemedText>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.key, styles.utilityKey, { flex: 2 }]} onPress={() => handlePress("⌫")}>
+            <MaterialIcons name="backspace-outline" size={20} color={theme.text} />
           </TouchableOpacity>
         </View>
       )}
@@ -145,25 +151,20 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     marginLeft: 12,
     padding: 4,
   },
-  backspaceRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 2,
-  },
   row: {
     flexDirection: "row",
     gap: 6,
   },
   key: {
     flex: 1,
-    aspectRatio: 1.6,
+    aspectRatio: 1.9,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: theme.calculator,
     borderRadius: 8,
   },
   keyText: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "700",
     color: theme.text,
   },
@@ -171,7 +172,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     backgroundColor: theme.calculatorDark,
   },
   operatorKeyText: {
-    fontSize: 22,
+    fontSize: 21,
     color: theme.text,
   },
   equalsKey: {
@@ -179,5 +180,13 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   },
   equalsKeyText: {
     color: "#FFFFFF",
+  },
+  utilityKey: {
+    backgroundColor: theme.calculatorDark,
+  },
+  utilityKeyText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.text,
   },
 });

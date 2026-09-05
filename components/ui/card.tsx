@@ -23,6 +23,7 @@ export function Card({ children, style, elevated, noPadding, noBorder }: Props) 
           borderWidth: noBorder ? 0 : 1,
           borderColor: theme.border,
           padding: noPadding ? 0 : Spacing.lg,
+          overflow: 'hidden',
         },
         style,
       ]}

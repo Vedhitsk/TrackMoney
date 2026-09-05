@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -71,7 +73,7 @@ const TYPE_OPTIONS: { value: UIType; label: string }[] = [
   { value: "settlement", label: "Settle" },
 ];
 
-function AccountChips({
+function ChipSection({
   label,
   items,
   selectedId,
@@ -82,10 +84,9 @@ function AccountChips({
   selectedId: number | null;
   onSelect: (id: number) => void;
 }) {
-  const theme = useAppTheme();
   return (
-    <View style={styles.listRow}>
-      <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>{label}</Text>
+    <View style={styles.section}>
+      <SectionLabel>{label}</SectionLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
         {items.map((item) => (
           <Chip
@@ -102,11 +103,13 @@ function AccountChips({
 }
 
 /**
- * Shared single-page Add/Edit Transaction layout. Deliberately NOT wrapped in
- * a page-level ScrollView: the amount readout, type toggle, and keypad stay
- * fixed, and the account/category pickers are single-row horizontal
- * scrollers (never wrap) so the whole screen stays visible with no scroll
- * regardless of how many accounts/categories exist.
+ * Shared single-page Add/Edit Transaction layout. The amount readout, type
+ * toggle, and keypad are meant to stay fixed without the page needing to
+ * scroll, and account/category pickers are single-row horizontal scrollers
+ * (never wrap) so the layout stays stable regardless of how many
+ * accounts/categories exist. It's still wrapped in a ScrollView (with a
+ * `flexGrow: 1` content container so it doesn't visibly scroll in the normal
+ * case) purely so focusing the Note field can scroll it above the keyboard.
  */
 export function TransactionFormLayout({
   uiType,
@@ -148,176 +151,173 @@ export function TransactionFormLayout({
   const isExpense = uiType === "expense";
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.background,
-          paddingTop: Math.max(insets.top, 16) + 8,
-          paddingBottom: Math.max(insets.bottom, 12) + 12,
-        },
-      ]}
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: theme.background }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={onCancel} style={styles.topBarBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <MaterialIcons name="close" size={22} color={theme.textSecondary} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.saveBtn, { backgroundColor: canSave ? theme.primary : theme.borderLight }]}
-          disabled={!canSave}
-          onPress={onSave}>
-          <Text style={[styles.saveBtnText, { color: canSave ? "#FFFFFF" : theme.textSecondary }]}>Save</Text>
-        </TouchableOpacity>
-      </View>
-
-      <SegmentedControl style={styles.typeSegment} options={TYPE_OPTIONS} value={uiType} onChange={onChangeType} />
-
-      <View style={styles.amountWrap}>
-        <Text style={[styles.amountText, { color: theme.text }]} numberOfLines={1} adjustsFontSizeToFit>
-          ₹{amountStr}
-        </Text>
-      </View>
-
-      {!isTransfer && !isSettlement && (
-        <View style={styles.section}>
-          <SectionLabel>Category</SectionLabel>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-            {categories.map((c) => (
-              <Chip key={c.id} label={c.name} icon={c.icon} selected={c.id === categoryId} onPress={() => onSelectCategory(c.id)} />
-            ))}
-          </ScrollView>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top, 16) + 8,
+            paddingBottom: Math.max(insets.bottom, 12) + 12,
+          },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={onCancel} style={styles.topBarBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <MaterialIcons name="close" size={22} color={theme.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.saveBtn, { backgroundColor: canSave ? theme.primary : theme.borderLight }]}
+            disabled={!canSave}
+            onPress={onSave}>
+            <Text style={[styles.saveBtnText, { color: canSave ? "#FFFFFF" : theme.textSecondary }]}>Save</Text>
+          </TouchableOpacity>
         </View>
-      )}
 
-      {isSettlement && (
-        <View style={styles.section}>
-          <SectionLabel>Select recoveries</SectionLabel>
-          {pendingRecoveries.length === 0 ? (
-            <Text style={[styles.mutedText, { color: theme.textSecondary }]}>No pending recoveries available.</Text>
-          ) : (
-            <ScrollView style={styles.recoveriesScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-              <View style={styles.recoveriesList}>
-                {pendingRecoveries.map((r) => {
-                  const checked = selectedRecoveries.has(r.tx.id);
-                  return (
-                    <View key={r.tx.id} style={[styles.recoveryRow, { borderColor: checked ? theme.primary : theme.border }]}>
-                      <TouchableOpacity style={styles.recoveryRowSelect} onPress={() => onToggleRecovery(r.tx.id)}>
-                        <MaterialIcons
-                          name={checked ? "check-box" : "check-box-outline-blank"}
-                          size={22}
-                          color={checked ? theme.primary : theme.textSecondary}
-                        />
-                        <View style={styles.recoveryRowInfo}>
-                          <Text style={[styles.recoveryRowMerchant, { color: theme.text }]} numberOfLines={1}>{r.tx.merchant}</Text>
-                          <Text style={[styles.recoveryRowRemaining, { color: theme.expense }]}>
-                            Remaining: {formatMoneyINR(r.remaining)}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                      {checked && (
-                        <TextInput
-                          style={[styles.recoveryAllocInput, { borderColor: theme.border, color: theme.text, backgroundColor: theme.background }]}
-                          value={allocations[r.tx.id] ?? ""}
-                          onChangeText={(v) => onChangeAllocation(r.tx.id, v)}
-                          keyboardType="numeric"
-                          placeholder="0"
-                          placeholderTextColor={theme.textSecondary}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          )}
+        <SegmentedControl style={styles.typeSegment} options={TYPE_OPTIONS} value={uiType} onChange={onChangeType} />
+
+        <View style={styles.amountWrap}>
+          <Text style={[styles.amountText, { color: theme.text }]} numberOfLines={1} adjustsFontSizeToFit>
+            ₹{amountStr}
+          </Text>
         </View>
-      )}
 
-      <Card style={styles.listCard} noPadding>
         {isTransfer ? (
           <>
-            <AccountChips label="From" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
-            <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
-            <AccountChips label="To" items={toAccounts} selectedId={toAccountId} onSelect={onSelectToAccount} />
+            <ChipSection label="From" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
+            <ChipSection label="To" items={toAccounts} selectedId={toAccountId} onSelect={onSelectToAccount} />
           </>
         ) : (
-          <AccountChips label="Account" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
+          <ChipSection label="Account" items={accounts} selectedId={accountId} onSelect={onSelectAccount} />
         )}
 
-        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
-        <TouchableOpacity style={styles.detailRow} onPress={onPressDate}>
-          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Date</Text>
-          <View style={styles.detailValueRow}>
-            <MaterialIcons name="calendar-today" size={14} color={theme.textSecondary} />
-            <Text style={[styles.detailValue, { color: theme.text }]}>{dateLabel}</Text>
+        {!isTransfer && !isSettlement && (
+          <ChipSection label="Category" items={categories} selectedId={categoryId} onSelect={onSelectCategory} />
+        )}
+
+        {isSettlement && (
+          <View style={styles.section}>
+            <SectionLabel>Select recoveries</SectionLabel>
+            {pendingRecoveries.length === 0 ? (
+              <Text style={[styles.mutedText, { color: theme.textSecondary }]}>No pending recoveries available.</Text>
+            ) : (
+              <ScrollView style={styles.recoveriesScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+                <View style={styles.recoveriesList}>
+                  {pendingRecoveries.map((r) => {
+                    const checked = selectedRecoveries.has(r.tx.id);
+                    return (
+                      <View key={r.tx.id} style={[styles.recoveryRow, { borderColor: checked ? theme.primary : theme.border }]}>
+                        <TouchableOpacity style={styles.recoveryRowSelect} onPress={() => onToggleRecovery(r.tx.id)}>
+                          <MaterialIcons
+                            name={checked ? "check-box" : "check-box-outline-blank"}
+                            size={22}
+                            color={checked ? theme.primary : theme.textSecondary}
+                          />
+                          <View style={styles.recoveryRowInfo}>
+                            <Text style={[styles.recoveryRowMerchant, { color: theme.text }]} numberOfLines={1}>{r.tx.merchant}</Text>
+                            <Text style={[styles.recoveryRowRemaining, { color: theme.expense }]}>
+                              Remaining: {formatMoneyINR(r.remaining)}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                        {checked && (
+                          <TextInput
+                            style={[styles.recoveryAllocInput, { borderColor: theme.border, color: theme.text, backgroundColor: theme.background }]}
+                            value={allocations[r.tx.id] ?? ""}
+                            onChangeText={(v) => onChangeAllocation(r.tx.id, v)}
+                            keyboardType="numeric"
+                            placeholder="0"
+                            placeholderTextColor={theme.textSecondary}
+                          />
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            )}
           </View>
-        </TouchableOpacity>
+        )}
 
-        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
-        <TouchableOpacity style={styles.detailRow} onPress={onPressTime}>
-          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Time</Text>
-          <View style={styles.detailValueRow}>
-            <MaterialIcons name="access-time" size={14} color={theme.textSecondary} />
-            <Text style={[styles.detailValue, { color: theme.text }]}>{timeLabel}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
-        <View style={styles.detailRow}>
-          <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Note</Text>
-          <TextInput
-            style={[styles.noteInput, { color: theme.text }]}
-            value={notes}
-            onChangeText={onChangeNotes}
-            placeholder="Add a note"
-            placeholderTextColor={theme.textTertiary}
-            numberOfLines={1}
-          />
-        </View>
-      </Card>
-
-      {isExpense && (
-        <View style={styles.sharedSection}>
-          <TouchableOpacity style={styles.sharedToggle} onPress={onToggleShared}>
-            <MaterialIcons
-              name={isShared ? "check-box" : "check-box-outline-blank"}
-              size={20}
-              color={isShared ? theme.primary : theme.textSecondary}
-            />
-            <Text style={[styles.sharedLabel, { color: theme.text }]}>Shared expense</Text>
-          </TouchableOpacity>
-          {isShared && (
-            <View style={styles.sharedInputWrap}>
-              <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Your share</Text>
-              <TextInput
-                style={[styles.shareAmountInput, { borderColor: theme.border, color: theme.text }]}
-                value={actualAmountStr}
-                onChangeText={onChangeActualAmount}
-                keyboardType="decimal-pad"
-                placeholderTextColor={theme.textTertiary}
-              />
+        <Card style={styles.listCard} noPadding>
+          <TouchableOpacity style={styles.detailRow} onPress={onPressDate}>
+            <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Date</Text>
+            <View style={styles.detailValueRow}>
+              <MaterialIcons name="calendar-today" size={14} color={theme.textSecondary} />
+              <Text style={[styles.detailValue, { color: theme.text }]}>{dateLabel}</Text>
             </View>
-          )}
-        </View>
-      )}
+          </TouchableOpacity>
 
-      <View style={styles.calculatorWrap}>
-        <CalculatorPad value={amountStr} onChange={onChangeAmount} showDisplay={false} />
-      </View>
-    </View>
+          <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+          <TouchableOpacity style={styles.detailRow} onPress={onPressTime}>
+            <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Time</Text>
+            <View style={styles.detailValueRow}>
+              <MaterialIcons name="access-time" size={14} color={theme.textSecondary} />
+              <Text style={[styles.detailValue, { color: theme.text }]}>{timeLabel}</Text>
+            </View>
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: theme.borderLight }]} />
+          <View style={styles.detailRow}>
+            <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Note</Text>
+            <TextInput
+              style={[styles.noteInput, { color: theme.text }]}
+              value={notes}
+              onChangeText={onChangeNotes}
+              placeholder="Add a note"
+              placeholderTextColor={theme.textTertiary}
+              numberOfLines={1}
+            />
+          </View>
+        </Card>
+
+        {isExpense && (
+          <View style={styles.sharedSection}>
+            <TouchableOpacity style={styles.sharedToggle} onPress={onToggleShared}>
+              <MaterialIcons
+                name={isShared ? "check-box" : "check-box-outline-blank"}
+                size={20}
+                color={isShared ? theme.primary : theme.textSecondary}
+              />
+              <Text style={[styles.sharedLabel, { color: theme.text }]}>Shared expense</Text>
+            </TouchableOpacity>
+            {isShared && (
+              <View style={styles.sharedInputWrap}>
+                <Text style={[styles.listRowLabel, { color: theme.textSecondary }]}>Your share</Text>
+                <TextInput
+                  style={[styles.shareAmountInput, { borderColor: theme.border, color: theme.text }]}
+                  value={actualAmountStr}
+                  onChangeText={onChangeActualAmount}
+                  keyboardType="decimal-pad"
+                  placeholderTextColor={theme.textTertiary}
+                />
+              </View>
+            )}
+          </View>
+        )}
+
+        <View style={styles.calculatorWrap}>
+          <CalculatorPad value={amountStr} onChange={onChangeAmount} showDisplay={false} />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: Spacing.lg,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   topBarBtn: {
     padding: 4,
@@ -332,18 +332,18 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   typeSegment: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   amountWrap: {
     alignItems: "center",
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   amountText: {
     ...Typography.hero,
-    fontSize: 40,
+    fontSize: 36,
   },
   section: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     gap: 6,
   },
   mutedText: {
@@ -384,11 +384,6 @@ const styles = StyleSheet.create({
   listCard: {
     marginBottom: Spacing.sm,
   },
-  listRow: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    gap: 6,
-  },
   listRowLabel: {
     fontSize: 13,
     fontWeight: "600",
@@ -398,7 +393,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: Spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 11,
   },
   detailValueRow: {
     flexDirection: "row",
@@ -421,7 +416,7 @@ const styles = StyleSheet.create({
   },
   sharedSection: {
     gap: 8,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   sharedToggle: {
     flexDirection: "row",
@@ -450,5 +445,6 @@ const styles = StyleSheet.create({
   calculatorWrap: {
     flex: 1,
     justifyContent: "flex-end",
+    minHeight: 260,
   },
 });

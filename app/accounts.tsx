@@ -1,5 +1,5 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
+import { IconPalette, Radius, Spacing, ThemeColors, Typography } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
@@ -23,6 +23,14 @@ import { formatMoneyINR } from "@/types";
 import { showAppAlert } from "@/store/useAlertStore";
 
 const ACCOUNT_ICONS = ["💳", "💵", "👛", "🏦", "📱", "💰", "🏧", "🪙"];
+const ACCOUNT_TILE_COLORS = [
+  IconPalette.blue,
+  IconPalette.purple,
+  IconPalette.teal,
+  IconPalette.pink,
+  IconPalette.indigo,
+  IconPalette.slate,
+];
 
 export default function AccountsScreen() {
   const theme = useAppTheme();
@@ -121,7 +129,7 @@ export default function AccountsScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.listContent}
         ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <Card noPadding>
             <TouchableOpacity
               style={styles.rowPad}
@@ -129,6 +137,7 @@ export default function AccountsScreen() {
               onLongPress={() => handleDelete(item)}>
               <ListRow
                 emoji={item.icon}
+                iconColor={ACCOUNT_TILE_COLORS[index % ACCOUNT_TILE_COLORS.length]}
                 title={item.name}
                 subtitle={`Initial: ${formatMoneyINR(item.initialBalance)}`}
                 trailing={<AmountText amount={item.currentBalance} type={item.currentBalance >= 0 ? "income" : "expense"} showSign={false} />}

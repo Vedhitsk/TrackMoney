@@ -242,12 +242,9 @@ export default function ActivityScreen() {
   }, [filtered, typeFilter]);
   const pendingCount = pendingTransactions.length;
 
-  const sectionTotalColor = (total: number) => {
-    if (typeFilter === "transfer") return theme.textSecondary;
-    if (typeFilter === "income") return theme.income;
-    if (typeFilter === "expense") return theme.expense;
-    return total >= 0 ? theme.income : theme.expense;
-  };
+  // Always neutral grey — this is a sum across the date, not a signed
+  // individual transaction amount, so it shouldn't read as good/bad.
+  const sectionTotalColor = () => theme.textSecondary;
 
   const sectionTotalLabel = (total: number) => {
     if (typeFilter === "transfer") return formatMoneyINR(total);
@@ -360,7 +357,7 @@ export default function ActivityScreen() {
           renderSectionHeader={({ section }) => (
             <View style={styles.dateHeaderRow}>
               <SectionLabel style={styles.dateHeader}>{section.title}</SectionLabel>
-              <Text style={[styles.dateHeaderTotal, { color: sectionTotalColor(section.total) }]}>
+              <Text style={[styles.dateHeaderTotal, { color: sectionTotalColor() }]}>
                 {sectionTotalLabel(section.total)}
               </Text>
             </View>

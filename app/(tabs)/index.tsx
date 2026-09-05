@@ -216,7 +216,7 @@ export default function HomeScreen() {
         <Text style={[styles.heroValue, { color: theme.text }]}>
           {balanceVisible ? formatMoneyINR(net) : "•••••"}
         </Text>
-        {balanceVisible && trendPct !== 0 && (
+        {trendPct !== 0 && (
           <View
             style={[
               styles.trendChip,
@@ -340,6 +340,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   donutCard: {
     marginTop: Spacing.lg,
     flex: 1,
+    minHeight: 210,
   },
   donutLabel: {
     marginBottom: Spacing.md,

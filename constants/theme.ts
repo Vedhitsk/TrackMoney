@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
 
-// Chart/legend palette shared by donut & bar charts (amber-led, matches the
-// reference fintech mockups: amber is the single "hero" accent, the rest are
-// muted functional/category hues).
-const DARK_CHART_PALETTE = ['#F0A94A', '#F2555A', '#3AD1B0', '#3DDC84', '#7C8CF0', '#98989F'];
-const LIGHT_CHART_PALETTE = ['#E8963C', '#D64550', '#2BB6A3', '#1FA463', '#6E7BE0', '#9A9AA1'];
+// Chart/legend palette shared by donut & bar charts (rich copper-amber led,
+// matches the reference fintech mockups: amber is the single "hero" accent,
+// the rest are muted functional/category hues).
+const DARK_CHART_PALETTE = ['#D6811F', '#F2555A', '#3AD1B0', '#3DDC84', '#7C8CF0', '#98989F'];
+const LIGHT_CHART_PALETTE = ['#B36B1A', '#D64550', '#2BB6A3', '#1FA463', '#6E7BE0', '#9A9AA1'];
 
 export const LightColors = {
   background: '#F5F4F0',
@@ -14,12 +14,12 @@ export const LightColors = {
   textSecondary: '#6B6B72',
   textTertiary: '#9A9AA1',
 
-  // Single brand accent (amber) — used for the FAB, hero chart line/fill,
-  // and the largest donut slice. NOT used for active tabs/segments — those
-  // use an inverted high-contrast pill instead (see segmentActiveBg).
-  primary: '#E8963C',
-  primaryLight: '#FBE8CF',
-  primaryMuted: 'rgba(232,150,60,0.14)',
+  // Single brand accent (rich copper-amber) — used for the FAB, hero chart
+  // line/fill, and the largest donut slice. NOT used for active tabs/segments
+  // — those use an inverted high-contrast pill instead (see segmentActiveBg).
+  primary: '#B36B1A',
+  primaryLight: '#F5E4CC',
+  primaryMuted: 'rgba(179,107,26,0.14)',
 
   expense: '#D64550',
   income: '#1FA463',
@@ -33,7 +33,7 @@ export const LightColors = {
   calculator: '#FFFFFF',
   calculatorDark: '#F1EFE9',
 
-  fab: '#E8963C',
+  fab: '#B36B1A',
   tabActive: '#14141A',
   tabInactive: '#9A9AA1',
 
@@ -51,9 +51,10 @@ export const LightColors = {
 
   chartPalette: LIGHT_CHART_PALETTE,
 
-  // Contrasting "unfilled" track color for partial-ring / two-tone donut charts
-  // (must read clearly against both `surface` and `surfaceElevated`).
-  ringTrack: '#E4E1D8',
+  // Contrasting "unfilled" track color for partial-ring / two-tone donut
+  // charts — a translucent version of `text`, so it's always visible against
+  // `surface`/`surfaceElevated` regardless of theme.
+  ringTrack: '#14141A1F',
 
   white: '#FFFFFF',
   shadow: 'rgba(20,20,20,0.08)',
@@ -67,9 +68,9 @@ export const DarkColors = {
   textSecondary: '#98989F',
   textTertiary: '#6B6B72',
 
-  primary: '#F0A94A',
-  primaryLight: '#3A2D18',
-  primaryMuted: 'rgba(240,169,74,0.18)',
+  primary: '#D6811F',
+  primaryLight: '#3A2712',
+  primaryMuted: 'rgba(214,129,31,0.18)',
 
   expense: '#F2555A',
   income: '#3DDC84',
@@ -83,7 +84,7 @@ export const DarkColors = {
   calculator: '#1D1D22',
   calculatorDark: '#141417',
 
-  fab: '#F0A94A',
+  fab: '#D6811F',
   tabActive: '#F2F2F4',
   tabInactive: '#6B6B72',
 
@@ -99,7 +100,7 @@ export const DarkColors = {
 
   chartPalette: DARK_CHART_PALETTE,
 
-  ringTrack: '#34343C',
+  ringTrack: '#F2F2F42B',
 
   white: '#FFFFFF',
   shadow: 'rgba(0,0,0,0.5)',
@@ -179,7 +180,7 @@ export const IconPalette = {
   teal: '#14B8A6',
   pink: '#EC4899',
   indigo: '#6366F1',
-  amber: '#F0A94A',
+  amber: '#D6811F',
   red: '#EF4444',
   slate: '#64748B',
 } as const;
