@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...Typography.label,
+    marginLeft: Spacing.sm,
     marginBottom: 5,
   },
   box: {

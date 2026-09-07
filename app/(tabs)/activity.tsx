@@ -505,6 +505,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   insightWrap: {
     paddingHorizontal: Spacing.lg,
     marginTop: Spacing.md,
+    marginBottom:Spacing.sm,
   },
   center: {
     flex: 1,
@@ -532,7 +533,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: Spacing.xl,
+    marginTop: Spacing.xs,
     marginBottom: Spacing.sm,
   },
   dateHeader: {

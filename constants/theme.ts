@@ -122,7 +122,7 @@ export const LightColors = {
   ringTrack: '#14152A1F',
 
   /** Tint for the blurred status-bar and tab-bar scrims. */
-  scrim: 'rgba(241,242,249,0.72)',
+  scrim: '#F1F2F9',
   /** Backdrop behind a presented sheet. */
   sheetScrim: 'rgba(20,21,42,0.40)',
 
@@ -173,7 +173,7 @@ export const DarkColors: typeof LightColors = {
 
   ringTrack: '#F1F1F72B',
 
-  scrim: 'rgba(7,7,13,0.72)',
+  scrim: '#07070D',
   sheetScrim: 'rgba(3,3,8,0.55)',
 
   white: '#FFFFFF',

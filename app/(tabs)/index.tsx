@@ -18,7 +18,7 @@ import {
   SegmentedControl,
 } from "@/components/ui";
 import { useTransactionStore } from "@/store/useTransactionStore";
-import { formatMoneyINR, formatMoneyINRWhole } from "@/types";
+import { formatMoneyINR, formatMoneyINRWhole, formatPartiallyMaskedINR } from "@/types";
 
 type PeriodMode = "week" | "month" | "year";
 
@@ -176,9 +176,22 @@ export default function HomeScreen() {
     });
   }, [current, mode, range]);
 
-  const lastPoint = chartPoints[chartPoints.length - 1];
-  const calloutLabel = lastPoint
-    ? `${mode === "year" ? lastPoint.label : `Day ${lastPoint.label}`} · ${formatMoneyINR(lastPoint.value)}`
+  const currentIndex = useMemo(() => {
+    if (chartPoints.length === 0) return 0;
+    let idx = 0;
+    if (mode === "week") {
+      idx = (anchor.getDay() + 6) % 7;
+    } else if (mode === "month") {
+      idx = anchor.getDate() - 1;
+    } else if (mode === "year") {
+      idx = anchor.getMonth();
+    }
+    return Math.min(Math.max(idx, 0), chartPoints.length - 1);
+  }, [anchor, mode, chartPoints.length]);
+
+  const currentPoint = chartPoints[currentIndex];
+  const calloutLabel = currentPoint
+    ? `${mode === "year" ? currentPoint.label : `Day ${currentPoint.label}`} · ${balanceVisible ? formatPartiallyMaskedINR(currentPoint.value) : "•••••"}`
     : undefined;
 
   const donutData = useMemo(() => {
@@ -241,7 +254,12 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.chartWrap}>
-        <CashFlowLineChart data={chartPoints} height={130} calloutLabel={calloutLabel} />
+        <CashFlowLineChart
+          data={chartPoints}
+          height={130}
+          calloutIndex={currentIndex}
+          calloutLabel={calloutLabel}
+        />
       </View>
 
       <SegmentedControl

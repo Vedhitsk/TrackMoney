@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
 import { DatePickerModal, TimePickerModal } from "@/components/date-time-picker";
 import { TransactionFormLayout, type UIType } from "@/components/transaction-form-layout";
+import { AccountFormModal } from "@/components/account-form-modal";
+import { CategoryFormModal } from "@/components/category-form-modal";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { showAppAlert } from "@/store/useAlertStore";
 import { insertTransaction } from "@/db/queries/transactions";
 import type { TransactionType } from "@/types";
 
 import { listPendingRecoveries, createSettlements, type PendingRecovery } from "@/db/queries/settlements";
-import { createAccount } from "@/db/queries/accounts";
-import { createCategory } from "@/db/queries/categories";
 
 export default function NewTransactionScreen() {
   const router = useRouter();
@@ -96,25 +96,28 @@ export default function NewTransactionScreen() {
   // Creating from inside a picker sheet selects the new row immediately — the
   // user asked for it by name, so making them find it in the list afterwards
   // would be busywork.
-  const handleCreateAccount = async (name: string) => {
-    try {
-      const created = await createAccount({ name });
-      await loadAccounts();
-      setAccountId(created.id);
-    } catch (e) {
-      showAppAlert("Couldn't add account", e instanceof Error ? e.message : "Unknown error");
-    }
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [accountInitialName, setAccountInitialName] = useState("");
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categoryInitialName, setCategoryInitialName] = useState("");
+
+  const handleCreateAccount = (name: string) => {
+    setAccountInitialName(name);
+    setShowAccountModal(true);
   };
 
-  const handleCreateCategory = async (name: string) => {
-    try {
-      const created = await createCategory({ name });
-      await loadCategories();
-      setCategoryId(created.id);
-    } catch (e) {
-      showAppAlert("Couldn't add category", e instanceof Error ? e.message : "Unknown error");
-    }
+  const handleCreateCategory = (name: string) => {
+    setCategoryInitialName(name);
+    setShowCategoryModal(true);
   };
+
+  const handleCancel = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)");
+    }
+  }, [router]);
 
   const canSave = (() => {
     if (amount <= 0) return false;
@@ -155,6 +158,8 @@ export default function NewTransactionScreen() {
         notes,
         date: txDate,
         source: "manual",
+        parsedBy: null,
+        parseStatus: "complete",
         isExcluded,
       });
 
@@ -171,7 +176,7 @@ export default function NewTransactionScreen() {
 
       const store = useTransactionStore.getState();
       await store.refreshAllTransactions();
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/activity");
     } catch (e) {
       showAppAlert("Failed to save", e instanceof Error ? e.message : "Unknown error");
     }
@@ -221,7 +226,7 @@ export default function NewTransactionScreen() {
         onPressTime={() => setShowTimePicker(true)}
         canSave={canSave}
         onSave={handleSave}
-        onCancel={() => router.back()}
+        onCancel={handleCancel}
       />
 
       <DatePickerModal
@@ -236,6 +241,25 @@ export default function NewTransactionScreen() {
         value={txDate}
         onSelect={setTxDate}
         onClose={() => setShowTimePicker(false)}
+      />
+
+      <AccountFormModal
+        visible={showAccountModal}
+        initialName={accountInitialName}
+        onClose={() => setShowAccountModal(false)}
+        onSaved={(created) => {
+          void loadAccounts();
+          setAccountId(created.id);
+        }}
+      />
+      <CategoryFormModal
+        visible={showCategoryModal}
+        initialName={categoryInitialName}
+        onClose={() => setShowCategoryModal(false)}
+        onSaved={(created) => {
+          void loadCategories();
+          setCategoryId(created.id);
+        }}
       />
     </>
   );

@@ -116,7 +116,53 @@ Went through several structural revisions to match the reference exactly:
 
 ---
 
-## 7. Outstanding Tasks & Handoff Summary
-1. **Run the redesign on a real device/emulator** — nothing in section 6 has been executed, only reviewed. Start with Add Transaction (all 4 types, both themes) and the FAB.
-2. **Remote Push:** Run `git push origin master` in an authenticated terminal.
-3. **Release Build & Verification:** Build `--variant release` to verify all latest features.
+## 8. Key Work Completed — Budgets Pane Pinning & Scroll Fix (2026-09-07)
+- **Problem:** On the Budgets pane of Insights (`app/(tabs)/insights.tsx`), the monthly budget/spent summary card and action buttons ("Copy previous" and "+ Add budget") were previously placed inside the scroll view or floating over the bottom tab bar. When scrolling, the summary card and buttons scrolled out of view, and the bottom item in the budget list was obscured by the bottom tab bar and center FAB.
+- **Fix:**
+  - Pinned the monthly summary card (`Card style={styles.summaryCard}`) and the action buttons (`Copy previous` + `+ Add budget`) inside a fixed top container (`budgetFixedHeader`) outside the scroll view.
+  - Made the list of category budgets scrollable in its own `ScrollView` (`budgetScroll`), restoring the over-budget alert (`InsightCard`) at the top of the scroll list.
+  - Added ample bottom padding (`tabBarHeight + Spacing.xxxl + Spacing.sm`) to the scroll container content style so the bottom-most item in the list is always fully visible and never hidden under the bottom tab bar/FAB.
+
+---
+
+## 9. Key Work Completed — Manual Transaction Modal & Form Polish (2026-09-07)
+- **FieldCard Label Alignment:** Added `marginLeft: Spacing.sm` to `styles.label` in `components/ui/field-card.tsx` to give "ACCOUNT" and "CATEGORY" labels proper left padding while keeping the picker card containers untouched.
+- **Button Gradient & Background Fill Fix:** In `components/ui/gradient-button.tsx`, fixed SVG LinearGradient `x2="85%"` to `x2="100%"` and set `width: size === 'fab' ? dims.height : '100%'` with `backgroundColor: ramp.mid` on the base button container. This eliminated the right-edge unfilled gap on the "+ Add Account", "+ New Category", and "Save" buttons.
+- **Shared Creation Modals:**
+  - Created `components/account-form-modal.tsx` and `components/category-form-modal.tsx` extracting the exact creation logic, icon pickers, balance inputs, color palettes, and duplicate check from `app/accounts.tsx` and `app/categories.tsx`.
+  - In `components/picker-sheet.tsx`, tapping the create button now closes the picker and directly invokes `onCreate(trimmedQuery)`, opening the rich creation modal in `app/transaction/new.tsx` and `app/transaction/[id].tsx`.
+- **Dismissal Gesture & Save Navigation Fix:**
+  - In `components/transaction-form-layout.tsx`, stabilized the dismissal callback via `onCancelRef` and made the top grab handle tap-to-dismiss as well as pan-to-dismiss.
+  - Guarded navigation with `if (router.canGoBack()) router.back(); else router.replace("/(tabs)");` to prevent Android OS termination when dismissing the modal.
+  - Updated transaction saving in `app/transaction/new.tsx` and `app/transaction/[id].tsx` to route directly to the Activity tab (`router.replace("/(tabs)/activity")`) rather than the Home tab.
+
+---
+
+## 10. Key Work Completed — Home Cash Flow Chart Dynamic Day/Month Marker (2026-09-08)
+- **Dynamic Current Day/Month Marker & Label:**
+  - In `app/(tabs)/index.tsx`, replaced hardcoded `chartPoints[chartPoints.length - 1]` with `currentIndex` derived from `anchor` (`(anchor.getDay() + 6) % 7` for week, `anchor.getDate() - 1` for month, and `anchor.getMonth()` for year).
+  - Passed `calloutIndex={currentIndex}` to `CashFlowLineChart` so the marker dot and dashed vertical guide line align with the current day/month on the chart rather than defaulting to peak/max or the last point in the period.
+  - Callout label dynamically displays `"Day <currentDay> · <balance>"` for week (e.g. Day 2 for Tuesday), `"Day <currentDay> · <balance>"` for month (e.g. Day 8 for 8th of month), and `"<currentMonth> · <balance>"` for year (e.g. Sep).
+- **Auto-sizing Callout Bubble & Hook Rules Compliance:**
+  - In `components/ui/cash-flow-line-chart.tsx`, removed fixed `width: 96` from `calloutWrap` and added dynamic `onLayout` width measurement to prevent text truncation (e.g., `Day 7 · -₹500...`).
+  - Ensured all hooks (`useState(0)`, `useState(100)`) are called unconditionally at the top of the component body before the early return `if (data.length === 0 || width === 0)`.
+- **Partial Balance Masking in Graph Callout:**
+  - Added `formatPartiallyMaskedINR(value)` in `types/index.ts` to format amounts with whole rupees (no decimals) and mask subsequent digits after the first with dots (e.g., `₹5••` for 500, `₹2,•••` for 2,380, `-₹5••` for -500).
+  - In `app/(tabs)/index.tsx`, updated `calloutLabel` to use `formatPartiallyMaskedINR` when `balanceVisible` is true, and mask completely (`•••••`) when `balanceVisible` is false.
+
+---
+
+## 11. Key Work Completed — Log Details Modal Amount Vertical Clipping Fix (2026-09-08)
+- **Root Cause Analysis:**
+  - In `components/log-details-modal.tsx`, `<ThemedText style={styles.amountText}>` was used with `fontSize: 36`.
+  - `ThemedText` default variant applied `lineHeight: 24` from `styles.default`. Since `styles.amountText` omitted `lineHeight`, the 36px font was constrained within a 24px line-box on Android, causing bottom glyph clipping (turning commas into dots and flattening the base of digits and the ₹ symbol).
+- **Fix:**
+  - In `components/themed-text.tsx`, added a check so when custom `fontSize` is passed in `style` without an explicit `lineHeight`, `lineHeight: 24` is not injected from `styles.default` / `styles.defaultSemiBold`, preventing line-height clamp bugs across the entire app.
+  - In `components/log-details-modal.tsx`:
+    - Replaced `ThemedText` with standard `Text` in the colored top header banner.
+    - Added `lineHeight: 48`, `paddingVertical: 2`, `includeFontPadding: false`, and `textAlign: "center"` to `styles.amountText`.
+    - Added `numberOfLines={1}` and `adjustsFontSizeToFit` to ensure amounts fit smoothly across all device sizes without horizontal overflow.
+    - Wrapped amount values with `Math.abs()` to avoid negative symbol duplication.
+
+
+

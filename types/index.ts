@@ -92,3 +92,16 @@ export function formatMoneyINRWhole(value: number) {
     maximumFractionDigits: 0,
   }).format(value);
 }
+
+/** Partially masked INR formatting — displays the first digit and masks remaining digits with dots (e.g. ₹5••, ₹2,•••, -₹5••). */
+export function formatPartiallyMaskedINR(value: number): string {
+  const whole = formatMoneyINRWhole(value);
+  let firstDigitSeen = false;
+  return whole.replace(/\d/g, (d) => {
+    if (!firstDigitSeen) {
+      firstDigitSeen = true;
+      return d;
+    }
+    return "•";
+  });
+}

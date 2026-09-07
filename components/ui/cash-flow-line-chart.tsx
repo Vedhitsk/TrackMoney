@@ -32,6 +32,7 @@ function buildSmoothPath(points: { x: number; y: number }[]): string {
 export function CashFlowLineChart({ data, height = 160, color, calloutIndex, calloutLabel }: Props) {
   const theme = useAppTheme();
   const [width, setWidth] = useState(0);
+  const [calloutWidth, setCalloutWidth] = useState(100);
   const lineColor = color ?? theme.primary;
 
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
@@ -59,8 +60,9 @@ export function CashFlowLineChart({ data, height = 160, color, calloutIndex, cal
 
   const peakIdx = calloutIndex ?? values.indexOf(max);
   const peak = points[peakIdx];
-  const calloutWidth = 96;
-  const calloutLeft = peak ? Math.min(Math.max(peak.x - calloutWidth / 2, 0), width - calloutWidth) : 0;
+  const calloutLeft = peak
+    ? Math.min(Math.max(peak.x - calloutWidth / 2, 0), Math.max(width - calloutWidth, 0))
+    : 0;
 
   return (
     <View style={{ height }} onLayout={onLayout}>
@@ -89,7 +91,16 @@ export function CashFlowLineChart({ data, height = 160, color, calloutIndex, cal
         ) : null}
       </Svg>
       {peak && calloutLabel ? (
-        <View pointerEvents="none" style={[styles.calloutWrap, { left: calloutLeft, top: Math.max(peak.y - 28, 0) }]}>
+        <View
+          pointerEvents="none"
+          onLayout={(e) => {
+            const w = e.nativeEvent.layout.width;
+            if (w > 0 && Math.abs(w - calloutWidth) > 2) {
+              setCalloutWidth(w);
+            }
+          }}
+          style={[styles.calloutWrap, { left: calloutLeft, top: Math.max(peak.y - 28, 0) }]}
+        >
           <Text
             style={[
               styles.calloutText,
@@ -108,7 +119,6 @@ export function CashFlowLineChart({ data, height = 160, color, calloutIndex, cal
 const styles = StyleSheet.create({
   calloutWrap: {
     position: 'absolute',
-    width: 96,
     alignItems: 'center',
   },
   calloutText: {

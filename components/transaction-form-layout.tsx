@@ -38,7 +38,7 @@ type Props = {
   accounts: PickerItem[];
   accountId: number | null;
   onSelectAccount: (id: number) => void;
-  onCreateAccount: (name: string) => Promise<void>;
+  onCreateAccount: (name: string) => Promise<void> | void;
 
   toAccounts: PickerItem[];
   toAccountId: number | null;
@@ -47,7 +47,7 @@ type Props = {
   categories: PickerItem[];
   categoryId: number | null;
   onSelectCategory: (id: number) => void;
-  onCreateCategory: (name: string) => Promise<void>;
+  onCreateCategory: (name: string) => Promise<void> | void;
 
   pendingRecoveries: PendingRecovery[];
   selectedRecoveries: Set<number>;
@@ -177,29 +177,33 @@ export function TransactionFormLayout({
   }, []);
 
   // K4/K5 — when the note gains focus, scroll the middle band only, and only
+  // K4/K5 — when the note gains focus, scroll the middle band only, and only
   // far enough to lift the focused row clear with a row of breathing space.
   const onNoteFocus = () => {
     requestAnimationFrame(() => midScroll.current?.scrollToEnd({ animated: true }));
   };
 
+  const onCancelRef = useRef(onCancel);
+  useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
+
+  const handleDismiss = () => {
+    onCancelRef.current();
+  };
+
+  const screenH = Dimensions.get("window").height;
   const translateY = useSharedValue(0);
 
-  // Drag-only dismiss. A tap is deliberately a no-op: this screen holds an
-  // amount the user typed, and the bar is the only exit, so an accidental tap
-  // must not throw the entry away.
   const drag = Gesture.Pan()
     .onUpdate((e) => {
       translateY.value = e.translationY > 0 ? e.translationY : e.translationY * 0.2;
     })
     .onEnd((e) => {
       if (e.translationY > DISMISS_DISTANCE || e.velocityY > DISMISS_VELOCITY) {
-        translateY.value = withTiming(
-          Dimensions.get("window").height,
-          { duration: 220 },
-          () => {
-            runOnJS(onCancel)();
-          },
-        );
+        translateY.value = withTiming(screenH, { duration: 180 }, () => {
+          runOnJS(handleDismiss)();
+        });
       } else {
         translateY.value = withSpring(0, { damping: 18, stiffness: 220 });
       }
@@ -213,14 +217,16 @@ export function TransactionFormLayout({
     <Animated.View style={[styles.root, { backgroundColor: theme.background }, sheetStyle]}>
       {/* ---------------- band 1 · header, fixed ---------------- */}
       <GestureDetector gesture={drag}>
-        <View
+        <TouchableOpacity
           style={[styles.grabWrap, { paddingTop: Math.max(insets.top, 12) }]}
+          onPress={handleDismiss}
+          activeOpacity={0.6}
           accessibilityRole="button"
           accessibilityLabel="Close"
           accessibilityHint="Drag down to discard this transaction"
         >
           <View style={[styles.grab, { backgroundColor: theme.border }]} />
-        </View>
+        </TouchableOpacity>
       </GestureDetector>
 
       <View style={styles.header}>
@@ -379,7 +385,15 @@ export function TransactionFormLayout({
 
           {isExpense && (
             <View style={styles.sharedSection}>
-              <TouchableOpacity style={styles.sharedToggle} onPress={onToggleShared}>
+              <TouchableOpacity 
+                style={styles.sharedToggle} 
+                onPress={() => {
+                  onToggleShared();
+                  if (!isShared) {
+                    setTimeout(() => midScroll.current?.scrollToEnd({ animated: true }), 150);
+                  }
+                }}
+              >
                 <MaterialIcons
                   name={isShared ? "check-box" : "check-box-outline-blank"}
                   size={20}
@@ -424,7 +438,7 @@ export function TransactionFormLayout({
         selectedId={sheet === "toAccount" ? toAccountId : accountId}
         onSelect={sheet === "toAccount" ? onSelectToAccount : onSelectAccount}
         onClose={() => setSheet(null)}
-        createLabel="New account"
+        createLabel="Add Account"
         onCreate={onCreateAccount}
       />
 
@@ -435,7 +449,7 @@ export function TransactionFormLayout({
         selectedId={categoryId}
         onSelect={onSelectCategory}
         onClose={() => setSheet(null)}
-        createLabel="New category"
+        createLabel="New Category"
         onCreate={onCreateCategory}
         searchable
       />

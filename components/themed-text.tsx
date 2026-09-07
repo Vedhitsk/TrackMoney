@@ -16,14 +16,16 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const flattened = StyleSheet.flatten(style);
+  const hasCustomFontSize = flattened && typeof flattened.fontSize === 'number';
 
   return (
     <Text
       style={[
         { color },
-        type === 'default' ? styles.default : undefined,
+        type === 'default' ? (hasCustomFontSize ? { fontSize: 16 } : styles.default) : undefined,
         type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        type === 'defaultSemiBold' ? (hasCustomFontSize ? { fontSize: 16, fontWeight: '600' } : styles.defaultSemiBold) : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link' ? styles.link : undefined,
         style,

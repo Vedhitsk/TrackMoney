@@ -113,6 +113,8 @@ export const useTransactionStore = create<TransactionStoreState>((set, get) => (
           notes: tx.notes,
           date: tx.date,
           source: tx.source,
+          parsedBy: tx.parsedBy,
+          parseStatus: tx.parseStatus,
           isExcluded: tx.isExcluded,
         };
         set({ draft });

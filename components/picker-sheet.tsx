@@ -71,11 +71,7 @@ export function PickerSheet({
   const screenH = Dimensions.get('window').height;
 
   const [query, setQuery] = useState('');
-  const [creating, setCreating] = useState(false);
-  const [draftName, setDraftName] = useState('');
-  const [saving, setSaving] = useState(false);
   const [kbHeight, setKbHeight] = useState(0);
-  const createInput = useRef<TextInput>(null);
 
   const translateY = useSharedValue(0);
 
@@ -83,8 +79,6 @@ export function PickerSheet({
     if (visible) {
       translateY.value = 0;
       setQuery('');
-      setCreating(false);
-      setDraftName('');
     }
   }, [visible, translateY]);
 
@@ -106,7 +100,6 @@ export function PickerSheet({
 
   const drag = Gesture.Pan()
     .onUpdate((e) => {
-      // Track the finger downward; rubber-band anything upward.
       translateY.value = e.translationY > 0 ? e.translationY : e.translationY * 0.2;
     })
     .onEnd((e) => {
@@ -128,27 +121,6 @@ export function PickerSheet({
     const q = query.trim().toLowerCase();
     return items.filter((i) => i.name.toLowerCase().includes(q));
   }, [items, query, searchable]);
-
-  const startCreate = () => {
-    setDraftName(query.trim());
-    setCreating(true);
-    requestAnimationFrame(() => createInput.current?.focus());
-  };
-
-  const commitCreate = async () => {
-    const name = draftName.trim();
-    if (!name || saving) return;
-    setSaving(true);
-    try {
-      await onCreate(name);
-      setCreating(false);
-      setDraftName('');
-      setQuery('');
-      Keyboard.dismiss();
-    } finally {
-      setSaving(false);
-    }
-  };
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
@@ -246,39 +218,16 @@ export function PickerSheet({
           </ScrollView>
 
           <View style={[styles.footer, { borderTopColor: theme.borderLight }]}>
-            {creating ? (
-              <View style={styles.createRow}>
-                <TextInput
-                  ref={createInput}
-                  style={[
-                    styles.createInput,
-                    { color: theme.text, backgroundColor: theme.background, borderColor: theme.border },
-                  ]}
-                  value={draftName}
-                  onChangeText={setDraftName}
-                  placeholder={title}
-                  placeholderTextColor={theme.textTertiary}
-                  returnKeyType="done"
-                  onSubmitEditing={commitCreate}
-                />
-                <GradientButton
-                  label="Add"
-                  size="mini"
-                  variant="secondary"
-                  onPress={commitCreate}
-                  disabled={!draftName.trim()}
-                  loading={saving}
-                />
-              </View>
-            ) : (
-              <GradientButton
-                label={createLabel}
-                icon="add"
-                size="mini"
-                variant="secondary"
-                onPress={startCreate}
-              />
-            )}
+            <GradientButton
+              label={createLabel}
+              icon="add"
+              size="mini"
+              onPress={() => {
+                const q = query.trim();
+                close();
+                onCreate(q);
+              }}
+            />
           </View>
         </Animated.View>
       </View>
@@ -363,18 +312,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     marginTop: Spacing.xs,
     borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  createRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  createInput: {
-    flex: 1,
-    height: 44,
-    borderRadius: Radius.pill,
-    borderWidth: 1,
-    paddingHorizontal: Spacing.lg,
-    fontSize: 14,
   },
 });

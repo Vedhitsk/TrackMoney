@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Modal, Text } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 
@@ -71,12 +71,16 @@ export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess
             </View>
 
             <View style={styles.amountContainer}>
-              <ThemedText style={styles.typeText}>{transaction.type.toUpperCase()}</ThemedText>
-              <ThemedText style={styles.amountText}>
+              <Text style={styles.typeText}>{transaction.type.toUpperCase()}</Text>
+              <Text
+                style={styles.amountText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
                 {isExpense ? "-" : "+"}
-                {formatMoneyINR(transaction.rawAmount)}
-              </ThemedText>
-              <ThemedText style={styles.dateText}>
+                {formatMoneyINR(Math.abs(transaction.rawAmount))}
+              </Text>
+              <Text style={styles.dateText}>
                 {transaction.date.toLocaleString("en-IN", {
                   month: "short",
                   day: "numeric",
@@ -85,7 +89,7 @@ export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess
                   minute: "2-digit",
                   hour12: true,
                 })}
-              </ThemedText>
+              </Text>
             </View>
           </View>
 
@@ -111,7 +115,7 @@ export function LogDetailsModal({ visible, onClose, transaction, onDeleteSuccess
               <View style={styles.metaRow}>
                 <ThemedText style={styles.metaLabel}>Shared</ThemedText>
                 <ThemedText style={styles.sharedText}>
-                  Your share: {formatMoneyINR(transaction.actualAmount)}
+                  Your share: {formatMoneyINR(Math.abs(transaction.actualAmount))}
                 </ThemedText>
               </View>
             )}
@@ -157,25 +161,32 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 8,
   },
   typeText: {
     color: "#FFF",
     fontSize: 13,
     fontWeight: "600",
     letterSpacing: 1,
-    marginBottom: 8,
+    lineHeight: 18,
+    marginBottom: 6,
   },
   amountText: {
     color: "#FFF",
     fontSize: 36,
-    fontWeight: "600",
-    marginBottom: 12,
+    fontWeight: "700",
+    lineHeight: 48,
+    textAlign: "center",
+    includeFontPadding: false,
+    paddingVertical: 2,
+    marginBottom: 8,
   },
   dateText: {
     color: "rgba(255,255,255,0.9)",
     fontSize: 14,
+    lineHeight: 20,
   },
   bottomSection: {
     backgroundColor: "#434039",

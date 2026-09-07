@@ -315,7 +315,10 @@ export default function InsightsScreen() {
 
       {pane === "analysis" ? (
         <ScrollView
-          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarHeight + Spacing.lg }]}
+          contentContainerStyle={[
+            styles.scroll,
+            { paddingBottom: tabBarHeight + Spacing.xxxl + Spacing.sm },
+          ]}
           showsVerticalScrollIndicator={false}
         >
           <SegmentedControl
@@ -407,11 +410,7 @@ export default function InsightsScreen() {
         </ScrollView>
       ) : (
         <View style={styles.budgetPane}>
-          <ScrollView
-            style={styles.budgetScroll}
-            contentContainerStyle={styles.scroll}
-            showsVerticalScrollIndicator={false}
-          >
+          <View style={styles.budgetFixedHeader}>
             <Card style={styles.summaryCard}>
               <View style={styles.summaryRow}>
                 <View>
@@ -437,6 +436,34 @@ export default function InsightsScreen() {
               </Text>
             </Card>
 
+            <View style={styles.budgetActionsRow}>
+              <TouchableOpacity
+                style={styles.footerSecondaryBtn}
+                onPress={handleCopyFromPrevious}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name="content-copy" size={15} color={theme.textSecondary} />
+                <Text style={styles.footerSecondaryBtnText}>Copy previous</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.footerPrimaryBtn}
+                onPress={openAdd}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons name="add" size={18} color="#FFFFFF" />
+                <Text style={styles.footerPrimaryBtnText}>Add budget</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <ScrollView
+            style={styles.budgetScroll}
+            contentContainerStyle={[
+              styles.budgetScrollContent,
+              { paddingBottom: tabBarHeight + Spacing.xxxl + Spacing.sm },
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
             {overBudgetCats.length > 0 && (
               <InsightCard
                 style={styles.section}
@@ -452,7 +479,7 @@ export default function InsightsScreen() {
             ) : budgetsData.length === 0 ? (
               <View style={styles.center}>
                 <Text style={styles.emptyText}>No budgets set for {monthLabel}</Text>
-                <Text style={styles.mutedText}>Tap "Add budget" below to create one</Text>
+                <Text style={styles.mutedText}>Tap "Add budget" above to create one</Text>
               </View>
             ) : (
               <View style={{ gap: Spacing.sm }}>
@@ -501,17 +528,6 @@ export default function InsightsScreen() {
               </View>
             )}
           </ScrollView>
-
-          <View style={[styles.budgetFooter, { paddingBottom: tabBarHeight }]}>
-            <TouchableOpacity style={styles.footerSecondaryBtn} onPress={handleCopyFromPrevious}>
-              <MaterialIcons name="content-copy" size={15} color={theme.textSecondary} />
-              <Text style={styles.footerSecondaryBtnText}>Copy previous</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.footerPrimaryBtn} onPress={openAdd}>
-              <MaterialIcons name="add" size={18} color="#FFFFFF" />
-              <Text style={styles.footerPrimaryBtnText}>Add budget</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 
@@ -606,7 +622,21 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   totalBar: { marginTop: Spacing.md },
   remainingText: { fontSize: 12, color: theme.textSecondary, marginTop: 6 },
   budgetPane: { flex: 1 },
+  budgetFixedHeader: {
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+    paddingBottom: Spacing.sm,
+  },
+  budgetActionsRow: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+  },
   budgetScroll: { flex: 1 },
+  budgetScrollContent: {
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xs,
+  },
   center: { alignItems: "center", paddingTop: 30, gap: 6 },
   emptyText: { fontSize: 15, fontWeight: "600", color: theme.textSecondary },
   mutedText: { fontSize: 13, color: theme.textSecondary },
@@ -618,14 +648,6 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
   budgetName: { fontSize: 14, fontWeight: "600", color: theme.text },
   budgetAmounts: { fontSize: 12, color: theme.textSecondary },
   budgetBar: { marginTop: Spacing.sm },
-  budgetFooter: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-    paddingTop: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: theme.borderLight,
-  },
   footerSecondaryBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -636,6 +658,7 @@ const getStyles = (theme: ThemeColors) => StyleSheet.create({
     borderRadius: Radius.pill,
     borderWidth: 1,
     borderColor: theme.border,
+    backgroundColor: theme.surface,
   },
   footerSecondaryBtnText: { fontSize: 13, fontWeight: "600", color: theme.textSecondary },
   footerPrimaryBtn: {
